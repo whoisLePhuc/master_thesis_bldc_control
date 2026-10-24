@@ -62,7 +62,7 @@ master_thesis_bldc_control/
 │   │   └── PDF/               # compiled PDFs
 │   └── Thesis/
 │       └── figures/           # all figures (draw.io source, PNG exports, Simulink screenshots, plots)
-├── 02_References/             # papers, datasheets, standards; references.bib
+├── 02_References/             # references.bib (paper PDFs are kept locally, not tracked)
 ├── 03_Simulation/             # one folder per control strategy (see 03_Simulation/README.md)
 │   ├── Common/                # shared parameters, scenarios, run helper, metrics, plant library (bldc_plant_lib.slx)
 │   ├── Tests/                 # regression test of all controllers (bldc_regression)
@@ -71,10 +71,9 @@ master_thesis_bldc_control/
 │   └── Six_Step/
 ├── 04_Results/
 │   ├── make_results.m         # KPI tables + figures fig7_* from the raw results
+│   ├── make_six_step_figures.m # figures fig8_* and numbers of document 06
 │   ├── Raw/                   # <scenario>_<controller>.mat (generated, not tracked)
-│   ├── Figures/
-│   └── Tables/                # kpi_comparison.{csv,md,tex}, metrics_all.csv
-├── 05_Admin/                  # forms, decisions, deadlines
+│   └── Tables/                # kpi_comparison.{csv,md,tex}, metrics_all.csv, six_step_numbers.csv
 └── .vscode/settings.json      # LaTeX Workshop: XeLaTeX via latexmk, output in build/
 ```
 
@@ -100,6 +99,9 @@ run_conv_foc                        % scenarios S1–S4 -> 04_Results/Raw/S*_con
 run_comp_foc                        % scenarios S1–S4 -> 04_Results/Raw/S*_comp.mat
 SCEN_LIST = {'S2'}; run_comp_foc    % a single scenario
 DO_CALIB = true;   run_comp_foc     % re-tune the look-up-table phase (TAB_SHIFT) first
+
+% from 03_Simulation/Six_Step
+run_six_step                        % scenarios S1–S4 -> 04_Results/Raw/S*_six.mat
 ```
 
 To run a model interactively, initialise a scenario and press **Run** in Simulink:
