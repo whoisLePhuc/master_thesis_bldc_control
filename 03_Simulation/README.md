@@ -10,6 +10,7 @@ and the same test scenarios S1–S4, so that results are directly comparable.
 |---|---|---|
 | `Conventional_FOC/` | Two PI current controllers + cross-coupling + constant fundamental back-EMF compensation (ω_e λ_1) | Sec. 5, Fig. 5.1 |
 | `Compensated_FOC/` | Conventional FOC + angle-based back-EMF compensation (LUT g_d, g_q), digital-delay compensation (θ_p, θ_a) and i_q current shaping (k_s) | Sec. 6, Fig. 6.2 |
+| `Six_Step/` | 120° six-step: Hall sectors (from the encoder angle), PI on the two-phase current I = ½·sᵀi_abc, back-EMF feed-forward 2λω_e, H_PWM–L_ON | – (doc planned) |
 
 ## Adding a new controller
 
@@ -44,6 +45,11 @@ Compensated_FOC/
 ├── comp_foc_calib.mat     # calibrated THETA_OFF, TAB_SHIFT
 └── run_comp_foc.m         # run S1-S4, save 04_Results/Raw/<SCEN>_comp.mat
                            # (DO_CALIB = true: re-tune TAB_SHIFT first)
+
+Six_Step/
+├── Six_Step.slx           # model (powergui discrete 1 us); plant blocks are links to bldc_plant_lib
+├── six_step_init.m        # common P + six-step gains (Kt = 2*p*lam, current/speed PI) and Hall table SS
+└── run_six_step.m         # run S1-S4, save 04_Results/Raw/<SCEN>_six.mat
 
 Tests/
 ├── bldc_controllers.m     # registry of implemented controllers (model, folder, init script, variables)
@@ -91,6 +97,10 @@ When a new controller is added, register it in `bldc_controllers.m` and create i
 | Outports `w`, `Te`, `i_abc` | speed, torque, phase currents (sample time `DECIM*P.dt`) |
 | Outports `idq`, `iq_ref`, `iq_cmd` | d-q currents, speed-loop output, final current reference |
 
+Six-step uses the same interface: `iq_ref` = `iq_cmd` = current reference I* of the two conducting phases
+(speed-loop output), `idq` = Park transform of the measured currents (for comparison only);
+an extra Outport `i_dc` (port 7) logs the measured current I.
+
 ## Test scenarios
 
 | ID | Description |
@@ -103,7 +113,7 @@ When a new controller is added, register it in `bldc_controllers.m` and create i
 ## Output naming
 
 Results are saved to `04_Results/Raw/` as `<scenario>_<controller>.mat`,
-e.g. `S2_conv.mat`, `S2_comp.mat` (use a short, unique tag for each new controller).
+e.g. `S2_conv.mat`, `S2_comp.mat`, `S2_six.mat` (use a short, unique tag for each new controller).
 
 ## Requirements
 

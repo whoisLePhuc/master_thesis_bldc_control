@@ -66,16 +66,17 @@ V  = nan(nI, numel(C));
 for i = 1:nI
     for c = 1:numel(C), V(i, c) = KPI.(IND{i,1}).(tags{c}).(IND{i,2}); end
 end
-chg = 100*(V(:, end) - V(:, 1))./abs(V(:, 1));          % last controller vs first (comp vs conv)
+iA = find(strcmp(tags, 'conv')); iB = find(strcmp(tags, 'comp'));
+chg = 100*(V(:, iB) - V(:, iA))./abs(V(:, iA));        % compensated vs conventional FOC
 
 fmt = @(x, f) ifelse(isnan(x), '–', sprintf(f, x));
 % CSV (machine readable)
 T = cell2table([IND(:,1) IND(:,2) IND(:,3) IND(:,4) num2cell(V) num2cell(chg)], ...
-    'VariableNames', [{'Scenario', 'Key', 'Indicator', 'Unit'}, tags, {'Change_pct'}]);
+    'VariableNames', [{'Scenario', 'Key', 'Indicator', 'Unit'}, tags, {'Change_comp_vs_conv_pct'}]);
 writetable(T, fullfile(tabDir, 'kpi_comparison.csv'), 'Encoding', 'UTF-8');
 % Markdown and LaTeX (Vietnamese decimal comma)
 vn = @(s) strrep(s, '.', ',');
-md  = {sprintf('| KB | Chỉ tiêu | %s | Thay đổi |', strjoin({C.name}, ' | ')), ...
+md  = {sprintf('| KB | Chỉ tiêu | %s | Thay đổi (bù so với thường) |', strjoin({C.name}, ' | ')), ...
        ['|---|---|' repmat('---:|', 1, numel(C)) '---:|']};
 tex = {};
 for i = 1:nI

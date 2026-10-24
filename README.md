@@ -67,7 +67,8 @@ master_thesis_bldc_control/
 │   ├── Common/                # shared parameters, scenarios, run helper, metrics, plant library (bldc_plant_lib.slx)
 │   ├── Tests/                 # regression test of all controllers (bldc_regression)
 │   ├── Conventional_FOC/
-│   └── Compensated_FOC/
+│   ├── Compensated_FOC/
+│   └── Six_Step/
 ├── 04_Results/
 │   ├── make_results.m         # KPI tables + figures fig7_* from the raw results
 │   ├── Raw/                   # <scenario>_<controller>.mat (generated, not tracked)
@@ -138,7 +139,8 @@ PDFs are written to `01_Documents/Theory/PDF/`. See [`01_Documents/Theory/Latex/
 |---|---|---|---|
 | **Conventional FOC** | Two PI current controllers (IMC tuning), cross-coupling decoupling, constant fundamental back-EMF feedforward $\omega_e\lambda_1$ | [`03_Simulation/Conventional_FOC`](03_Simulation/Conventional_FOC) | ✅ S1–S4 |
 | **Compensated FOC** | Conventional FOC + trapezoidal back-EMF feedforward from look-up tables $g_d$, $g_q$, digital-delay compensation $\theta_p$, $\theta_a$, and $i_q$ shaping $i_q^{**} = k_s\,i_q^*$ | [`03_Simulation/Compensated_FOC`](03_Simulation/Compensated_FOC) | ✅ S1–S4 |
-| *Six-step, DTC, MPC, …* | Planned / open for extension | – | – |
+| **Six-step** | 120° trapezoidal commutation from Hall sectors, PI control of the two-phase current, back-EMF feed-forward, H_PWM–L_ON modulation | [`03_Simulation/Six_Step`](03_Simulation/Six_Step) | ✅ S1–S4 |
+| *DTC, MPC, …* | Planned / open for extension | – | – |
 
 Common setup: 8 pole-pair BLDC motor (R = 0.4578 Ω, L = 3.33 mH, λ = 0.171 Wb), 36 V IGBT inverter, SVPWM at 10 kHz, current loop 10 kHz, speed loop 1 kHz, Simscape PMSM block with 120° flat-top back-EMF.
 
