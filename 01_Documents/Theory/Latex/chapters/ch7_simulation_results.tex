@@ -1,0 +1,169 @@
+% !TEX root = ../05_simulation_results.tex
+% ch7_simulation_results.tex -- Chương 7 (nguồn: Markdown/05_simulation_results.md, chuyển sang LaTeX)
+% Compiled from ../05_simulation_results.tex
+
+\section{Mô phỏng và thảo luận}\label{sec:7}
+
+\subsection{Thiết lập mô phỏng}\label{sec:7.1}
+
+Hai bộ điều khiển được mô phỏng trên cùng một mô hình đối tượng (thư viện \texttt{bldc\_plant\_lib.slx} trong thư mục \texttt{03\_Simulation/Common}):
+
+\begin{itemize}[leftmargin=*]
+\item nghịch lưu ba pha IGBT/diode chuyển mạch từng van, nguồn DC 36 V;
+\item khối PMSM back-EMF hình thang, đỉnh phẳng 120° (Simscape Electrical – Specialized Power Systems), thông số ở Bảng 5.3 (Tài liệu 03);
+\item \texttt{powergui} rời rạc, bước 1 $\mu$s; PWM và vòng dòng 10 kHz; vòng tốc độ 1 kHz;
+\item PI dòng, PI tốc độ, giới hạn điện áp và SVPWM \textbf{giống hệt nhau} ở hai bộ điều khiển. Khác biệt cấu trúc chỉ nằm ở khối bộ điều khiển dòng (Bảng 6.1, Tài liệu 04).
+\end{itemize}
+
+Các chỉ tiêu được đánh giá trên bốn kịch bản:
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{S1:} khởi động không tải, tham chiếu 0 $\to$ 100 vòng/phút tại 0,02 s;
+\item \textbf{S2:} tốc độ 100 vòng/phút, đóng tải 1 N$\cdot$m tại 0,3 s và cắt tải tại 0,6 s;
+\item \textbf{S3:} đảo chiều +100 $\to$ $-$100 vòng/phút tại 0,3 s;
+\item \textbf{S4:} tham chiếu bậc thang 30 $\to$ 60 $\to$ 100 $\to$ 60 $\to$ 30 vòng/phút, tải 0,5 N$\cdot$m.
+\end{itemize}
+
+\subsection{Định nghĩa các chỉ tiêu}\label{sec:7.2}
+
+Các chỉ tiêu được tính bằng hàm \texttt{Common/bldc\_kpi.m} (dựa trên \texttt{Common/bldc\_metrics.m}) từ dữ liệu ghi với bước 10 $\mu$s. Mô-men được lấy trung bình trượt trên một chu kỳ PWM (100 $\mu$s) trước khi tính gợn và phổ, để loại gợn tần số chuyển mạch.
+
+\begin{table}[H]
+\centering\small
+\caption{Định nghĩa các chỉ tiêu.}\label{tab:7.1}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+Chỉ tiêu & Định nghĩa \\ \midrule
+Thời gian lên & Từ 10 \% đến 90 \% của bước tham chiếu tốc độ (S1) \\
+Độ quá điều chỉnh & $(\omega_{max} - \omega^*)/\omega^*$ (S1); với S3 là phần vượt quá $-$100 vòng/phút \\
+Thời gian xác lập / phục hồi & Thời điểm sau đó tốc độ ở trong dải $\pm$2 vòng/phút quanh giá trị đặt cho tới hết đoạn đánh giá (ít nhất 20 ms); "–" nếu không đạt \\
+Gợn tốc độ, gợn mô-men, gợn $i_q$ & Giá trị đỉnh–đỉnh (và RMS với mô-men) trong cửa sổ xác lập: S1 0,20–0,40 s; S2 0,45–0,58 s; S3 0,50–0,70 s; S4 1,10–1,25 s \\
+Độ sụt tốc & Chênh lệch giữa tốc độ đặt và tốc độ nhỏ nhất trong 150 ms sau khi đóng tải \\
+Biên độ gợn bậc 6 & Biên độ thành phần $f_6 = 6f_e$ (80 Hz tại 100 vòng/phút) của mô-men, theo \eqref{eq:7.1}, trên 10 chu kỳ $f_6$ từ 0,45 s \\
+THD dòng pha & Theo \eqref{eq:7.2} với dòng $i_a$, bậc 2–41, trên 2 chu kỳ điện từ 0,45 s \\
+Thời gian qua tốc độ 0 & Từ lệnh đảo chiều (0,3 s) tới khi tốc độ đổi dấu (S3) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Biên độ của thành phần tần số $f$ trong cửa sổ $[t_1, t_1 + T_w]$, với $T_w$ là bội nguyên của $1/f$, được tính bằng DFT một điểm:
+
+\begin{equation}
+A(f) = \frac{2}{N}\left|\sum_{k} \big(x_k - \bar{x}\big)\, e^{-j 2\pi f t_k}\right|,
+\tag{7.1}\label{eq:7.1}
+\end{equation}
+
+và độ méo hài tổng của dòng pha với tần số cơ bản $f_e = p\,n/60$:
+
+\begin{equation}
+\mathrm{THD} = \frac{\sqrt{\sum_{h=2}^{41} A(h f_e)^2}}{A(f_e)} \times 100\ \%.
+\tag{7.2}\label{eq:7.2}
+\end{equation}
+
+\subsection{Kết quả}\label{sec:7.3}
+
+Bảng~\ref{tab:7.2} tổng hợp các chỉ tiêu; các hình 7.1–7.6 minh họa đáp ứng.
+
+\begin{table}[H]
+\centering\small
+\caption{Chỉ tiêu chất lượng của hai bộ điều khiển (KB: kịch bản). "–": không vào được dải $\pm$2 vòng/phút vì dao động xác lập lớn hơn dải. Thay đổi tính theo FOC bù so với FOC thông thường.}\label{tab:7.2}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+KB & Chỉ tiêu & FOC thông thường & FOC bù & Thay đổi \\ \midrule
+S1 & Thời gian lên (ms) & 4,74 & 4,82 & +2 \% \\
+S1 & Độ quá điều chỉnh (\%) & 18,0 & 16,9 & $-$6 \% \\
+S1 & Thời gian xác lập $\pm$2 vòng/phút (ms) & – & 42,3 &  \\
+S1 & Gợn tốc độ không tải (vòng/phút) & 8,42 & 0,49 & $-$94 \% \\
+S1 & Gợn mô-men không tải đ–đ (N$\cdot$m) & 0,767 & 0,137 & $-$82 \% \\
+S2 & Độ sụt tốc khi đóng tải (vòng/phút) & 22,9 & 21,1 & $-$8 \% \\
+S2 & Thời gian phục hồi $\pm$2 vòng/phút (ms) & – & 39,9 &  \\
+S2 & Gợn mô-men đỉnh–đỉnh (N$\cdot$m) & 0,642 & 0,153 & \textbf{$-$76 \%} \\
+S2 & Gợn mô-men RMS (N$\cdot$m) & 0,177 & 0,030 & \textbf{$-$83 \%} \\
+S2 & Biên độ gợn bậc 6, 80 Hz (N$\cdot$m) & 0,239 & 0,022 & \textbf{$-$91 \%} \\
+S2 & Gợn tốc độ đỉnh–đỉnh (vòng/phút) & 6,90 & 0,87 & \textbf{$-$87 \%} \\
+S2 & THD dòng pha, bậc 2–41 (\%) & 22,0 & 5,6 & $-$75 \% \\
+S3 & Thời gian qua tốc độ 0 (ms) & 2,81 & 2,63 & $-$7 \% \\
+S3 & Độ vọt lố khi đảo chiều (\%) & 33,8 & 32,4 & $-$4 \% \\
+S3 & Dòng pha đỉnh (A) & 2,56 & 2,72 & +6 \% \\
+S4 & Thời gian xác lập TB các bậc (ms) & – & 33,7 &  \\
+S4 & Gợn tốc độ ở 30 vòng/phút (vòng/phút) & 3,62 & 0,81 & $-$78 \% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig7_1_S2_torque.png}
+\caption{Mô-men điện từ ở chế độ xác lập có tải 1 N$\cdot$m, 100 vòng/phút (S2, trung bình một chu kỳ PWM). FOC thông thường gợn 0,64 N$\cdot$m đỉnh–đỉnh với chu kỳ 12,5 ms (80 Hz); FOC bù còn 0,15 N$\cdot$m.}\label{fig:7.1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig7_2_S2_idq.png}
+\caption{Dòng $i_d$, $i_q$ trong đoạn có tải (S2). (a) FOC thông thường: $i_q$ dao động khoảng 0,30 A đỉnh–đỉnh ngoài ý muốn do nhiễu back-EMF (cơ chế 1); dòng đặt $i_q^*$ cũng dao động vì PI tốc độ phản ứng với gợn tốc độ. (b) FOC bù: $i_q$ bám sát $i_q^{**}$ đã định dạng (đường đứt); dao động nhỏ của $i_q$ là có chủ đích.}\label{fig:7.2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig7_3_S2_speed_spectrum.png}
+\caption{Kịch bản S2: (a) tốc độ; (b) phổ biên độ của gợn mô-men trong đoạn có tải. Thành phần 80 Hz (bậc 6) chiếm ưu thế ở FOC thông thường và gần như bị triệt ở FOC bù.}\label{fig:7.3}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig7_4_S2_phase_currents.png}
+\caption{Dòng ba pha trong đoạn có tải (S2). Dòng pha của FOC thông thường bị méo rõ do dao động bậc 6 của $i_q$; dòng của FOC bù gần với dạng sin có định dạng nhẹ.}\label{fig:7.4}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig7_5_speed_S1_S3_S4.png}
+\caption{Đáp ứng tốc độ ở các kịch bản S1, S3, S4: quá độ của hai bộ điều khiển gần như trùng nhau, khác biệt nằm ở dao động xác lập.}\label{fig:7.5}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig7_6_S2_summary.png}
+\caption{Các chỉ tiêu xác lập chính của FOC bù ở kịch bản S2, tính theo phần trăm so với FOC thông thường.}\label{fig:7.6}
+\end{figure}
+
+\subsection{Thảo luận}\label{sec:7.4}
+
+\textbf{Chế độ xác lập.} FOC bù giảm gợn mô-men đỉnh–đỉnh 76 \% (0,642 xuống 0,153 N$\cdot$m), gợn mô-men RMS 83 \% và biên độ thành phần bậc 6 tới 91 \%. Gợn tốc độ giảm 78–94 \% tùy kịch bản, nhờ đó FOC bù xác lập được trong dải $\pm$2 vòng/phút ở các kịch bản S1, S2, S4, điều mà FOC thông thường không đạt được. Độ méo hài dòng pha (bậc 2–41, \cite{r3}) giảm từ 22,0 \% xuống 5,6 \%, vì dao động bậc 6 không mong muốn của $i_q$ (cơ chế 1) bị loại bỏ; dao động còn lại của $i_q$ là thành phần định dạng có chủ đích (Hình~\ref{fig:7.2}). Gợn mô-men còn lại chủ yếu là gợn tần số chuyển mạch PWM và sai lệch bám của vòng dòng đối với tín hiệu định dạng.
+
+\textbf{Chế độ quá độ.} Thời gian lên ($\approx$ 4,8 ms), độ sụt tốc khi đóng tải (21–23 vòng/phút) và thời gian qua điểm 0 khi đảo chiều (2,6–2,8 ms) gần như không đổi. Điều này phù hợp với thiết kế: khâu định dạng giữ nguyên hệ số mô-men trung bình $K_t = \tfrac32 p\lambda_1$, nên vòng tốc độ không bị thay đổi. Dòng pha đỉnh ở S3 của FOC bù lớn hơn 6 \%, phù hợp với việc $i_q^{**}$ được điều chế $\pm$7 \% quanh $i_q^*$ \cite{r2}.
+
+\textbf{Đối chiếu với phân tích lý thuyết.}
+
+\begin{itemize}[leftmargin=*]
+\item \emph{Cơ chế 1 (nhiễu điện áp lên vòng dòng).} Ước lượng ở mục 5.2 cho dao động $i_q \approx 0{,}23$ A đỉnh–đỉnh với FOC thông thường; mô phỏng cho khoảng 0,30 A đỉnh–đỉnh, gồm cả gợn PWM do lấy mẫu và phần dao động thêm của dòng đặt $i_q^*$ (PI tốc độ phản ứng với gợn tốc độ, Hình~\ref{fig:7.2}a).
+\item \emph{Cơ chế 2 (gợn nội tại khi $i_q$ phẳng).} Lý thuyết cho gợn nội tại 14,7 \%. Gợn đo được của FOC thông thường ($\approx$ 64 \% đỉnh–đỉnh) lớn hơn nhiều, cho thấy tại điểm làm việc này cơ chế 1 chiếm ưu thế: dao động $i_q$ khoảng $\pm$0,15 A quanh 0,41 A.
+\item \emph{Tần số gợn.} Phổ mô-men (Hình~\ref{fig:7.3}b) có thành phần chính tại 80 Hz $= 6 f_e$ và các bội 160, 240 Hz, đúng như phân tích ở mục 3.4 \cite{r1}.
+\item \emph{Độ nhạy với góc bảng tra.} Khi hiệu chỉnh \texttt{TAB\_SHIFT} (mục 6.7.4), gợn mô-men đỉnh–đỉnh của FOC bù là 0,153 N$\cdot$m tại 0°, nhưng tăng lên 0,43–0,49 N$\cdot$m khi lệch $\pm$5° và 0,82–0,86 N$\cdot$m khi lệch $\pm$15°, tức còn lớn hơn FOC thông thường. Khâu bù chỉ hiệu quả khi góc đo chính xác tới vài độ điện.
+\end{itemize}
+
+\subsection{Hạn chế của nghiên cứu mô phỏng}\label{sec:7.5}
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Động cơ lý tưởng.} Back-EMF là hình thang lý tưởng và bảng tra được dựng từ chính dạng sóng đó, nên khâu bù khớp hoàn toàn với đối tượng. Với động cơ thực, cần dựng bảng tra từ back-EMF đo được (Tài liệu 04, ghi chú hạn chế).
+\item \textbf{Cảm biến lý tưởng.} Góc và tốc độ lấy trực tiếp từ mô hình (encoder lý tưởng, không nhiễu, không lượng tử hóa); dòng đo không nhiễu.
+\item \textbf{Nghịch lưu.} Không có thời gian chết và sụt áp van ($R_{on}$ = 1 m$\Omega$, điện áp thuận bằng 0); các phi tuyến này sẽ thêm gợn ở bậc 6 trong thực tế.
+\item \textbf{Dải tốc độ.} Các kịch bản chỉ tới $\pm$100 vòng/phút; ở S3, khi vọt lố tới $\approx$ 130 vòng/phút, tốc độ đã vượt giới hạn điện áp của FOC ($V_{dc}/(\sqrt3\,p\lambda_1) \approx 119$ vòng/phút) nên vòng dòng bão hòa ở cả hai bộ điều khiển. Vai trò của bù trễ số (6.3), (6.5) chỉ thể hiện rõ ở tốc độ cao hơn.
+\item \textbf{Bão hòa hai lần.} PI dòng tự giới hạn $\pm$$V_{dc}/\sqrt3$ trước khi cộng phần bù, nên cơ chế chống bão hòa không thấy giới hạn của tổng điện áp (Tài liệu 03, mục 5.3.4). Ở 100 vòng/phút ảnh hưởng không đáng kể.
+\end{enumerate}
+
+\subsection{Tái lập kết quả}\label{sec:7.6}
+
+Toàn bộ bảng và hình của tài liệu này được tạo tự động từ dữ liệu mô phỏng:
+
+\begin{Verbatim}
+% 1. chạy mô phỏng (mỗi bộ điều khiển khoảng 30-60 s)
+run('03_Simulation/Conventional_FOC/run_conv_foc.m')
+run('03_Simulation/Compensated_FOC/run_comp_foc.m')
+% 2. tính chỉ tiêu, xuất bảng và hình
+run('04_Results/make_results.m')
+% 3. (tùy chọn) kiểm tra hồi quy
+addpath('03_Simulation/Tests'); bldc_regression('Scenarios', {'S1','S2','S3','S4'})
+\end{Verbatim}
+
+\texttt{make\_results.m} ghi bảng chỉ tiêu vào \texttt{04\_Results/Tables/} (\texttt{kpi\_comparison.csv}, \texttt{.md}, \texttt{.tex} và \texttt{metrics\_all.csv}) và các hình \texttt{fig7\_*.png} vào \texttt{01\_Documents/Thesis/figures/}. Bộ điều khiển mới được đăng ký trong \texttt{Tests/bldc\_controllers.m} sẽ tự động xuất hiện trong bảng.

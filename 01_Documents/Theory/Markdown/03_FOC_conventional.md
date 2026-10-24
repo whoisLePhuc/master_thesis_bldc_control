@@ -8,6 +8,7 @@
 | [02 – Mô hình BLDC trên hệ tọa độ quay](02_dq_model.md) | Chương 3 |
 | **03 – Thiết kế FOC và FOC thông thường** (tài liệu này) | Chương 4, 5 và mô hình Simulink |
 | [04 – FOC bù back-EMF hình thang](04_FOC_compensated.md) | Chương 6 |
+| [05 – Mô phỏng và so sánh](05_simulation_results.md) | Chương 7 |
 
 ---
 

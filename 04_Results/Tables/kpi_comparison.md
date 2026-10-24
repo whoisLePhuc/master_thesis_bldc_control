@@ -1,0 +1,19 @@
+| KB | Chỉ tiêu | Conventional FOC | Compensated FOC | Thay đổi |
+|---|---|---:|---:|---:|
+| S1 | Thời gian lên (ms) | 4,74 | 4,82 | +2 % |
+| S1 | Độ quá điều chỉnh (%) | 18,0 | 16,9 | −6 % |
+| S1 | Thời gian xác lập ±2 vòng/phút (ms) | – | 42,3 |  |
+| S1 | Gợn tốc độ không tải (vòng/phút) | 8,42 | 0,49 | −94 % |
+| S1 | Gợn mô-men không tải đ–đ (N·m) | 0,767 | 0,137 | −82 % |
+| S2 | Độ sụt tốc khi đóng tải (vòng/phút) | 22,9 | 21,1 | −8 % |
+| S2 | Thời gian phục hồi ±2 vòng/phút (ms) | – | 39,9 |  |
+| S2 | Gợn mô-men đỉnh–đỉnh (N·m) | 0,642 | 0,153 | −76 % |
+| S2 | Gợn mô-men RMS (N·m) | 0,177 | 0,030 | −83 % |
+| S2 | Biên độ gợn bậc 6 (80 Hz) (N·m) | 0,239 | 0,022 | −91 % |
+| S2 | Gợn tốc độ đỉnh–đỉnh (vòng/phút) | 6,90 | 0,87 | −87 % |
+| S2 | THD dòng pha (bậc 2–41) (%) | 22,0 | 5,6 | −75 % |
+| S3 | Thời gian qua tốc độ 0 (ms) | 2,81 | 2,63 | −7 % |
+| S3 | Độ vọt lố khi đảo chiều (%) | 33,8 | 32,4 | −4 % |
+| S3 | Dòng pha đỉnh (A) | 2,56 | 2,72 | +6 % |
+| S4 | Thời gian xác lập TB các bậc (ms) | – | 33,7 |  |
+| S4 | Gợn tốc độ ở 30 vòng/phút (vòng/phút) | 3,62 | 0,81 | −78 % |

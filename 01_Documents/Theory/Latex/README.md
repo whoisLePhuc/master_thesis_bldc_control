@@ -1,6 +1,6 @@
 # Theory documents – LaTeX sources
 
-LaTeX version of the four theory documents (same content as `../Markdown/`).
+LaTeX version of the five theory documents (same content as `../Markdown/`).
 Figures are shared with the Markdown version and taken from `../../Thesis/figures/`
 (draw.io exports, Simulink screenshots, MATLAB plots).
 
@@ -12,13 +12,15 @@ Latex/
 │   ├── ch3_dq_model.tex         # Chapter 3
 │   ├── ch4_foc_design.tex       # Chapter 4
 │   ├── ch5_conventional_foc.tex # Chapter 5 (incl. 5.3 Simulink model)
-│   └── ch6_compensated_foc.tex  # Chapter 6 (incl. 6.7 Simulink model)
+│   ├── ch6_compensated_foc.tex  # Chapter 6 (incl. 6.7 Simulink model)
+│   └── ch7_simulation_results.tex # Chapter 7 (results, tables/figures from 04_Results/make_results.m)
 ├── 01_BLDC_model.tex            # main files: title, abstract, TOC, symbols, chapters, references
 ├── 02_dq_model.tex
 ├── 03_FOC_conventional.tex
 ├── 04_FOC_compensated.tex
+├── 05_simulation_results.tex
 ├── latexmkrc                    # XeLaTeX, auxiliary files in build/
-├── build.sh / build.bat         # build all four and copy PDFs to ../PDF/
+├── build.sh / build.bat         # build all documents and copy PDFs to ../PDF/
 └── build/                       # (generated, not tracked)
 ```
 

@@ -2,4 +2,4 @@
 $pdf_mode = 5;          # xelatex
 $out_dir  = 'build';
 $aux_dir  = 'build';
-@default_files = ('01_BLDC_model.tex', '02_dq_model.tex', '03_FOC_conventional.tex', '04_FOC_compensated.tex');
+@default_files = ('01_BLDC_model.tex', '02_dq_model.tex', '03_FOC_conventional.tex', '04_FOC_compensated.tex', '05_simulation_results.tex');

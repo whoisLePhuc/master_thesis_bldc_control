@@ -1,0 +1,43 @@
+% !TeX program = xelatex
+% =====================================================================
+%  Tài liệu 05 -- Mô phỏng và so sánh FOC thông thường với FOC bù back-EMF hình thang
+%  Biên dịch: latexmk 05_simulation_results.tex   (hoặc xelatex 2 lần)
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+\usepackage{style/foc_style}
+
+\title{\vspace{-1.2cm}\textbf{Mô phỏng và so sánh FOC thông thường với FOC bù back-EMF hình thang}}
+\author{\normalsize Tài liệu 05 -- Bộ tài liệu lý thuyết\\[2pt]
+\small Điều khiển định hướng từ trường cho động cơ BLDC có sức phản điện động hình thang}
+\date{\small Tháng 10 năm 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent Tài liệu so sánh FOC thông thường (Tài liệu 03) và FOC bù back-EMF hình thang (Tài liệu 04) trên cùng một mô hình Simulink ở mức chuyển mạch van, với cùng thông số động cơ, nghịch lưu, bộ PI và bốn kịch bản vận hành S1–S4. Các chỉ tiêu được tính tự động từ dữ liệu mô phỏng bằng các hàm dùng chung của repo, theo định nghĩa thống nhất. Ở chế độ có tải 1 N$\cdot$m, 100 vòng/phút, FOC bù giảm gợn mô-men đỉnh–đỉnh 76 \%, gợn mô-men RMS 83 \%, thành phần gợn bậc 6 tới 91 \%, gợn tốc độ 87 \% và độ méo hài dòng pha 75 \%, trong khi đặc tính quá độ gần như không thay đổi. Kết quả mô phỏng khớp với các ước lượng lý thuyết ở chương 5.
+
+\vspace{0.5em}
+\noindent\textbf{Từ khóa:} BLDC; FOC; back-EMF hình thang; gợn mô-men; mô phỏng Simulink; so sánh chỉ tiêu.
+\end{abstract}
+
+\seriesbox{5}
+
+\tableofcontents
+\newpage
+
+
+
+% ---------------- nội dung ----------------
+\setcounter{section}{6}
+\input{chapters/ch7_simulation_results}
+
+% ---------------- tài liệu tham khảo ----------------
+\begin{thebibliography}{9}
+\small
+\bibitem{r1} T. M. Jahns and W. L. Soong, "Pulsating torque minimization techniques for permanent magnet AC motor drives — A review," \emph{IEEE Trans. Ind. Electron.}, vol. 43, no. 2, pp. 321–330, 1996.
+\bibitem{r2} J. Y. Hung and Z. Ding, "Design of currents to reduce torque ripple in brushless permanent magnet motors," \emph{IEE Proc. B – Electric Power Applications}, vol. 140, no. 4, pp. 260–266, 1993.
+\bibitem{r3} D. G. Holmes and T. A. Lipo, \emph{Pulse Width Modulation for Power Converters: Principles and Practice}. Piscataway, NJ, USA: IEEE Press / Wiley, 2003.
+\end{thebibliography}
+
+\end{document}

@@ -36,7 +36,7 @@ The workspace is **not tied to a single controller**: every strategy lives in it
 
 ## Highlights
 
-Steady state with 1 N·m load at 100 rpm (scenario S2), identical PI gains for both controllers:
+Steady state with 1 N·m load at 100 rpm (scenario S2), identical PI gains for both controllers (full table: [`04_Results/Tables/kpi_comparison.md`](04_Results/Tables/kpi_comparison.md), discussion: theory document 05):
 
 | Metric | Conventional FOC | Compensated FOC | Change |
 |---|---:|---:|---:|
@@ -69,9 +69,10 @@ master_thesis_bldc_control/
 │   ├── Conventional_FOC/
 │   └── Compensated_FOC/
 ├── 04_Results/
+│   ├── make_results.m         # KPI tables + figures fig7_* from the raw results
 │   ├── Raw/                   # <scenario>_<controller>.mat (generated, not tracked)
 │   ├── Figures/
-│   └── Tables/
+│   └── Tables/                # kpi_comparison.{csv,md,tex}, metrics_all.csv
 ├── 05_Admin/                  # forms, decisions, deadlines
 └── .vscode/settings.json      # LaTeX Workshop: XeLaTeX via latexmk, output in build/
 ```
@@ -112,6 +113,12 @@ After changing a model or anything in `03_Simulation/Common`, run the regression
 
 ```matlab
 addpath('03_Simulation/Tests'); bldc_regression    % S2 of every controller vs. stored reference metrics
+```
+
+### Tables and figures of the results
+
+```matlab
+run('04_Results/make_results.m')     % KPI tables -> 04_Results/Tables, figures fig7_* -> Thesis/figures
 ```
 
 ### Build the documentation
@@ -160,6 +167,7 @@ Theory documents (Vietnamese), available as Markdown, LaTeX and PDF:
 | 02 | BLDC model in the rotating $dq$ frame | 3 | [md](01_Documents/Theory/Markdown/02_dq_model.md) | [pdf](01_Documents/Theory/PDF/02_dq_model.pdf) |
 | 03 | FOC design and conventional FOC (+ Simulink model) | 4, 5 | [md](01_Documents/Theory/Markdown/03_FOC_conventional.md) | [pdf](01_Documents/Theory/PDF/03_FOC_conventional.pdf) |
 | 04 | Compensated FOC for trapezoidal back-EMF (+ Simulink model) | 6 | [md](01_Documents/Theory/Markdown/04_FOC_compensated.md) | [pdf](01_Documents/Theory/PDF/04_FOC_compensated.pdf) |
+| 05 | Simulation results and comparison | 7 | [md](01_Documents/Theory/Markdown/05_simulation_results.md) | [pdf](01_Documents/Theory/PDF/05_simulation_results.pdf) |
 
 Equations, figures and tables are numbered by chapter, e.g. (3.3), Fig. 5.2, Table 6.1, consistently across all three formats.
 
