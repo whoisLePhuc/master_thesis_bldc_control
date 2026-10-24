@@ -76,7 +76,7 @@
 \newcommand{\lamf}{\lambda_1}
 
 % ---------- series box (list of documents) ----------
-% \seriesbox{n}: table of the four documents, document n in bold
+% \seriesbox{n}: table of the documents, document n in bold
 \newcommand{\seriesrow}[4]{\ifnum#1=\seriescurrent\gdef\seriesfmt{\bfseries}\else\gdef\seriesfmt{}\fi{\seriesfmt #2} & {\seriesfmt #3} & {\seriesfmt #4}\\}
 \newcommand{\seriesbox}[1]{%
   \def\seriescurrent{#1}%
@@ -89,6 +89,7 @@
   \seriesrow{3}{03}{Thiết kế FOC và FOC thông thường}{4, 5}
   \seriesrow{4}{04}{FOC bù back-EMF hình thang}{6}
   \seriesrow{5}{05}{Mô phỏng và so sánh}{7}
+  \seriesrow{6}{06}{Điều khiển six-step và so sánh ba bộ điều khiển}{8}
   \bottomrule
   \end{tabular}
   \end{center}}

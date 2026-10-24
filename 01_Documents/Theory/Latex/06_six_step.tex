@@ -1,0 +1,45 @@
+% !TeX program = xelatex
+% =====================================================================
+%  Tài liệu 06 -- Điều khiển six-step và so sánh ba bộ điều khiển
+%  Biên dịch: latexmk 06_six_step.tex   (hoặc xelatex 2 lần)
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+\usepackage{style/foc_style}
+
+\title{\vspace{-1.2cm}\textbf{Điều khiển six-step và so sánh ba bộ điều khiển}}
+\author{\normalsize Tài liệu 06 -- Bộ tài liệu lý thuyết\\[2pt]
+\small Điều khiển định hướng từ trường cho động cơ BLDC có sức phản điện động hình thang}
+\date{\small Tháng 10 năm 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent Tài liệu trình bày phương pháp điều khiển six-step (chuyển mạch 120°), là phương pháp kinh điển cho động cơ BLDC có back-EMF hình thang, và so sánh nó với FOC thông thường và FOC bù (Tài liệu 03–05) trên cùng mô hình Simulink mức chuyển mạch van, cùng thông số động cơ, nghịch lưu và bốn kịch bản S1–S4. Bộ điều khiển six-step gồm: xác định sector từ tín hiệu Hall, một bộ PI cho dòng của hai pha đang dẫn, bù sức phản điện động dây và điều chế H\_PWM–L\_ON. Ở chế độ có tải 1 N$\cdot$m, 100 vòng/phút, six-step gần như triệt tiêu gợn bậc 6 liên tục (0,023 N$\cdot$m, bằng FOC bù) nhưng tạo các xung sụt mô-men hẹp 33–39 \% tại mỗi lần chuyển mạch, khớp với công thức giải tích của gợn chuyển mạch. Gợn mô-men RMS của six-step (0,043 N$\cdot$m) thấp hơn nhiều so với FOC thông thường (0,177 N$\cdot$m) và gần FOC bù (0,030 N$\cdot$m), song tổn hao đồng lớn hơn khoảng 11 \% và độ méo hài dòng pha cao (31,6 \%). Đặc tính quá độ của ba bộ điều khiển gần như như nhau.
+
+\vspace{0.5em}
+\noindent\textbf{Từ khóa:} BLDC; six-step; chuyển mạch 120°; cảm biến Hall; gợn mô-men chuyển mạch; FOC; so sánh bộ điều khiển.
+\end{abstract}
+
+\seriesbox{6}
+
+\tableofcontents
+\newpage
+
+
+
+% ---------------- nội dung ----------------
+\setcounter{section}{7}
+\input{chapters/ch8_six_step}
+
+% ---------------- tài liệu tham khảo ----------------
+\begin{thebibliography}{9}
+\small
+\bibitem{r1} R. Carlson, M. Lajoie-Mazenc, and J. C. dos S. Fagundes, "Analysis of torque ripple due to phase commutation in brushless dc machines," \emph{IEEE Trans. Ind. Appl.}, vol. 28, no. 3, pp. 632–638, 1992.
+\bibitem{r2} P. Pillay and R. Krishnan, "Modeling, simulation, and analysis of permanent-magnet motor drives, Part II: The brushless DC motor drive," \emph{IEEE Trans. Ind. Appl.}, vol. 25, no. 2, pp. 274–279, 1989.
+\bibitem{r3} R. Krishnan, \emph{Permanent Magnet Synchronous and Brushless DC Motor Drives}. Boca Raton, FL, USA: CRC Press, 2010.
+\bibitem{r4} T. M. Jahns and W. L. Soong, "Pulsating torque minimization techniques for permanent magnet AC motor drives — A review," \emph{IEEE Trans. Ind. Electron.}, vol. 43, no. 2, pp. 321–330, 1996.
+\bibitem{r5} D. G. Holmes and T. A. Lipo, \emph{Pulse Width Modulation for Power Converters: Principles and Practice}. Piscataway, NJ, USA: IEEE Press / Wiley, 2003.
+\end{thebibliography}
+
+\end{document}

@@ -10,7 +10,7 @@ and the same test scenarios S1–S4, so that results are directly comparable.
 |---|---|---|
 | `Conventional_FOC/` | Two PI current controllers + cross-coupling + constant fundamental back-EMF compensation (ω_e λ_1) | Sec. 5, Fig. 5.1 |
 | `Compensated_FOC/` | Conventional FOC + angle-based back-EMF compensation (LUT g_d, g_q), digital-delay compensation (θ_p, θ_a) and i_q current shaping (k_s) | Sec. 6, Fig. 6.2 |
-| `Six_Step/` | 120° six-step: Hall sectors (from the encoder angle), PI on the two-phase current I = ½·sᵀi_abc, back-EMF feed-forward 2λω_e, H_PWM–L_ON | – (doc planned) |
+| `Six_Step/` | 120° six-step: Hall sectors (from the encoder angle), PI on the two-phase current I = ½·sᵀi_abc, back-EMF feed-forward 2λω_e, H_PWM–L_ON | Sec. 8, Fig. 8.2 |
 
 ## Adding a new controller
 

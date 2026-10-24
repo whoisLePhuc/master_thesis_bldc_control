@@ -13,12 +13,14 @@ Latex/
 │   ├── ch4_foc_design.tex       # Chapter 4
 │   ├── ch5_conventional_foc.tex # Chapter 5 (incl. 5.3 Simulink model)
 │   ├── ch6_compensated_foc.tex  # Chapter 6 (incl. 6.7 Simulink model)
-│   └── ch7_simulation_results.tex # Chapter 7 (results, tables/figures from 04_Results/make_results.m)
+│   ├── ch7_simulation_results.tex # Chapter 7 (results, tables/figures from 04_Results/make_results.m)
+│   └── ch8_six_step.tex         # Chapter 8 (six-step, comparison of three controllers)
 ├── 01_BLDC_model.tex            # main files: title, abstract, TOC, symbols, chapters, references
 ├── 02_dq_model.tex
 ├── 03_FOC_conventional.tex
 ├── 04_FOC_compensated.tex
 ├── 05_simulation_results.tex
+├── 06_six_step.tex
 ├── latexmkrc                    # XeLaTeX, auxiliary files in build/
 ├── build.sh / build.bat         # build all documents and copy PDFs to ../PDF/
 └── build/                       # (generated, not tracked)

@@ -1,0 +1,326 @@
+% ch8_six_step.tex -- Chương 8 (nguồn: Markdown/06_six_step.md, chuyển sang LaTeX)
+% Compiled from ../06_six_step.tex
+
+\section{Điều khiển six-step}\label{sec:8}
+
+\subsection{Nguyên lý chuyển mạch 120°}\label{sec:8.1}
+
+\subsubsection{Mô-men với dòng chữ nhật 120°}\label{sec:8.1.1}
+
+Theo chương 2, sức phản điện động của pha $x \in \{a, b, c\}$ là
+
+\begin{equation}
+e_x = \lambda\,\omega_e\, f_x(\theta_e), \qquad f_a = -F(\theta_e),\quad f_b = -F(\theta_e - 2\pi/3),\quad f_c = -F(\theta_e + 2\pi/3),
+\tag{8.1}\label{eq:8.1}
+\end{equation}
+
+với $F$ là dạng hình thang chuẩn hóa (biên độ 1, đỉnh phẳng 120°, sườn 60°, hàm \texttt{bldc\_trap}). Trong mỗi khoảng 60° điện luôn có đúng hai pha nằm trên đỉnh phẳng (một pha $+1$, một pha $-1$) và một pha nằm trên sườn (Hình~\ref{fig:8.1}a). Six-step đưa dòng vào đúng hai pha có back-EMF phẳng: pha $+1$ mang dòng $+I$, pha $-1$ mang dòng $-I$, pha còn lại thả nổi. Gọi $s_x \in \{-1, 0, +1\}$ là trạng thái dẫn của pha $x$, dòng lý tưởng là $i_x = s_x I$ và mô-men điện từ
+
+\begin{equation}
+T_e = \frac{e_a i_a + e_b i_b + e_c i_c}{\omega_m} = \frac{p\,\lambda\,\omega_m (1\cdot I + (-1)(-I))}{\omega_m} = 2p\lambda\, I = K_{t,6}\, I.
+\tag{8.2}\label{eq:8.2}
+\end{equation}
+
+Mô-men không phụ thuộc góc trong suốt sector, tức không có gợn nếu dòng là chữ nhật lý tưởng. Với thông số ở Bảng 5.3, $K_{t,6} = 2p\lambda = 2{,}736$ N$\cdot$m/A, lớn hơn hệ số mô-men của FOC $K_t = \tfrac32 p\lambda_1 = 2{,}495$ N$\cdot$m/A khoảng 10 \%. Hai hệ số không so sánh trực tiếp được vì $I$ là biên độ dòng chữ nhật còn $i_q$ là biên độ dòng sin; so sánh công bằng theo tổn hao đồng được trình bày ở mục 8.4.
+
+\subsubsection{Tín hiệu Hall và bảng chuyển mạch}\label{sec:8.1.2}
+
+Thời điểm chuyển mạch là các điểm $\theta_e = 30^\circ + k\cdot 60^\circ$, nơi một pha rời đỉnh phẳng và pha khác vừa lên đỉnh phẳng. Ba cảm biến Hall đặt lệch nhau 120° điện cho tín hiệu $H_x = 1$ trong nửa chu kỳ $f_x(\theta_e - 30^\circ) > 0$; các sườn của $H_a$, $H_b$, $H_c$ trùng đúng với sáu điểm chuyển mạch (Hình~\ref{fig:8.1}b). Chỉ số sector được tính từ góc điện:
+
+\begin{equation}
+k = \left\lfloor \frac{\mathrm{mod}(\theta_e - \pi/6,\ 2\pi)}{\pi/3} \right\rfloor \in \{0, \ldots, 5\}.
+\tag{8.3}\label{eq:8.3}
+\end{equation}
+
+Bảng~\ref{tab:8.1} là bảng chuyển mạch, được tạo tự động trong \texttt{six\_step\_init.m} bằng cách lấy dấu của \eqref{eq:8.1} tại tâm mỗi sector.
+
+\begin{table}[H]
+\centering\small
+\caption{Bảng chuyển mạch 120° (thứ tự quay thuận).}\label{tab:8.1}
+\begin{tabular}{@{}llllll@{}}
+\toprule
+Sector & $\theta_e$ (độ) & $H_a H_b H_c$ & Pha $+$ (van trên PWM) & Pha $-$ (van dưới dẫn) & $\mathbf{s}_{abc}$ \\ \midrule
+0 & 30–90 & 010 & b & a & $[-1,\ 1,\ 0]$ \\
+1 & 90–150 & 011 & c & a & $[-1,\ 0,\ 1]$ \\
+2 & 150–210 & 001 & c & b & $[0,\ -1,\ 1]$ \\
+3 & 210–270 & 101 & a & b & $[1,\ -1,\ 0]$ \\
+4 & 270–330 & 100 & a & c & $[1,\ 0,\ -1]$ \\
+5 & 330–30 & 110 & b & c & $[0,\ 1,\ -1]$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Mỗi lần chuyển mạch chỉ đổi một pha: chuyển mạch phía trên (ví dụ sector 4 $\to$ 5, pha dương đổi từ a sang b) và chuyển mạch phía dưới (sector 5 $\to$ 0, pha âm đổi từ c sang a) xen kẽ nhau.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig8_1_hall_commutation.png}
+\caption{(a) Back-EMF chuẩn hóa và các sector S0–S5; (b) tín hiệu Hall; (c) dòng pha lý tưởng của chuyển mạch 120°. Đường chấm là các điểm chuyển mạch $\theta_e = 30^\circ + k\cdot 60^\circ$.}\label{fig:8.1}
+\end{figure}
+
+\begin{ghichu}[Hall và encoder]
+Trong mô hình, sector được tính từ góc encoder theo \eqref{eq:8.3}, tương đương với việc giải mã ba tín hiệu Hall lý tưởng. Cách này giữ nguyên khối Power Stage dùng chung với FOC. Tham số \texttt{COMM\_SHIFT} (rad điện) dịch toàn bộ bảng để mô phỏng sai lệch lắp đặt Hall hoặc góc chuyển mạch sớm (mục 8.7).
+\end{ghichu}
+
+\subsection{Cấu trúc bộ điều khiển}\label{sec:8.2}
+
+Sơ đồ khối của hệ six-step được cho ở Hình~\ref{fig:8.2}. So với FOC (Hình 4.1), six-step không cần biến đổi Clarke/Park, không cần SVPWM và chỉ có một bộ PI dòng.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig8_2_six_step_drive.png}
+\caption{Sơ đồ khối hệ truyền động six-step: vòng tốc độ, vòng dòng hai pha dẫn với bù back-EMF dây, bảng chuyển mạch Hall và điều chế H\_PWM–L\_ON.}\label{fig:8.2}
+\end{figure}
+
+\subsubsection{Đo dòng hai pha dẫn}\label{sec:8.2.1}
+
+Trong khoảng dẫn, dòng hai pha dẫn bằng nhau về độ lớn và ngược dấu. Đại lượng được điều khiển là
+
+\begin{equation}
+I = \tfrac12\,\mathbf{s}^{T}\mathbf{i}_{abc} = \tfrac12\,(s_a i_a + s_b i_b + s_c i_c),
+\tag{8.4}\label{eq:8.4}
+\end{equation}
+
+bằng $I$ khi dòng là chữ nhật lý tưởng và tương đương với dòng một chiều phía nguồn. Dòng ba pha được lấy mẫu ở đáy sóng mang (10 kHz) như ở FOC.
+
+\subsubsection{Vòng dòng và bù back-EMF}\label{sec:8.2.2}
+
+Hai pha dẫn mắc nối tiếp giữa hai cực nghịch lưu. Điện áp dây đặt lên chúng là
+
+\begin{equation}
+v_{xy} = 2R\,I + 2L\,\frac{dI}{dt} + 2\lambda\,\omega_e,
+\tag{8.5}\label{eq:8.5}
+\end{equation}
+
+tức đối tượng là khâu quán tính bậc nhất $1/(2Ls + 2R)$ với nhiễu là back-EMF dây $2\lambda\omega_e$. Bộ điều khiển dòng là PI theo phương pháp IMC (như mục 4.2) cộng thêm bù $2\lambda\omega_e$:
+
+\begin{equation}
+V^* = K_{p,i}\,e_I + K_{i,i}\!\int e_I\,dt + 2\lambda\,\omega_e, \qquad K_{p,i} = \frac{2L}{\tau_c} = 20{,}9\ \text{V/A},\quad K_{i,i} = \frac{2R}{\tau_c} = 2876\ \text{V/(A·s)},
+\tag{8.6}\label{eq:8.6}
+\end{equation}
+
+với cùng $\tau_c = 0{,}318$ ms như FOC, nên băng thông vòng dòng của ba bộ điều khiển như nhau. Đầu ra PI được giới hạn $\pm$$V_{dc}$, chống bão hòa kiểu back-calculation, và tổng $V^*$ được giới hạn $\pm$$V_{dc}$.
+
+\subsubsection{\texorpdfstring{Điều chế H\_PWM–L\_ON}{Điều chế H\_PWM–L\_ON}}\label{sec:8.2.3}
+
+Với chỉ số điều chế $m = V^*/V_{dc} \in [-1, 1]$, hệ số điều chế và tín hiệu cho phép của từng pha là
+
+\begin{equation}
+d_x = \max(s_x\, m,\ 0), \qquad en_x = |s_x|.
+\tag{8.7}\label{eq:8.7}
+\end{equation}
+
+Khi $m > 0$, pha $+$ được băm xung ở van trên với hệ số $m$, pha $-$ có van dưới dẫn liên tục, pha thả nổi bị khóa cả hai van ($en_x = 0$); điện áp dây trung bình là $m V_{dc}$. Khi $m < 0$ (hãm, đảo chiều), vai trò hai pha đổi cho nhau và điện áp dây là $-|m| V_{dc}$. Khối PWM dùng chung là khối so sánh bù (van trên và van dưới của một nhánh đóng ngắt bù nhau), nên trong thời gian van trên của pha $+$ ngắt, van dưới của nó dẫn (chỉnh lưu đồng bộ). Như ở SVPWM, $d_x$ và $en_x$ được trễ một chu kỳ lấy mẫu để mô phỏng thời gian tính toán.
+
+\subsubsection{Vòng tốc độ}\label{sec:8.2.4}
+
+Vòng tốc độ giống FOC (mục 4.3): PI rời rạc 1 kHz, đặt cực tại 20 Hz, $\zeta = 1$, giới hạn dòng $\pm$$I_{max} = 3$ A, nhưng với hệ số mô-men $K_{t,6}$:
+
+\begin{equation}
+K_{p,\omega} = \frac{2\zeta\omega_n J - B}{K_{t,6}} = 0{,}135, \qquad K_{i,\omega} = \frac{J\,\omega_n^2}{K_{t,6}} = 8{,}48.
+\tag{8.8}\label{eq:8.8}
+\end{equation}
+
+Nhờ đó vòng tốc độ của six-step có cùng động học danh định với FOC (FOC: 0,148 và 9,30), và các chỉ tiêu quá độ của ba bộ điều khiển so sánh được với nhau.
+
+\subsection{Gợn mô-men do chuyển mạch}\label{sec:8.3}
+
+Dòng chữ nhật lý tưởng không thể đạt được vì điện cảm pha làm dòng pha ra giảm và dòng pha vào tăng với tốc độ hữu hạn. Xét chuyển mạch phía trên từ sector 4 sang 5 (pha $+$ đổi từ a sang b, pha c dẫn liên tục ở van dưới). Ngay sau chuyển mạch, dòng $i_a > 0$ của pha ra tiếp tục chảy qua diode dưới ($v_a = 0$), van trên pha b dẫn với hệ số $d$, van dưới pha c dẫn ($v_c = 0$); $e_a \approx e_b \approx E$, $e_c = -E$ với $E = \lambda\omega_e$. Bỏ qua điện trở, điện áp điểm trung tính là $v_n = (dV_{dc} - E)/3$ và
+
+\begin{equation}
+L\frac{di_a}{dt} = -\frac{dV_{dc} + 2E}{3}, \qquad L\frac{d|i_c|}{dt} = \frac{dV_{dc} - 4E}{3}.
+\tag{8.9}\label{eq:8.9}
+\end{equation}
+
+Mô-men trong khoảng chuyển mạch tỉ lệ với dòng pha không chuyển mạch: $T_e = 2p\lambda\,|i_c|$. Khoảng chuyển mạch kết thúc khi $i_a = 0$, sau $t_c = 3LI/(dV_{dc} + 2E)$; khi đó $|i_c|$ đã thay đổi một lượng tương đối
+
+\begin{equation}
+\frac{\Delta T_e}{T_e} = \frac{\Delta |i_c|}{I} = \frac{d\,V_{dc} - 4E}{d\,V_{dc} + 2E}.
+\tag{8.10}\label{eq:8.10}
+\end{equation}
+
+Với $d = 1$ (bộ PI dòng bão hòa), \eqref{eq:8.10} trở thành công thức kinh điển của Carlson và cộng sự \cite{r1}; chuyển mạch phía dưới cho cùng kết quả khi $d = 1$. Từ \eqref{eq:8.10}:
+
+\begin{itemize}[leftmargin=*]
+\item $V_{dc} > 4E$ (tốc độ thấp): dòng pha không chuyển mạch tăng, mô-men nhô lên;
+\item $V_{dc} = 4E$: không có gợn chuyển mạch; với động cơ này điều đó xảy ra tại $\omega_m = V_{dc}/(4p\lambda) = 62{,}8$ vòng/phút;
+\item $V_{dc} < 4E$ (tốc độ cao): mô-men sụt.
+\end{itemize}
+
+Tại 100 vòng/phút, $E = 14{,}3$ V, $4E = 57{,}3$ V > $V_{dc} = 36$ V, nên \eqref{eq:8.10} dự báo mô-men sụt ít nhất 33 \% tại mỗi lần chuyển mạch. Vì gợn này lặp lại sáu lần mỗi chu kỳ điện, tần số cơ bản của nó cũng là $6 f_e$, nhưng các xung rất hẹp ($t_c = 3LI/(V_{dc}+2E) \approx 0{,}06$ ms tại 1 N$\cdot$m, 100 vòng/phút) nên biên độ thành phần bậc 6 nhỏ.
+
+\subsection{Tổn hao đồng so với FOC}\label{sec:8.4}
+
+So sánh hai cách cấp dòng cho cùng mô-men $T$, bỏ qua gợn:
+
+\begin{itemize}[leftmargin=*]
+\item six-step: $I = T/(2p\lambda)$, mỗi pha dẫn 2/3 chu kỳ nên $I_{rms}^2 = \tfrac23 I^2$ và $P_{Cu,6} = 3R\,I_{rms}^2 = 2R\,I^2$;
+\item FOC với dòng sin: $i_q = T/(\tfrac32 p\lambda_1)$ và $P_{Cu,FOC} = \tfrac32 R\,i_q^2$.
+\end{itemize}
+
+Tỉ số tổn hao đồng là
+
+\begin{equation}
+\frac{P_{Cu,6}}{P_{Cu,FOC}} = \frac{2R\,T^2/(2p\lambda)^2}{\tfrac32 R\,T^2/(\tfrac32 p\lambda_1)^2} = \frac34\left(\frac{\lambda_1}{\lambda}\right)^2 = \frac34\, b_1^2 = 1{,}109,
+\tag{8.11}\label{eq:8.11}
+\end{equation}
+
+với $b_1 = 12/\pi^2$ (chương 2). Với back-EMF hình thang có sườn 60°, dòng sin cho cùng mô-men với tổn hao đồng ít hơn khoảng 10 \% so với dòng chữ nhật 120°. Nguyên nhân là phần sườn chiếm 1/3 chu kỳ, nên dạng sóng này còn khá gần sin và thành phần cơ bản của nó đã chứa phần lớn năng lượng ($b_1^2/2 \big/ \overline{f^2} = 0{,}95$). Ưu thế của dòng chữ nhật chỉ xuất hiện khi đỉnh phẳng rộng hơn, sườn dốc hơn.
+
+\subsection{Mô hình Simulink}\label{sec:8.5}
+
+Mô hình \texttt{Six\_Step.slx} nằm trong thư mục \texttt{03\_Simulation/Six\_Step} và được dựng theo quy trình thêm bộ điều khiển mới của repo. Các khối Power Stage, PWM và abc\_to\_dq là liên kết tới thư viện dùng chung \texttt{bldc\_plant\_lib.slx}; mô hình dùng \texttt{powergui} rời rạc 1 $\mu$s và có giao diện cổng giống hai mô hình FOC (Hình~\ref{fig:8.3}). Khối abc\_to\_dq chỉ dùng để ghi $i_d$, $i_q$ phục vụ so sánh và không tham gia điều khiển. Cổng ra thêm \texttt{i\_dc} (cổng 7) ghi dòng đo $I$ theo \eqref{eq:8.4}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig8_sim_six_root.png}
+\caption{Tầng ngoài cùng của mô hình \texttt{Six\_Step.slx}. Khối Six-Step Ctrl thay cho Current PI và SVPWM của mô hình FOC; Speed PI, PWM, Power Stage và phần đo góc/tốc độ được giữ nguyên.}\label{fig:8.3}
+\end{figure}
+
+Khối Six-Step Ctrl (Hình~\ref{fig:8.4}) hiện thực trực tiếp các phương trình \eqref{eq:8.3}, \eqref{eq:8.4}, \eqref{eq:8.6} và \eqref{eq:8.7}: chuỗi \texttt{th\_shift}–\texttt{mod\_2pi}–\texttt{to\_sector}–\texttt{floor}–\texttt{sat\_0\_5} tính sector, khối tra trực tiếp \texttt{Hall table} (bảng \texttt{SS.tab} 3$\times$6) cho $\mathbf{s}_{abc}$, nhánh \texttt{s.*i}–\texttt{sum\_si}–\texttt{half} tính $I$, khối \texttt{PI\_I} cộng bù \texttt{2lam} tạo $V^*$, và nhánh \texttt{s*m}–\texttt{max0}, \texttt{abs\_s} tạo $d_{abc}$, $en_{abc}$ qua hai khâu trễ \texttt{z\_duty}, \texttt{z\_en}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig8_sim_six_ctrl.png}
+\caption{Khối Six-Step Ctrl: xác định sector, bảng chuyển mạch, đo dòng hai pha dẫn, PI dòng với bù back-EMF và điều chế H\_PWM–L\_ON.}\label{fig:8.4}
+\end{figure}
+
+\begin{table}[H]
+\centering\small
+\caption{Tham số của bộ điều khiển six-step (\texttt{six\_step\_init.m}). Thông số động cơ, nghịch lưu và chu kỳ lấy mẫu lấy từ \texttt{Common/bldc\_params.m}.}\label{tab:8.2}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}Xl@{}}
+\toprule
+Tham số & Ký hiệu trong mã & Giá trị \\ \midrule
+Hệ số mô-men $K_{t,6} = 2p\lambda$ & \texttt{P.Kt\_6s} & 2,736 N$\cdot$m/A \\
+PI dòng $K_{p,i}$, $K_{i,i}$ & \texttt{P.Kp\_i6}, \texttt{P.Ki\_i6} & 20,9 V/A; 2876 V/(A$\cdot$s) \\
+PI tốc độ $K_{p,\omega}$, $K_{i,\omega}$ & \texttt{P.Kp\_w\_6s}, \texttt{P.Ki\_w\_6s} & 0,135; 8,48 \\
+Bảng chuyển mạch (Bảng~\ref{tab:8.1}) & \texttt{SS.tab} & ma trận 3$\times$6 \\
+Biên sector đầu tiên & \texttt{SS.th0} & $\pi/6$ \\
+Dịch góc chuyển mạch & \texttt{SS.shift} (\texttt{COMM\_SHIFT}) & 0 \\
+Giới hạn điện áp, dòng & \texttt{P.Vdc}, \texttt{P.Imax} & 36 V; 3 A \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Kết quả mô phỏng và so sánh ba bộ điều khiển}\label{sec:8.6}
+
+Ba bộ điều khiển được mô phỏng trên cùng đối tượng và cùng bốn kịch bản S1–S4 như chương 7; các chỉ tiêu được tính bằng cùng hàm \texttt{Common/bldc\_kpi.m} theo các định nghĩa ở Bảng 7.1.
+
+\begin{table}[H]
+\centering\small
+\caption{Chỉ tiêu chất lượng của ba bộ điều khiển (KB: kịch bản). "–": không vào được dải $\pm$2 vòng/phút.}\label{tab:8.3}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+KB & Chỉ tiêu & FOC thông thường & FOC bù & Six-step \\ \midrule
+S1 & Thời gian lên (ms) & 4,74 & 4,82 & 4,73 \\
+S1 & Độ quá điều chỉnh (\%) & 18,0 & 16,9 & 17,9 \\
+S1 & Thời gian xác lập $\pm$2 vòng/phút (ms) & – & 42,3 & 39,0 \\
+S1 & Gợn tốc độ không tải (vòng/phút) & 8,42 & 0,49 & 0,86 \\
+S1 & Gợn mô-men không tải đ–đ (N$\cdot$m) & 0,767 & 0,137 & 0,142 \\
+S2 & Độ sụt tốc khi đóng tải (vòng/phút) & 22,9 & 21,1 & 20,8 \\
+S2 & Thời gian phục hồi $\pm$2 vòng/phút (ms) & – & 39,9 & 36,5 \\
+S2 & Gợn mô-men đỉnh–đỉnh (N$\cdot$m) & 0,642 & 0,153 & 0,447 \\
+S2 & Gợn mô-men RMS (N$\cdot$m) & 0,177 & 0,030 & 0,043 \\
+S2 & Biên độ gợn bậc 6, 80 Hz (N$\cdot$m) & 0,239 & 0,022 & 0,023 \\
+S2 & Gợn tốc độ đỉnh–đỉnh (vòng/phút) & 6,90 & 0,87 & 1,16 \\
+S2 & THD dòng pha, bậc 2–41 (\%) & 22,0 & 5,6 & 31,6 \\
+S2 & Dòng pha RMS (A) & 0,296 & 0,286 & 0,302 \\
+S2 & Tổn hao đồng (W) & 0,121 & 0,113 & 0,125 \\
+S3 & Thời gian qua tốc độ 0 (ms) & 2,81 & 2,63 & 2,61 \\
+S3 & Độ vọt lố khi đảo chiều (\%) & 33,8 & 32,4 & 30,0 \\
+S3 & Dòng pha đỉnh (A) & 2,56 & 2,72 & 2,81 \\
+S4 & Thời gian xác lập TB các bậc (ms) & – & 33,7 & 28,3 \\
+S4 & Gợn tốc độ ở 30 vòng/phút (vòng/phút) & 3,62 & 0,81 & 2,02 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig8_5_S2_torque_3ctrl.png}
+\caption{Mô-men điện từ ở chế độ xác lập có tải 1 N$\cdot$m, 100 vòng/phút (S2, trung bình một chu kỳ PWM) của ba bộ điều khiển. Six-step có mô-men gần phẳng xen kẽ các xung sụt hẹp mỗi 12,5 ms (mỗi lần chuyển mạch).}\label{fig:8.5}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig8_6_commutation_zoom.png}
+\caption{Một lần chuyển mạch phía trên của six-step (S2, pha $+$ đổi từ a sang b). (a) Dòng pha ra $i_a$ giảm về 0 trong khoảng 0,1 ms, dòng pha vào $i_b$ tăng chậm hơn, nên độ lớn dòng pha không chuyển mạch $|i_c|$ sụt từ 0,37 A xuống khoảng 0,21 A; (b) mô-men sụt tương ứng.}\label{fig:8.6}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig8_7_S2_phase_current_3ctrl.png}
+\caption{Dòng pha $i_a$ trong một chu kỳ điện (S2). Six-step cho dòng chữ nhật 120° với các vết lõm khi pha khác chuyển mạch; hai bộ FOC cho dòng gần sin.}\label{fig:8.7}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig8_8_speed_S1_S3_S4.png}
+\caption{Đáp ứng tốc độ ở các kịch bản S1, S3, S4 của ba bộ điều khiển. Quá độ gần như trùng nhau; khác biệt nằm ở dao động xác lập.}\label{fig:8.8}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig8_9_S2_summary_3ctrl.png}
+\caption{Các chỉ tiêu xác lập chính ở kịch bản S2, tính theo phần trăm so với FOC thông thường.}\label{fig:8.9}
+\end{figure}
+
+\subsection{Thảo luận}\label{sec:8.7}
+
+\textbf{Gợn mô-men.} Ở S2, six-step giảm gợn mô-men RMS 76 \% và biên độ bậc 6 tới 90 \% so với FOC thông thường, gần bằng FOC bù, vì trong phần lớn mỗi sector mô-men gần phẳng theo \eqref{eq:8.2}. Tuy nhiên gợn đỉnh–đỉnh (0,447 N$\cdot$m) lớn gấp ba FOC bù vì các xung sụt chuyển mạch (Hình~\ref{fig:8.5}, 8.6). Mô-men trung bình một chu kỳ PWM sụt xuống 0,61–0,68 N$\cdot$m (33–39 \%) và mô-men tức thời xuống khoảng 0,58 N$\cdot$m (42 \%), trong khi \eqref{eq:8.10} với $d = 1$ dự báo 33 \%. Sụt thực tế lớn hơn một chút vì lúc bắt đầu chuyển mạch $d \approx 0{,}8$ (phần dư điện áp $V_{dc} - 2E$ nhỏ) và PI dòng cần vài chu kỳ lấy mẫu để bão hòa; với $d = 0{,}8$, \eqref{eq:8.10} cho khoảng 50 \%. Độ sâu các xung xen kẽ nhau (0,61 và 0,67 N$\cdot$m) giữa chuyển mạch phía trên và phía dưới, vì hai kiểu chuyển mạch chỉ cho cùng kết quả khi $d = 1$.
+
+\textbf{Gợn tốc độ.} Các xung sụt hẹp bị quán tính lọc mạnh, nên gợn tốc độ của six-step ở 100 vòng/phút (1,16 vòng/phút) chỉ lớn hơn FOC bù một chút. Ở 30 vòng/phút (S4) gợn tốc độ của six-step là 2,02 vòng/phút, lớn gấp 2,5 lần FOC bù: tại tốc độ này $V_{dc} > 4E$, mô-men nhô lên thay vì sụt, và chu kỳ gợn dài hơn (24 Hz) nên quán tính lọc kém hơn.
+
+\textbf{Dòng pha và tổn hao.} THD dòng pha của six-step là 31,6 \%, gần với giá trị của sóng chữ nhật 120° lý tưởng tính tới bậc 41 ($\approx$ 29,8 \%); phần chênh do sườn chuyển mạch hữu hạn và gợn PWM. Dòng pha RMS lớn hơn FOC bù 5,5 \%, tổn hao đồng lớn hơn 11,2 \%, khớp với \eqref{eq:8.11} (10,9 \%). So với FOC thông thường, chênh lệch chỉ còn 3,9 \% vì dòng của FOC thông thường bị dao động bậc 6 làm tăng giá trị RMS.
+
+\textbf{Chế độ quá độ.} Nhờ thiết kế vòng tốc độ theo $K_{t,6}$ \eqref{eq:8.8}, thời gian lên, độ quá điều chỉnh và độ sụt tốc của ba bộ điều khiển gần như trùng nhau (Bảng~\ref{tab:8.3}, Hình~\ref{fig:8.8}). Six-step có thời gian xác lập và phục hồi ngắn nhất vì không có dao động xác lập kéo dài, và vọt lố khi đảo chiều thấp nhất (30,0 \%). Dòng pha đỉnh ở S3 lớn hơn FOC thông thường 10 \%, do dòng chữ nhật có biên độ bằng $I$ trong khi dòng sin chỉ đạt biên độ tại một điểm.
+
+\textbf{Độ nhạy với góc chuyển mạch.} Quét \texttt{COMM\_SHIFT} trong kịch bản hiệu chỉnh (tải 1 N$\cdot$m, 100 vòng/phút) cho gợn mô-men đỉnh–đỉnh 0,447 N$\cdot$m tại 0°, 0,50–0,66 N$\cdot$m tại $\pm$5°, 1,0–1,5 N$\cdot$m tại $\pm$10° và 2,5–3,4 N$\cdot$m tại $\pm$15°. Six-step ít nhạy hơn FOC bù ở sai lệch nhỏ (FOC bù tăng gấp ba khi lệch $\pm$5°, mục 7.4), nhưng sai lệch Hall cỡ 10° đã làm gợn đỉnh–đỉnh lớn hơn FOC thông thường. Chuyển mạch sớm +5° giảm nhẹ gợn RMS (0,041 so với 0,043 N$\cdot$m), phù hợp với việc bù một phần độ trễ lấy mẫu và thời gian chuyển mạch.
+
+\begin{table}[H]
+\centering\small
+\caption{So sánh định tính ba bộ điều khiển trên động cơ BLDC back-EMF hình thang.}\label{tab:8.4}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+Tiêu chí & FOC thông thường & FOC bù & Six-step \\ \midrule
+Cảm biến vị trí & Encoder (góc liên tục) & Encoder chính xác vài độ điện & 3 Hall (6 trạng thái) \\
+Biến đổi tọa độ & Clarke, Park, Park ngược & Clarke, Park, Park ngược & Không \\
+Số bộ PI dòng & 2 & 2 & 1 \\
+Điều chế & SVPWM & SVPWM & H\_PWM–L\_ON \\
+Thông tin động cơ cần biết & $L$, $\lambda_1$ & $L$, dạng back-EMF (bảng tra), trễ số & $L$, $\lambda$ \\
+Gợn mô-men xác lập & Lớn (bậc 6) & Nhỏ nhất & Xung sụt khi chuyển mạch \\
+Tổn hao đồng & Trung bình & Thấp nhất & Cao nhất (+11 \%) \\
+Độ méo dòng pha & Trung bình & Thấp & Cao (sóng chữ nhật) \\
+Độ phức tạp tính toán & Trung bình & Cao & Thấp \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Kết luận của so sánh.} Trên động cơ BLDC back-EMF hình thang, FOC thông thường là lựa chọn kém nhất: phức tạp hơn six-step mà gợn mô-men lớn hơn bốn lần (RMS). Six-step đạt gợn RMS gần FOC bù với phần cứng và tính toán đơn giản nhất, phù hợp khi ưu tiên chi phí và tốc độ thấp. FOC bù cho mô-men êm nhất và tổn hao đồng thấp nhất, phù hợp với các ứng dụng đòi hỏi mô-men êm (servo, robot), với điều kiện có encoder chính xác và dạng back-EMF được nhận dạng tốt. Ở tốc độ cao ($V_{dc} < 4E$), gợn chuyển mạch của six-step tăng theo \eqref{eq:8.10} và cần các kỹ thuật bù chuyển mạch \cite{r1}, \cite{r3}.
+
+\subsection{Hạn chế}\label{sec:8.8}
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Hall lý tưởng.} Sector được tính từ góc encoder lý tưởng, nên không có sai lệch lắp đặt, độ trễ và rung tín hiệu Hall. Ảnh hưởng của sai lệch góc được đánh giá riêng bằng \texttt{COMM\_SHIFT}.
+\item \textbf{Không bù chuyển mạch.} Bộ điều khiển dùng chiến lược six-step cơ bản; các kỹ thuật giảm gợn chuyển mạch (điều khiển dòng pha không chuyển mạch, chồng lấn chuyển mạch, thay đổi kiểu PWM trong khoảng chuyển mạch \cite{r3}) chưa được xét.
+\item \textbf{Đo dòng.} Dòng $I$ được tính từ ba dòng pha đo được; trong thực tế six-step thường đo một điện trở shunt ở DC bus, khi đó dòng của pha thả nổi trong khoảng chuyển mạch không đo được.
+\item \textbf{Các hạn chế chung} của mô hình động cơ và nghịch lưu lý tưởng như ở mục 7.5 (không thời gian chết, back-EMF hình thang lý tưởng, chỉ xét tới $\pm$100 vòng/phút).
+\end{enumerate}
+
+\subsection{Tái lập kết quả}\label{sec:8.9}
+
+\begin{Verbatim}
+% 1. chạy mô phỏng (mỗi bộ điều khiển khoảng 15-60 s)
+run('03_Simulation/Conventional_FOC/run_conv_foc.m')
+run('03_Simulation/Compensated_FOC/run_comp_foc.m')
+run('03_Simulation/Six_Step/run_six_step.m')
+% 2. bảng chỉ tiêu ba bộ điều khiển (04_Results/Tables/kpi_comparison.*)
+run('04_Results/make_results.m')
+% 3. hình fig8_* và các số liệu của chương 8 (04_Results/Tables/six_step_numbers.csv)
+SIMULINK_SCREENSHOTS = true; run('04_Results/make_six_step_figures.m')
+% 4. (tùy chọn) kiểm tra hồi quy
+addpath('03_Simulation/Tests')
+bldc_regression('Controllers', {'six'}, 'Scenarios', {'S1','S2','S3','S4'})
+\end{Verbatim}
+
+Hình~\ref{fig:8.2} được vẽ trong trang \emph{Fig. 8.2 - Six-step drive} của \texttt{foc\_block\_diagram.drawio} và xuất PNG bằng draw.io.

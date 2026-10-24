@@ -57,7 +57,7 @@ Steady state with 1 N·m load at 100 rpm (scenario S2), identical PI gains for b
 master_thesis_bldc_control/
 ├── 01_Documents/
 │   ├── Theory/
-│   │   ├── Markdown/          # theory documents 01–04 (.md, render on GitHub)
+│   │   ├── Markdown/          # theory documents 01–06 (.md, render on GitHub)
 │   │   ├── Latex/             # same documents as LaTeX sources (XeLaTeX)
 │   │   └── PDF/               # compiled PDFs
 │   └── Thesis/
@@ -170,6 +170,7 @@ Theory documents (Vietnamese), available as Markdown, LaTeX and PDF:
 | 03 | FOC design and conventional FOC (+ Simulink model) | 4, 5 | [md](01_Documents/Theory/Markdown/03_FOC_conventional.md) | [pdf](01_Documents/Theory/PDF/03_FOC_conventional.pdf) |
 | 04 | Compensated FOC for trapezoidal back-EMF (+ Simulink model) | 6 | [md](01_Documents/Theory/Markdown/04_FOC_compensated.md) | [pdf](01_Documents/Theory/PDF/04_FOC_compensated.pdf) |
 | 05 | Simulation results and comparison | 7 | [md](01_Documents/Theory/Markdown/05_simulation_results.md) | [pdf](01_Documents/Theory/PDF/05_simulation_results.pdf) |
+| 06 | Six-step control and comparison of three controllers (+ Simulink model) | 8 | [md](01_Documents/Theory/Markdown/06_six_step.md) | [pdf](01_Documents/Theory/PDF/06_six_step.pdf) |
 
 Equations, figures and tables are numbered by chapter, e.g. (3.3), Fig. 5.2, Table 6.1, consistently across all three formats.
 
