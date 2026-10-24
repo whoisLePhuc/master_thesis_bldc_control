@@ -40,3 +40,9 @@ venv/
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# ---- LaTeX build output ----
+01_Documents/Theory/Latex/build/
+01_Documents/Theory/Latex/build_log.txt
+*.xdv
+*.fdb_latexmk

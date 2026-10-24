@@ -1,0 +1,18 @@
+{
+  // LaTeX Workshop: build the theory documents with XeLaTeX (fontspec) via latexmk,
+  // auxiliary files and PDF in ./build next to the main .tex file.
+  "latex-workshop.latex.recipes": [
+    { "name": "latexmk (xelatex)", "tools": ["latexmk-xelatex"] }
+  ],
+  "latex-workshop.latex.tools": [
+    {
+      "name": "latexmk-xelatex",
+      "command": "latexmk",
+      "args": ["-xelatex", "-synctex=1", "-interaction=nonstopmode", "-file-line-error", "-outdir=%OUTDIR%", "%DOC%"],
+      "env": {}
+    }
+  ],
+  "latex-workshop.latex.recipe.default": "first",
+  "latex-workshop.latex.outDir": "%DIR%/build",
+  "latex-workshop.view.pdf.viewer": "tab"
+}
