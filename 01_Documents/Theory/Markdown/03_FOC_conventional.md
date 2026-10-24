@@ -249,8 +249,20 @@ Các file nằm trong `03_Simulation/Conventional_FOC/`:
 | File | Vai trò |
 |---|---|
 | `Conventional_FOC.slx` | Mô hình Simulink (Simscape Electrical – Specialized Power Systems) |
-| `conv_foc_init.m` | Tạo struct thông số `P`, kịch bản `SC` (S1–S4), góc lệch `THETA_OFF`, hệ số ghi dữ liệu `DECIM`. Được gọi tự động khi mở mô hình (`PreLoadFcn`) |
-| `run_conv_foc.m` | Chạy lần lượt S1–S4, lưu kết quả vào `04_Results/Raw/<SCEN>_conv.mat` |
+| `conv_foc_init.m` | Tạo `P` (`bldc_params`) và kịch bản `SC` (`bldc_scenario`), đặt góc lệch `THETA_OFF` và hệ số ghi dữ liệu `DECIM`. Được gọi tự động khi mở mô hình (`PreLoadFcn`) |
+| `run_conv_foc.m` | Chạy lần lượt S1–S4 (qua `bldc_run_scenario`), lưu kết quả vào `04_Results/Raw/<SCEN>_conv.mat` |
+
+Phần dùng chung cho mọi bộ điều khiển nằm trong `03_Simulation/Common/`:
+
+| File | Vai trò |
+|---|---|
+| `bldc_params.m` | Hàm trả về struct `P`: thông số động cơ, nghịch lưu, tần số lấy mẫu, hệ số PI của FOC và các ma trận dùng trong khối Gain |
+| `bldc_scenario.m` | Hàm trả về kịch bản `SC` (S1–S4 và `CAL`) |
+| `bldc_run_scenario.m` | Hàm chạy một kịch bản cho một mô hình bất kỳ có cùng giao diện (Inport `w_ref`, `TL`; Outport `w`, `Te`, `i_abc`, `idq`, `iq_ref`, `iq_cmd`) và trả về struct kết quả `R` |
+| `bldc_trap.m` | Hàm dạng back-EMF hình thang chuẩn hóa $F(\theta)$ |
+| `bldc_plant_lib.slx` | Thư viện Simulink chứa các khối `Power Stage`, `PWM`, `SVPWM`, `abc_to_dq`. Trong mô hình, các khối này là liên kết thư viện (library link): sửa một lần trong thư viện là cập nhật cho mọi mô hình |
+
+`PreLoadFcn` của mô hình tự thêm thư mục của mô hình và `Common/` vào đường dẫn MATLAB, rồi gọi `conv_foc_init`; vì vậy có thể mở mô hình từ bất kỳ thư mục làm việc nào.
 
 ```matlab
 % Chạy cả 4 kịch bản

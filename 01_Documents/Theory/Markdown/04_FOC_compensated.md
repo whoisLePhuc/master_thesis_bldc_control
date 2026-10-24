@@ -194,8 +194,7 @@ Các file nằm trong `03_Simulation/Compensated_FOC/`:
 | File | Vai trò |
 |---|---|
 | `Compensated_FOC.slx` | Mô hình Simulink (Simscape Electrical – Specialized Power Systems) |
-| `comp_foc_init.m` | Tạo `P` (giống `conv_foc_init.m`, thêm `P.Td_ff`, `P.Td_sh`), bảng tra `TAB`, kịch bản `SC` (S1–S4 và `CAL`), `THETA_OFF`, `TAB_SHIFT`, `DECIM`. Được gọi tự động khi mở mô hình (`PreLoadFcn`) |
-| `bldc_trap.m` | Hàm dạng back-EMF hình thang chuẩn hóa $F(\theta)$, dùng để dựng bảng tra |
+| `comp_foc_init.m` | Tạo `P` (`bldc_params`, thêm `P.Td_ff`, `P.Td_sh`), bảng tra `TAB` (dùng `bldc_trap`), kịch bản `SC` (`bldc_scenario`, S1–S4 và `CAL`), `THETA_OFF`, `TAB_SHIFT`, `DECIM`. Được gọi tự động khi mở mô hình (`PreLoadFcn`) |
 | `comp_foc_calib.mat` | Giá trị đã hiệu chỉnh `THETA_OFF`, `TAB_SHIFT` |
 | `run_comp_foc.m` | Chạy S1–S4, lưu kết quả vào `04_Results/Raw/<SCEN>_comp.mat`; tùy chọn hiệu chỉnh `TAB_SHIFT` trước |
 
@@ -218,7 +217,7 @@ Cấu trúc file kết quả giống FOC thông thường (struct `R`, bước 1
 
 *Hình 6.3. Tầng ngoài cùng của `Compensated_FOC.slx`. Bố cục giống Hình 5.2 của Tài liệu 03; khác biệt là `Current PI` nhận thêm góc $\theta_e$ (cổng `theta`) và có thêm đầu ra `iq_cmd` = $i_q^{**}$.*
 
-Các khối `Speed PI`, `abc_to_dq`, `SVPWM`, `PWM`, `Power Stage`, các khâu lấy mẫu ZOH và cấu hình solver giống hệt FOC thông thường; xem Tài liệu 03, mục 5.3.2–5.3.4 (Hình 5.3, 5.5–5.8).
+Các khối `Speed PI`, `abc_to_dq`, `SVPWM`, `PWM`, `Power Stage`, các khâu lấy mẫu ZOH và cấu hình solver giống hệt FOC thông thường (bốn khối `abc_to_dq`, `SVPWM`, `PWM`, `Power Stage` là liên kết tới cùng thư viện `Common/bldc_plant_lib.slx`); xem Tài liệu 03, mục 5.3.2–5.3.4 (Hình 5.3, 5.5–5.8).
 
 #### 6.7.4. Khối Current PI của FOC bù
 

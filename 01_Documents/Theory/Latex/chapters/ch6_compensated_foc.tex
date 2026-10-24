@@ -137,8 +137,7 @@ Các file nằm trong \texttt{03\_Simulation/Compensated\_FOC/}:
 \toprule
 File & Vai trò \\ \midrule
 \texttt{Compensated\_FOC.slx} & Mô hình Simulink (Simscape Electrical – Specialized Power Systems) \\
-\texttt{comp\_foc\_init.m} & Tạo \texttt{P} (giống \texttt{conv\_foc\_init.m}, thêm \texttt{P.Td\_ff}, \texttt{P.Td\_sh}), bảng tra \texttt{TAB}, kịch bản \texttt{SC} (S1–S4 và \texttt{CAL}), \texttt{THETA\_OFF}, \texttt{TAB\_SHIFT}, \texttt{DECIM}. Được gọi tự động khi mở mô hình (\texttt{PreLoadFcn}) \\
-\texttt{bldc\_trap.m} & Hàm dạng back-EMF hình thang chuẩn hóa $F(\theta)$, dùng để dựng bảng tra \\
+\texttt{comp\_foc\_init.m} & Tạo \texttt{P} (\texttt{bldc\_params}, thêm \texttt{P.Td\_ff}, \texttt{P.Td\_sh}), bảng tra \texttt{TAB} (dùng \texttt{bldc\_trap}), kịch bản \texttt{SC} (\texttt{bldc\_scenario}, S1–S4 và \texttt{CAL}), \texttt{THETA\_OFF}, \texttt{TAB\_SHIFT}, \texttt{DECIM}. Được gọi tự động khi mở mô hình (\texttt{PreLoadFcn}) \\
 \texttt{comp\_foc\_calib.mat} & Giá trị đã hiệu chỉnh \texttt{THETA\_OFF}, \texttt{TAB\_SHIFT} \\
 \texttt{run\_comp\_foc.m} & Chạy S1–S4, lưu kết quả vào \texttt{04\_Results/Raw/<SCEN>\_comp.mat}; tùy chọn hiệu chỉnh \texttt{TAB\_SHIFT} trước \\
 \bottomrule
@@ -166,7 +165,7 @@ Cấu trúc file kết quả giống FOC thông thường (struct \texttt{R}, b�
 \caption{Tầng ngoài cùng của \texttt{Compensated\_FOC.slx}. Bố cục giống Hình 5.2 của Tài liệu 03; khác biệt là \texttt{Current PI} nhận thêm góc $\theta_e$ (cổng \texttt{theta}) và có thêm đầu ra \texttt{iq\_cmd} = $i_q^{**}$.}\label{fig:6.3}
 \end{figure}
 
-Các khối \texttt{Speed PI}, \texttt{abc\_to\_dq}, \texttt{SVPWM}, \texttt{PWM}, \texttt{Power Stage}, các khâu lấy mẫu ZOH và cấu hình solver giống hệt FOC thông thường; xem Tài liệu 03, mục 5.3.2–5.3.4 (Hình 5.3, 5.5–5.8).
+Các khối \texttt{Speed PI}, \texttt{abc\_to\_dq}, \texttt{SVPWM}, \texttt{PWM}, \texttt{Power Stage}, các khâu lấy mẫu ZOH và cấu hình solver giống hệt FOC thông thường (bốn khối \texttt{abc\_to\_dq}, \texttt{SVPWM}, \texttt{PWM}, \texttt{Power Stage} là liên kết tới cùng thư viện \texttt{Common/bldc\_plant\_lib.slx}); xem Tài liệu 03, mục 5.3.2–5.3.4 (Hình 5.3, 5.5–5.8).
 
 \subsubsection{Khối Current PI của FOC bù}\label{sec:6.7.4}
 

@@ -81,7 +81,7 @@ Khi chỉ hai pha dẫn (chế độ 6 bước), dòng chạy qua đúng hai pha
 
 *Hình 2.1. Back-EMF chuẩn hóa của ba pha theo (2.2): đỉnh phẳng 120°, sườn 60°, lệch nhau 120°. Trong mô hình, $e_x = \omega_e\lambda f_x$.*
 
-Hàm $F$ được hiện thực trong `bldc_trap.m` (thư mục `03_Simulation/Compensated_FOC`):
+Hàm $F$ được hiện thực trong `bldc_trap.m` (thư mục `03_Simulation/Common`, dùng chung cho mọi bộ điều khiển):
 
 ```matlab
 function y = bldc_trap(x)

@@ -79,11 +79,28 @@ Các file nằm trong \texttt{03\_Simulation/Conventional\_FOC/}:
 \toprule
 File & Vai trò \\ \midrule
 \texttt{Conventional\_FOC.slx} & Mô hình Simulink (Simscape Electrical – Specialized Power Systems) \\
-\texttt{conv\_foc\_init.m} & Tạo struct thông số \texttt{P}, kịch bản \texttt{SC} (S1–S4), góc lệch \texttt{THETA\_OFF}, hệ số ghi dữ liệu \texttt{DECIM}. Được gọi tự động khi mở mô hình (\texttt{PreLoadFcn}) \\
-\texttt{run\_conv\_foc.m} & Chạy lần lượt S1–S4, lưu kết quả vào \texttt{04\_Results/Raw/<SCEN>\_conv.mat} \\
+\texttt{conv\_foc\_init.m} & Tạo \texttt{P} (\texttt{bldc\_params}) và kịch bản \texttt{SC} (\texttt{bldc\_scenario}), đặt góc lệch \texttt{THETA\_OFF} và hệ số ghi dữ liệu \texttt{DECIM}. Được gọi tự động khi mở mô hình (\texttt{PreLoadFcn}) \\
+\texttt{run\_conv\_foc.m} & Chạy lần lượt S1–S4 (qua \texttt{bldc\_run\_scenario}), lưu kết quả vào \texttt{04\_Results/Raw/<SCEN>\_conv.mat} \\
 \bottomrule
 \end{tabularx}
 \end{center}
+
+Phần dùng chung cho mọi bộ điều khiển nằm trong \texttt{03\_Simulation/Common/}:
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+File & Vai trò \\ \midrule
+\texttt{bldc\_params.m} & Hàm trả về struct \texttt{P}: thông số động cơ, nghịch lưu, tần số lấy mẫu, hệ số PI của FOC và các ma trận dùng trong khối Gain \\
+\texttt{bldc\_scenario.m} & Hàm trả về kịch bản \texttt{SC} (S1–S4 và \texttt{CAL}) \\
+\texttt{bldc\_run\_scenario.m} & Hàm chạy một kịch bản cho một mô hình bất kỳ có cùng giao diện (Inport \texttt{w\_ref}, \texttt{TL}; Outport \texttt{w}, \texttt{Te}, \texttt{i\_abc}, \texttt{idq}, \texttt{iq\_ref}, \texttt{iq\_cmd}) và trả về struct kết quả \texttt{R} \\
+\texttt{bldc\_trap.m} & Hàm dạng back-EMF hình thang chuẩn hóa $F(\theta)$ \\
+\texttt{bldc\_plant\_lib.slx} & Thư viện Simulink chứa các khối \texttt{Power Stage}, \texttt{PWM}, \texttt{SVPWM}, \texttt{abc\_to\_dq}. Trong mô hình, các khối này là liên kết thư viện (library link): sửa một lần trong thư viện là cập nhật cho mọi mô hình \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\texttt{PreLoadFcn} của mô hình tự thêm thư mục của mô hình và \texttt{Common/} vào đường dẫn MATLAB, rồi gọi \texttt{conv\_foc\_init}; vì vậy có thể mở mô hình từ bất kỳ thư mục làm việc nào.
 
 \begin{Verbatim}
 % Chạy cả 4 kịch bản

@@ -64,6 +64,7 @@ master_thesis_bldc_control/
 │       └── figures/           # all figures (draw.io source, PNG exports, Simulink screenshots, plots)
 ├── 02_References/             # papers, datasheets, standards; references.bib
 ├── 03_Simulation/             # one folder per control strategy (see 03_Simulation/README.md)
+│   ├── Common/                # shared parameters, scenarios, run helper, plant library (bldc_plant_lib.slx)
 │   ├── Conventional_FOC/
 │   └── Compensated_FOC/
 ├── 04_Results/
@@ -168,7 +169,7 @@ Equations, figures and tables are numbered by chapter, e.g. (3.3), Fig. 5.2, Tab
         01_Documents/Theory (Markdown · LaTeX · PDF)
 ```
 
-- **Single source for parameters** – motor, inverter, PI gains and scenarios are defined in each controller's init script and are identical across controllers.
+- **Single source for parameters and plant** – motor, inverter, gains and scenarios come from `03_Simulation/Common` (`bldc_params`, `bldc_scenario`); Power Stage, PWM, SVPWM and abc_to_dq are library links to `Common/bldc_plant_lib.slx`.
 - **Single source for figures** – Markdown and LaTeX documents both use the PNG files in `01_Documents/Thesis/figures/`; block diagrams are edited in `foc_block_diagram.drawio` and exported with draw.io.
 - **Generated data is not tracked** – `04_Results/Raw/`, LaTeX `build/` folders, Simulink caches (`slprj/`, `*.slxc`) and copyrighted PDFs in `02_References/` are git-ignored.
 
@@ -176,8 +177,8 @@ Equations, figures and tables are numbered by chapter, e.g. (3.3), Fig. 5.2, Tab
 
 ## Adding a new controller
 
-1. Create `03_Simulation/<Strategy_Name>/` with a Simulink model, an init script and a run script.
-2. Reuse the motor parameters and scenarios S1–S4 from an existing init script.
+1. Create `03_Simulation/<Strategy_Name>/` with a Simulink model built from the blocks of `Common/bldc_plant_lib.slx`.
+2. Write an init script based on `bldc_params` / `bldc_scenario` and a run script based on `bldc_run_scenario`.
 3. Save results as `04_Results/Raw/<scenario>_<tag>.mat` with the same struct `R`.
 4. Add the controller to the tables in this README and in [`03_Simulation/README.md`](03_Simulation/README.md).
 

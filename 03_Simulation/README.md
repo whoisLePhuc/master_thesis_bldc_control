@@ -13,28 +13,39 @@ and the same test scenarios S1–S4, so that results are directly comparable.
 
 ## Adding a new controller
 
-1. Create a new folder named after the strategy (e.g. `Six-step/`, `MPC/`).
-2. Use the same motor parameters and scenarios S1–S4 as the existing models.
-3. Follow the folder layout below and save results with the same naming convention.
+1. Create a new folder named after the strategy (e.g. `Six_Step/`, `MPC/`).
+2. Build the model from the library blocks in `Common/bldc_plant_lib.slx` (open the library with
+   `open_system('bldc_plant_lib')` and copy the blocks into the model), add a discrete `powergui` (1 us) and keep the
+   controller interface below.
+3. Write `<tag>_init.m` starting from `P = bldc_params(); [SC, sc_name] = bldc_scenario(SCEN);`
+   and `run_<tag>.m` calling `bldc_run_scenario`; save results as `<SCEN>_<tag>.mat`.
 4. Add a row to the table above and to the main `README.md`.
 
 ## Folder layout
 
 ```
+Common/                    # shared by every controller -- edit here only
+├── bldc_params.m          # P = bldc_params(): motor, inverter, sampling, FOC gains, Gain-block matrices
+├── bldc_scenario.m        # [SC, sc_name] = bldc_scenario('S1'..'S4' | 'CAL')
+├── bldc_run_scenario.m    # [R, so, tSim] = bldc_run_scenario(mdl, SC, vars): simulate + collect outputs
+├── bldc_trap.m            # normalized trapezoidal back-EMF shape F(theta)
+└── bldc_plant_lib.slx     # Simulink library: Power Stage, PWM, SVPWM, abc_to_dq
+
 Conventional_FOC/
-├── Conventional_FOC.slx   # Simulink model (powergui discrete, 1 us)
-├── conv_foc_init.m        # parameters P, scenarios SC (S1-S4), THETA_OFF; run by PreLoadFcn
+├── Conventional_FOC.slx   # model (powergui discrete 1 us); plant blocks are links to bldc_plant_lib
+├── conv_foc_init.m        # P, SC, THETA_OFF, DECIM; run by PreLoadFcn
 └── run_conv_foc.m         # run S1-S4, save 04_Results/Raw/<SCEN>_conv.mat
 
 Compensated_FOC/
-├── Compensated_FOC.slx    # Simulink model (powergui discrete, 1 us)
-├── comp_foc_init.m        # same parameters/scenarios + look-up tables TAB (g_d, g_q, k_s),
-│                          # delay compensation P.Td_ff, P.Td_sh; run by PreLoadFcn
-├── bldc_trap.m            # normalized trapezoidal back-EMF shape (used to build the tables)
+├── Compensated_FOC.slx    # model (powergui discrete 1 us); plant blocks are links to bldc_plant_lib
+├── comp_foc_init.m        # common P + look-up tables TAB (g_d, g_q, k_s), P.Td_ff, P.Td_sh
 ├── comp_foc_calib.mat     # calibrated THETA_OFF, TAB_SHIFT
 └── run_comp_foc.m         # run S1-S4, save 04_Results/Raw/<SCEN>_comp.mat
                            # (DO_CALIB = true: re-tune TAB_SHIFT first)
 ```
+
+Each model's `PreLoadFcn` adds its own folder and `Common/` to the MATLAB path and calls its
+init script, so a model can be opened from any working folder.
 
 Usage (MATLAB, from the controller folder):
 
@@ -43,6 +54,16 @@ run_conv_foc                         % Conventional FOC, S1-S4
 SCEN_LIST = {'S2'}; run_comp_foc     % Compensated FOC, S2 only
 DO_CALIB = true; run_comp_foc        % re-calibrate TAB_SHIFT, then S1-S4
 ```
+
+## Controller interface
+
+`bldc_run_scenario` works with any model that exposes the common interface:
+
+| Root port | Signal |
+|---|---|
+| Inport 1 `w_ref`, Inport 2 `TL` | speed reference (rad/s), load torque (N·m); `Interpolate = off` |
+| Outports `w`, `Te`, `i_abc` | speed, torque, phase currents (sample time `DECIM*P.dt`) |
+| Outports `idq`, `iq_ref`, `iq_cmd` | d-q currents, speed-loop output, final current reference |
 
 ## Test scenarios
 
