@@ -4,13 +4,14 @@ function [SC, sc_name] = bldc_scenario(SCEN)
 %     T       stop time (s)
 %     t_ref   breakpoints of the speed reference (s),  w_ref  values (rad/s, mechanical)
 %     t_load  breakpoints of the load torque (s),      TL     values (N.m)
+%     win     steady-state evaluation window [t1 t2] (s), used by BLDC_METRICS
 %   Both references are piecewise constant (held between breakpoints).
 %
 %   SCEN : 'S1' no-load start-up         'S2' load step
 %          'S3' speed reversal           'S4' staircase speed reference
 %          'CAL' short run used for look-up-table calibration (Compensated FOC)
 %
-%   See also BLDC_PARAMS, BLDC_RUN_SCENARIO.
+%   See also BLDC_PARAMS, BLDC_RUN_SCENARIO, BLDC_METRICS.
 
 RPM = 2*pi/60;
 switch SCEN
@@ -34,6 +35,19 @@ switch SCEN
     otherwise
         error('bldc_scenario: unknown scenario "%s"', SCEN);
 end
+SC.win = bldc_scenario_window(SCEN);
 if numel(SC.t_ref)  < 2, SC.t_ref  = [SC.t_ref 1e3];  SC.w_ref = SC.w_ref([1 1]); end
 if numel(SC.t_load) < 2, SC.t_load = [SC.t_load 1e3]; SC.TL    = SC.TL([1 1]);    end
+end
+
+function win = bldc_scenario_window(SCEN)
+% Steady-state window [t1 t2] in which ripple metrics are evaluated.
+switch SCEN
+    case 'S1',  win = [0.20 0.40];   % 100 rpm, no load
+    case 'S2',  win = [0.45 0.58];   % 100 rpm, 1 N.m load
+    case 'S3',  win = [0.50 0.70];   % -100 rpm after reversal
+    case 'S4',  win = [1.10 1.25];   % 30 rpm, 0.5 N.m load (last step)
+    case 'CAL', win = [0.18 0.26];   % 100 rpm, 1 N.m load
+    otherwise,  win = [NaN NaN];
+end
 end

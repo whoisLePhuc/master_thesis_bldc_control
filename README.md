@@ -64,7 +64,8 @@ master_thesis_bldc_control/
 │       └── figures/           # all figures (draw.io source, PNG exports, Simulink screenshots, plots)
 ├── 02_References/             # papers, datasheets, standards; references.bib
 ├── 03_Simulation/             # one folder per control strategy (see 03_Simulation/README.md)
-│   ├── Common/                # shared parameters, scenarios, run helper, plant library (bldc_plant_lib.slx)
+│   ├── Common/                # shared parameters, scenarios, run helper, metrics, plant library (bldc_plant_lib.slx)
+│   ├── Tests/                 # regression test of all controllers (bldc_regression)
 │   ├── Conventional_FOC/
 │   └── Compensated_FOC/
 ├── 04_Results/
@@ -106,6 +107,12 @@ SCEN = 'S3'; conv_foc_init; open_system('Conventional_FOC')
 ```
 
 Each model calls its init script automatically on load (`PreLoadFcn`). One scenario takes a few seconds (fixed step 1 µs).
+
+After changing a model or anything in `03_Simulation/Common`, run the regression test:
+
+```matlab
+addpath('03_Simulation/Tests'); bldc_regression    % S2 of every controller vs. stored reference metrics
+```
 
 ### Build the documentation
 

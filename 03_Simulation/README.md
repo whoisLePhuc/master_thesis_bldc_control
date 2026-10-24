@@ -19,7 +19,8 @@ and the same test scenarios S1–S4, so that results are directly comparable.
    controller interface below.
 3. Write `<tag>_init.m` starting from `P = bldc_params(); [SC, sc_name] = bldc_scenario(SCEN);`
    and `run_<tag>.m` calling `bldc_run_scenario`; save results as `<SCEN>_<tag>.mat`.
-4. Add a row to the table above and to the main `README.md`.
+4. Register it in `Tests/bldc_controllers.m` and store its reference metrics (see *Regression test*).
+5. Add a row to the table above and to the main `README.md`.
 
 ## Folder layout
 
@@ -28,6 +29,7 @@ Common/                    # shared by every controller -- edit here only
 ├── bldc_params.m          # P = bldc_params(): motor, inverter, sampling, FOC gains, Gain-block matrices
 ├── bldc_scenario.m        # [SC, sc_name] = bldc_scenario('S1'..'S4' | 'CAL')
 ├── bldc_run_scenario.m    # [R, so, tSim] = bldc_run_scenario(mdl, SC, vars): simulate + collect outputs
+├── bldc_metrics.m         # M = bldc_metrics(R, SC, P): speed/torque/current metrics in SC.win
 ├── bldc_trap.m            # normalized trapezoidal back-EMF shape F(theta)
 └── bldc_plant_lib.slx     # Simulink library: Power Stage, PWM, SVPWM, abc_to_dq
 
@@ -42,6 +44,11 @@ Compensated_FOC/
 ├── comp_foc_calib.mat     # calibrated THETA_OFF, TAB_SHIFT
 └── run_comp_foc.m         # run S1-S4, save 04_Results/Raw/<SCEN>_comp.mat
                            # (DO_CALIB = true: re-tune TAB_SHIFT first)
+
+Tests/
+├── bldc_controllers.m     # registry of implemented controllers (model, folder, init script, variables)
+├── bldc_regression.m      # regression test against stored reference metrics
+└── regression_reference.mat
 ```
 
 Each model's `PreLoadFcn` adds its own folder and `Common/` to the MATLAB path and calls its
@@ -54,6 +61,25 @@ run_conv_foc                         % Conventional FOC, S1-S4
 SCEN_LIST = {'S2'}; run_comp_foc     % Compensated FOC, S2 only
 DO_CALIB = true; run_comp_foc        % re-calibrate TAB_SHIFT, then S1-S4
 ```
+
+## Regression test
+
+`Tests/bldc_regression.m` re-simulates every controller registered in `Tests/bldc_controllers.m`,
+computes the metrics of `Common/bldc_metrics.m` (mean speed and torque, speed/torque/i_q ripple,
+peak speed and current, speed dip) and compares them with `Tests/regression_reference.mat`
+(tolerance 1 % + 1e-3). It errors if any metric is outside tolerance.
+
+```matlab
+addpath('03_Simulation/Tests')
+bldc_regression                                   % S2, all controllers (~40 s)
+bldc_regression('Scenarios', {'S1','S2','S3','S4'})
+bldc_regression('Controllers', {'comp'})
+bldc_regression('Update', true)                   % accept the current results as new reference
+```
+
+Run it after any change in `Common/` (parameters, plant library) or in a controller model.
+When a new controller is added, register it in `bldc_controllers.m` and create its reference with
+`bldc_regression('Controllers', {'<tag>'}, 'Scenarios', {'S1','S2','S3','S4'}, 'Update', true)`.
 
 ## Controller interface
 
