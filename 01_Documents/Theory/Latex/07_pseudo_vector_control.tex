@@ -1,0 +1,44 @@
+% !TeX program = xelatex
+% =====================================================================
+%  Tài liệu 07 -- Điều khiển giả vector (PVC) cho động cơ BLDC back-EMF hình thang
+%  Biên dịch: latexmk 07_pseudo_vector_control.tex   (hoặc xelatex 2 lần)
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+\usepackage{style/foc_style}
+
+\title{\vspace{-1.2cm}\textbf{Điều khiển giả vector (PVC) cho động cơ BLDC back-EMF hình thang}}
+\author{\normalsize Tài liệu 07 -- Bộ tài liệu lý thuyết\\[2pt]
+\small Điều khiển định hướng từ trường cho động cơ BLDC có sức phản điện động hình thang}
+\date{\small Tháng 10 năm 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent Tài liệu trình bày phương pháp điều khiển giả vector (pseudo vector control, PVC) theo bằng sáng chế US 7,339,346 của NSK và đánh giá nó trên cùng mô hình Simulink mức chuyển mạch van, cùng thông số và bốn kịch bản S1–S4 như các bộ điều khiển trước. PVC tính dòng đặt bằng lý thuyết vector (dòng $i_q^*$ từ cân bằng công suất với back-EMF hình thang, dòng $i_d^*$ suy yếu từ thông), đổi sang dòng đặt ba pha, rồi điều khiển từng pha bằng một bộ PI riêng thay cho vòng dòng $d$–$q$. Phân tích cho thấy khi dưới tốc độ cơ sở, dòng đặt của PVC trùng với khâu định dạng dòng của FOC bù (6.4). Điểm yếu nằm ở vòng dòng: bộ PI trên hệ tọa độ đứng yên phải tự tạo điện áp back-EMF xoay chiều nên sinh ra sai lệch dòng tỉ lệ với tốc độ, tính được bằng công thức \eqref{eq:9.9}. Tại 100 vòng/phút, sai lệch này là 0,87 A (mô phỏng: 0,76 A trục $d$ và $-$0,46 A trục $q$), làm dòng RMS tăng gấp đôi và tổn hao đồng tăng 4,6 lần so với FOC bù, trong khi gợn mô-men còn lớn hơn FOC thông thường. Khi thêm bù back-EMF từng pha, sai lệch này biến mất và PVC đạt gợn mô-men RMS 0,034 N$\cdot$m, gần FOC bù (0,030 N$\cdot$m).
+
+\vspace{0.5em}
+\noindent\textbf{Từ khóa:} BLDC; điều khiển giả vector; PVC; back-EMF hình thang; điều khiển dòng pha; bộ PI hệ tọa độ đứng yên; gợn mô-men.
+\end{abstract}
+
+\seriesbox{7}
+
+\tableofcontents
+\newpage
+
+
+
+% ---------------- nội dung ----------------
+\setcounter{section}{8}
+\input{chapters/ch9_pseudo_vector_control}
+
+% ---------------- tài liệu tham khảo ----------------
+\begin{thebibliography}{9}
+\small
+\bibitem{r1} C. M. Ta and S. Endo, "Motor and drive control device therefor," U.S. Patent 7,339,346 B2, Mar. 4, 2008 (NSK Ltd.).
+\bibitem{r2} J. Y. Hung and Z. Ding, "Design of currents to reduce torque ripple in brushless permanent magnet motors," \emph{IEE Proc. B – Electric Power Applications}, vol. 140, no. 4, pp. 260–266, 1993.
+\bibitem{r3} D. N. Zmood and D. G. Holmes, "Stationary frame current regulation of PWM inverters with zero steady-state error," \emph{IEEE Trans. Power Electron.}, vol. 18, no. 3, pp. 814–822, 2003.
+\bibitem{r4} D. G. Holmes and T. A. Lipo, \emph{Pulse Width Modulation for Power Converters: Principles and Practice}. Piscataway, NJ, USA: IEEE Press / Wiley, 2003.
+\end{thebibliography}
+
+\end{document}

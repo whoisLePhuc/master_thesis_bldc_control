@@ -1,0 +1,321 @@
+% ch9_pseudo_vector_control.tex -- Chương 9 (nguồn: Markdown/07_pseudo_vector_control.md, chuyển sang LaTeX)
+% Compiled from ../07_pseudo_vector_control.tex
+
+\section{Điều khiển giả vector (PVC)}\label{sec:9}
+
+\subsection{Ý tưởng của PVC}\label{sec:9.1}
+
+PVC được đề xuất cho động cơ BLDC dùng trong hệ trợ lực lái điện \cite{r1}. Lập luận của bằng sáng chế: FOC thông thường điều khiển dòng trong hệ $d$–$q$, nên các phi tuyến của từng pha (thời gian chết, mạch đo dòng) bị phép biến đổi Park trộn sang cả ba pha. PVC tách bài toán làm hai phần:
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{Tính dòng đặt bằng lý thuyết vector:} back-EMF ba pha được đổi sang hệ $d$–$q$, dòng $i_q^*$ được tính từ phương trình công suất có xét back-EMF hình thang, dòng $i_d^*$ được dùng để suy yếu từ thông ở tốc độ cao. Sau đó dòng đặt được đổi về ba pha.
+\item \textbf{Điều khiển dòng theo từng pha:} mỗi pha có một bộ PI riêng so sánh dòng đặt và dòng đo của pha đó; không có biến đổi Park trong vòng hồi tiếp.
+\end{itemize}
+
+Vì lý thuyết vector chỉ dùng ở khâu tính dòng đặt, phương pháp được gọi là điều khiển "giả" vector. Sơ đồ khối được cho ở Hình~\ref{fig:9.1}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig9_1_pvc_drive.png}
+\caption{Sơ đồ khối hệ truyền động PVC: vòng tốc độ, khối tính dòng đặt theo lý thuyết vector, biến đổi Park ngược, ba bộ PI dòng pha và điều chế min–max. Nhánh nét đứt là phần bù back-EMF từng pha, không có trong bằng sáng chế, được thêm vào ở biến thể PVC + bù.}\label{fig:9.1}
+\end{figure}
+
+\subsection{Tính dòng đặt bằng lý thuyết vector}\label{sec:9.2}
+
+\subsubsection{\texorpdfstring{Back-EMF trên hệ $d$–$q$}{Back-EMF trên hệ d–q}}\label{sec:9.2.1}
+
+Như chương 3, back-EMF trên hệ $d$–$q$ là
+
+\begin{equation}
+e_d = \lambda\,\omega_e\, g_d(\theta_e), \qquad e_q = \lambda\,\omega_e\, g_q(\theta_e),
+\tag{9.1}\label{eq:9.1}
+\end{equation}
+
+với $g_d$, $g_q$ là các hàm tuần hoàn chu kỳ $\pi/3$ (3.6) và $g_q \in [1{,}155;\ 1{,}333]$ (3.8). Bằng sáng chế dùng bảng tra back-EMF pha theo góc rồi biến đổi Park; mô hình dùng trực tiếp hai bảng $g_d$, $g_q$ giống FOC bù (6.6), cho cùng kết quả.
+
+\subsubsection{\texorpdfstring{Dòng trục $q$ từ cân bằng công suất}{Dòng trục q từ cân bằng công suất}}\label{sec:9.2.2}
+
+Bằng sáng chế cho công suất điện từ bằng công suất cơ:
+
+\begin{equation}
+T^*\,\omega_m = \tfrac32\,\big(e_d\, i_d^* + e_q\, i_q^*\big).
+\tag{9.2}\label{eq:9.2}
+\end{equation}
+
+Rút $i_q^*$ và chia cả tử và mẫu cho $\omega_e = p\,\omega_m$ để tránh dạng $0/0$ khi đứng yên:
+
+\begin{equation}
+i_q^* = \frac{T^*/(\tfrac32\,p\lambda) - g_d(\theta_e)\, i_d^*}{g_q(\theta_e)}.
+\tag{9.3}\label{eq:9.3}
+\end{equation}
+
+Mô-men đặt được lấy từ đầu ra PI tốc độ (giống FOC): $T^* = K_t\, i_{q,\omega}^*$ với $K_t = \tfrac32 p\lambda_1$. Khi $i_d^* = 0$, \eqref{eq:9.3} trở thành $i_q^* = i_{q,\omega}^*\,(\lambda_1/\lambda)/g_q(\theta_e)$, \textbf{trùng với khâu định dạng dòng $k_s$ của FOC bù} (6.4). Khác biệt duy nhất là FOC bù tra bảng tại góc đã bù trễ $\theta_a$ (6.5), còn PVC dùng góc đo $\theta_e$. Như vậy dòng đặt của PVC cũng khử gợn mô-men bậc 6 theo nguyên lý của chương 6 (Hình~\ref{fig:9.2}a, b).
+
+\subsubsection{\texorpdfstring{Dòng trục $d$ suy yếu từ thông}{Dòng trục d suy yếu từ thông}}\label{sec:9.2.3}
+
+Trên tốc độ cơ sở $\omega_b$, bằng sáng chế đặt
+
+\begin{equation}
+i_d^* = \begin{cases} 0, & |\omega_m| \le \omega_b \\[2pt] -\left|\dfrac{T^*}{K_t}\right| \sin\!\Big(\arccos\dfrac{\omega_b}{|\omega_m|}\Big), & |\omega_m| > \omega_b \end{cases}
+\tag{9.4}\label{eq:9.4}
+\end{equation}
+
+Bằng sáng chế tính $\omega_b$ từ mô-men đặt. Mô hình dùng một hằng số: tốc độ tại đó biên độ back-EMF cơ bản bằng giới hạn điện áp pha của SVPWM,
+
+\begin{equation}
+\omega_b = \frac{V_{dc}/\sqrt3}{p\,\lambda_1} = 12{,}49\ \text{rad/s} = 119{,}3\ \text{vòng/phút}.
+\tag{9.5}\label{eq:9.5}
+\end{equation}
+
+Hệ số $\sin(\arccos(\omega_b/\omega_m))$ tăng nhanh ngay sau $\omega_b$ rồi tiến dần tới 1 (Hình~\ref{fig:9.2}c). Trong các kịch bản S1–S4 (tối đa $\pm$100 vòng/phút), $i_d^*$ chỉ khác 0 trong đoạn vọt lố khi đảo chiều (S3).
+
+\subsubsection{Dòng đặt ba pha}\label{sec:9.2.4}
+
+Dòng đặt pha được tính bằng biến đổi Park ngược và Clarke ngược:
+
+\begin{equation}
+\begin{bmatrix} i_a^* \\ i_b^* \\ i_c^* \end{bmatrix} = \mathbf{K}_{ic}
+\begin{bmatrix} \cos\theta_e & -\sin\theta_e \\ \sin\theta_e & \cos\theta_e \end{bmatrix}
+\begin{bmatrix} i_d^* \\ i_q^* \end{bmatrix}.
+\tag{9.6}\label{eq:9.6}
+\end{equation}
+
+Dòng đặt pha gần sin với các "vết lõm" nhỏ tại các điểm chuyển mạch của back-EMF (Hình~\ref{fig:9.2}b). Đây chính là dạng dòng giữ cho mô-men phẳng với back-EMF hình thang có sườn 60°.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig9_2_pvc_references.png}
+\caption{Dòng đặt của PVC: (a) $i_d^*$, $i_q^*$ theo \eqref{eq:9.3} cho $T^* = 1$ N$\cdot$m dưới tốc độ cơ sở, so với $i_q^*$ hằng của FOC; (b) dòng đặt pha $a$; (c) dòng $i_d^*$ suy yếu từ thông theo \eqref{eq:9.4}.}\label{fig:9.2}
+\end{figure}
+
+\subsection{Điều khiển dòng từng pha}\label{sec:9.3}
+
+\subsubsection{Bộ PI dòng pha}\label{sec:9.3.1}
+
+Mỗi pha có một bộ PI rời rạc 10 kHz:
+
+\begin{equation}
+v_{PI,x} = K_{p,i}\, e_x + K_{i,i}\!\int e_x\,dt, \qquad e_x = i_x^* - i_x,\quad x \in \{a, b, c\},
+\tag{9.7}\label{eq:9.7}
+\end{equation}
+
+với cùng hệ số IMC như FOC ($K_{p,i} = L/\tau_c = 10{,}46$ V/A, $K_{i,i} = R/\tau_c = 1438$ V/(A$\cdot$s), $\tau_c = 0{,}318$ ms), giới hạn $\pm$$V_{dc}/\sqrt3$ và chống bão hòa back-calculation. Ba dòng pha luôn có tổng bằng 0 (động cơ nối sao, không nối trung tính) nên tổng ba sai lệch cũng bằng 0 và ba khâu tích phân không trôi theo thứ tự không.
+
+\subsubsection{Bám tín hiệu xoay chiều}\label{sec:9.3.2}
+
+Với $Z(j\omega) = R + j\omega L$ và $C(j\omega) = K_{p,i} + K_{i,i}/(j\omega)$, hàm truyền từ dòng đặt tới dòng pha (bỏ qua trễ số) là
+
+\begin{equation}
+T(j\omega) = \frac{C(j\omega)}{Z(j\omega) + C(j\omega)} = \frac{1}{1 + j\omega\tau_c}.
+\tag{9.8}\label{eq:9.8}
+\end{equation}
+
+Khác với vòng dòng $d$–$q$ (nơi dòng đặt gần như không đổi), dòng đặt pha của PVC là tín hiệu xoay chiều tần số $f_e$ cộng các sóng hài bậc $6k \pm 1$ của khâu định dạng. Bảng~\ref{tab:9.1} cho sai lệch bám tương đối tại 100 vòng/phút ($f_e = 13{,}3$ Hz).
+
+\begin{table}[H]
+\centering\small
+\caption{Đáp ứng của bộ PI dòng pha với các thành phần của dòng đặt tại 100 vòng/phút, theo \eqref{eq:9.8}.}\label{tab:9.1}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+Bậc & Tần số (Hz) & $\lvert T \rvert$ & Góc lệch (độ) & Sai lệch $\lvert 1 - T \rvert$ \\ \midrule
+1 & 13,3 & 1,000 & $-$1,5 & 0,027 \\
+5 & 66,7 & 0,991 & $-$7,6 & 0,132 \\
+7 & 93,3 & 0,983 & $-$10,6 & 0,183 \\
+11 & 146,7 & 0,960 & $-$16,3 & 0,281 \\
+13 & 173,3 & 0,945 & $-$19,1 & 0,328 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Thành phần cơ bản được bám tốt, nhưng các sóng hài định dạng bị lệch pha 8–19° và sai lệch 13–33 \%. Đây là giới hạn cố hữu của bộ PI trên hệ tọa độ đứng yên: khâu tích phân chỉ triệt sai lệch ở tần số 0, còn với tín hiệu xoay chiều cần bộ điều khiển cộng hưởng hoặc tăng băng thông \cite{r3}.
+
+\subsubsection{Nhiễu back-EMF}\label{sec:9.3.3}
+
+Ảnh hưởng lớn hơn đến từ back-EMF. Phương trình pha là $v_x = R i_x + L\,di_x/dt + e_x$; bộ PI phải tự tạo điện áp $e_x$, vốn là tín hiệu xoay chiều biên độ $\lambda_1\omega_e$ ở tần số cơ bản. Với dòng đặt bám tốt, sai lệch dòng do back-EMF gây ra là
+
+\begin{equation}
+\underline{i}_{err} = -\frac{\underline{e}}{Z(j\omega_e) + C(j\omega_e)},
+\tag{9.9}\label{eq:9.9}
+\end{equation}
+
+với $\underline{e}$ là phasor back-EMF cơ bản, nằm trên trục $q$. Tại 100 vòng/phút: $\lambda_1\omega_e = 17{,}4$ V, $|Z + C| = 20{,}1$ $\Omega$, nên $|\underline{i}_{err}| = 0{,}87$ A, gồm 0,73 A trên trục $d$ và $-$0,47 A trên trục $q$. Hệ quả:
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{Dòng trục $q$ bị hụt 0,47 A}, tạo mô-men hãm. Vòng tốc độ phải bù bằng cách tăng $i_{q,\omega}^*$ thêm đúng lượng đó, kể cả khi không tải.
+\item \textbf{Xuất hiện dòng trục $d$ dương 0,73 A}, không sinh mô-men nhưng làm tăng dòng RMS, tổn hao đồng, và tăng từ thông (ngược với suy yếu từ thông).
+\item \textbf{Sai lệch phụ thuộc tốc độ:} gần như tỉ lệ $\omega_e^2$ ở tốc độ thấp (0,09 A tại 30 vòng/phút), nên mô-men hãm do nó gây ra tác động như một khâu cản nhớt.
+\end{itemize}
+
+Hình~\ref{fig:9.3} so sánh \eqref{eq:9.9} với mô phỏng tại 30 và 100 vòng/phút; sai khác không quá 5 \%.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig9_3_backemf_error.png}
+\caption{Sai lệch dòng do back-EMF của PVC theo tốc độ: đường liền và đứt là \eqref{eq:9.9}, điểm là giá trị trung bình mô phỏng ở S1, S2 (100 vòng/phút) và S4 (30 vòng/phút).}\label{fig:9.3}
+\end{figure}
+
+\subsubsection{Bù back-EMF từng pha}\label{sec:9.3.4}
+
+Bằng sáng chế không nêu khâu bù back-EMF. Để tách ảnh hưởng của mục 9.3.3, mô hình có thêm tùy chọn \texttt{PVC\_FF}:
+
+\begin{equation}
+\mathbf{v}_{abc}^* = \mathbf{v}_{PI} + \texttt{PVC\_FF}\cdot \lambda\,\omega_e\,\mathbf{f}_{abc}(\theta_e),
+\tag{9.10}\label{eq:9.10}
+\end{equation}
+
+với $\mathbf{f}_{abc}$ được tạo lại từ $g_d$, $g_q$ bằng \eqref{eq:9.6}. Khi \texttt{PVC\_FF = 1}, bộ PI chỉ còn phải bù phần sụt áp trên $R$, $L$, giống vòng dòng $d$–$q$ có bù back-EMF của FOC.
+
+\subsubsection{Điều chế}\label{sec:9.3.5}
+
+Điện áp pha đặt được chuyển thành hệ số điều chế bằng phương pháp bơm thứ tự không min–max, tương đương SVPWM về dải điện áp:
+
+\begin{equation}
+v_0 = -\tfrac12\big(\max_x v_x^* + \min_x v_x^*\big), \qquad d_x = \tfrac12 + \frac{v_x^* + v_0}{V_{dc}},
+\tag{9.11}\label{eq:9.11}
+\end{equation}
+
+rồi trễ một chu kỳ lấy mẫu như ở FOC.
+
+\subsection{Mô hình Simulink}\label{sec:9.4}
+
+Mô hình \texttt{Pseudo\_Vector\_Control.slx} nằm trong thư mục \texttt{03\_Simulation/PVC} và được dựng theo quy trình thêm bộ điều khiển mới của repo (Hình~\ref{fig:9.4}). Các khối Power Stage, PWM và abc\_to\_dq là liên kết tới thư viện dùng chung \texttt{bldc\_plant\_lib.slx}; khối abc\_to\_dq chỉ dùng để ghi $i_d$, $i_q$ phục vụ so sánh. Tên mô hình khác tên thư mục để không trùng với biến cấu hình \texttt{PVC} trong workspace.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig9_sim_pvc_root.png}
+\caption{Tầng ngoài cùng của mô hình \texttt{Pseudo\_Vector\_Control.slx}. Khối PVC Ctrl thay cho Current PI và SVPWM của mô hình FOC; Speed PI, PWM, Power Stage và phần đo góc/tốc độ được giữ nguyên.}\label{fig:9.4}
+\end{figure}
+
+Khối PVC Ctrl (Hình~\ref{fig:9.5}) hiện thực các phương trình của mục 9.2–9.3: hai bảng \texttt{g\_d}, \texttt{g\_q} \eqref{eq:9.1}; nhánh \texttt{abs\_we}–\texttt{inv\_p}–\texttt{wb\_over\_wm}–\texttt{sqrt}–\texttt{sin\_adv} tính $i_d^*$ \eqref{eq:9.4}; nhánh \texttt{lam1\_lam}–\texttt{num}–\texttt{div\_gq} tính $i_q^*$ \eqref{eq:9.3}; khối \texttt{InvPark\_i} tạo dòng đặt pha \eqref{eq:9.6}; khối \texttt{PI\_abc} là ba bộ PI pha dạng véc-tơ \eqref{eq:9.7}; nhánh \texttt{InvPark\_e}–\texttt{ff\_on} là bù back-EMF \eqref{eq:9.10}; nhánh \texttt{max}, \texttt{min}, \texttt{neg\_half}, \texttt{v\_inj} là điều chế min–max \eqref{eq:9.11}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig9_sim_pvc_ctrl.png}
+\caption{Khối PVC Ctrl: tính dòng đặt theo lý thuyết vector, Park ngược, ba bộ PI dòng pha, bù back-EMF tùy chọn và điều chế min–max.}\label{fig:9.5}
+\end{figure}
+
+\begin{table}[H]
+\centering\small
+\caption{Tham số của bộ điều khiển PVC (\texttt{pvc\_init.m}). Thông số động cơ, nghịch lưu, chu kỳ lấy mẫu và hệ số PI lấy từ \texttt{Common/bldc\_params.m}.}\label{tab:9.2}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+Tham số & Ký hiệu trong mã & Giá trị \\ \midrule
+Bảng $g_d$, $g_q$ (chu kỳ $\pi/3$, 361 điểm) & \texttt{TAB.gd}, \texttt{TAB.gq} & như FOC bù \\
+PI dòng pha $K_{p,i}$, $K_{i,i}$ & \texttt{P.Kp\_i}, \texttt{P.Ki\_i} & 10,46 V/A; 1438 V/(A$\cdot$s) \\
+PI tốc độ $K_{p,\omega}$, $K_{i,\omega}$ & \texttt{P.Kp\_w\_foc}, \texttt{P.Ki\_w\_foc} & 0,148; 9,30 \\
+Tốc độ cơ sở $\omega_b$ \eqref{eq:9.5} & \texttt{PVC.wb} & 12,49 rad/s (119,3 vòng/phút) \\
+Bật suy yếu từ thông \eqref{eq:9.4} & \texttt{PVC.fw} & 1 \\
+Bật bù back-EMF pha \eqref{eq:9.10} & \texttt{PVC.ff} (\texttt{PVC\_FF}) & 0: PVC; 1: PVC + bù \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\texttt{run\_pvc.m} chạy cả hai biến thể và lưu \texttt{<SCEN>\_pvc.mat}, \texttt{<SCEN>\_pvcff.mat}. Hai biến thể được đăng ký trong kiểm tra hồi quy với tag \texttt{pvc} và \texttt{pvcff}.
+
+\subsection{Kết quả mô phỏng}\label{sec:9.5}
+
+\begin{table}[H]
+\centering\small
+\caption{Chỉ tiêu chất lượng của năm bộ điều khiển (KB: kịch bản; 6-step: six-step; PVC+bù: PVC có bù back-EMF pha). "–": không vào được dải $\pm$2 vòng/phút.}\label{tab:9.3}
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}Xlllll@{}}
+\toprule
+KB & Chỉ tiêu & FOC thường & FOC bù & 6-step & PVC & PVC+bù \\ \midrule
+S1 & Thời gian lên (ms) & 4,74 & 4,82 & 4,73 & 11,53 & 4,87 \\
+S1 & Độ quá điều chỉnh (\%) & 18,0 & 16,9 & 17,9 & 7,9 & 16,7 \\
+S1 & Thời gian xác lập (ms) & – & 42,3 & 39,0 & – & 43,9 \\
+S1 & Gợn tốc độ không tải (vòng/phút) & 8,42 & 0,49 & 0,86 & 7,79 & 1,01 \\
+S2 & Độ sụt tốc khi đóng tải (vòng/phút) & 22,9 & 21,1 & 20,8 & 14,9 & 21,2 \\
+S2 & Thời gian phục hồi (ms) & – & 39,9 & 36,5 & – & 36,3 \\
+S2 & Gợn mô-men đỉnh–đỉnh (N$\cdot$m) & 0,642 & 0,153 & 0,447 & 0,707 & 0,179 \\
+S2 & Gợn mô-men RMS (N$\cdot$m) & 0,177 & 0,030 & 0,043 & 0,200 & 0,034 \\
+S2 & Biên độ gợn bậc 6 (N$\cdot$m) & 0,239 & 0,022 & 0,023 & 0,264 & 0,028 \\
+S2 & Gợn tốc độ đỉnh–đỉnh (vòng/phút) & 6,90 & 0,87 & 1,16 & 7,42 & 0,95 \\
+S2 & THD dòng pha (\%) & 22,0 & 5,6 & 31,6 & 9,4 & 5,2 \\
+S2 & Dòng $i_d$ trung bình (A) & 0,00 & 0,00 & 0,00 & 0,76 & 0,02 \\
+S2 & Dòng pha RMS (A) & 0,296 & 0,286 & 0,302 & 0,612 & 0,286 \\
+S2 & Tổn hao đồng (W) & 0,121 & 0,113 & 0,125 & 0,515 & 0,113 \\
+S3 & Thời gian qua tốc độ 0 (ms) & 2,81 & 2,63 & 2,61 & 3,72 & 2,61 \\
+S3 & Độ vọt lố khi đảo chiều (\%) & 33,8 & 32,4 & 30,0 & 15,7 & 28,8 \\
+S3 & Dòng pha đỉnh (A) & 2,56 & 2,72 & 2,81 & 2,73 & 2,76 \\
+S4 & Thời gian xác lập TB các bậc (ms) & – & 33,7 & 28,3 & – & 34,5 \\
+S4 & Gợn tốc độ ở 30 vòng/phút (vòng/phút) & 3,62 & 0,81 & 2,02 & 2,78 & 0,40 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig9_6_S2_idq_pvc.png}
+\caption{Dòng $d$–$q$ đo được và dòng đặt $i_q^*$ \eqref{eq:9.3} ở S2. (a) PVC: dòng $i_q^*$ cao gấp đôi dòng $i_q$ thực vì vòng tốc độ phải bù phần dòng hụt \eqref{eq:9.9}, và có dòng $i_d \approx 0{,}76$ A; (b) PVC + bù: $i_q$ bám sát $i_q^*$ đã định dạng, $i_d \approx 0$.}\label{fig:9.6}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig9_7_S2_torque_pvc.png}
+\caption{Mô-men điện từ ở chế độ xác lập có tải 1 N$\cdot$m, 100 vòng/phút (S2, trung bình một chu kỳ PWM): (a) FOC bù; (b) PVC; (c) PVC + bù.}\label{fig:9.7}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig9_8_speed_S1_S3_S4.png}
+\caption{Đáp ứng tốc độ ở các kịch bản S1, S3, S4 của FOC thông thường, FOC bù, PVC và PVC + bù. PVC không bù tăng tốc chậm hơn rõ rệt nhưng vọt lố ít hơn.}\label{fig:9.8}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig9_9_S2_summary_5ctrl.png}
+\caption{Các chỉ tiêu xác lập chính ở kịch bản S2 của năm bộ điều khiển, tính theo phần trăm so với FOC thông thường.}\label{fig:9.9}
+\end{figure}
+
+\subsection{Thảo luận}\label{sec:9.6}
+
+\textbf{PVC theo bằng sáng chế.} Dù dòng đặt đã được định dạng để khử gợn bậc 6, PVC không bù có gợn mô-men RMS 0,200 N$\cdot$m, lớn hơn cả FOC thông thường (0,177 N$\cdot$m). Nguyên nhân là vòng dòng, không phải dòng đặt. Sai lệch do back-EMF \eqref{eq:9.9} chồng lên dòng thực, và các sóng hài định dạng bị lệch pha 8–19° (Bảng~\ref{tab:9.1}), nên dòng thực gần sin hơn dòng đặt: THD dòng chỉ 9,4 \% so với 5,6 \% của FOC bù. Dòng gần sin trên động cơ back-EMF hình thang lại tạo gợn bậc 6 như FOC thông thường (mục 3.4). Dòng $i_d \approx 0{,}76$ A và phần $i_q$ bù thêm làm dòng RMS tăng gấp đôi (0,612 so với 0,286 A) và tổn hao đồng tăng 4,6 lần. Ở chế độ không tải (S1), tổn hao đồng của PVC là 0,39 W, trong khi FOC bù gần như bằng 0.
+
+\textbf{Đặc tính động của PVC không bù.} Sai lệch dòng tỉ lệ gần với $\omega_e^2$ tạo ra một mô-men hãm phụ thuộc tốc độ. Vòng tốc độ thấy thêm một khâu cản, nên đáp ứng chậm hơn (thời gian lên 11,5 ms so với 4,7–4,9 ms), vọt lố ít hơn (7,9 \% ở S1, 15,7 \% ở S3) và sụt tốc khi đóng tải nhỏ hơn (14,9 so với khoảng 21 vòng/phút). Đây không phải ưu điểm thực sự: cùng tác dụng có thể đạt được bằng cách chỉnh PI tốc độ, mà không phải trả giá bằng dòng phản kháng.
+
+\textbf{PVC + bù back-EMF.} Khi bù $\lambda\omega_e\mathbf{f}_{abc}$ vào đầu ra PI \eqref{eq:9.10}, sai lệch \eqref{eq:9.9} bị loại bỏ: $i_d \approx 0{,}02$ A, dòng RMS và tổn hao đồng bằng FOC bù. Gợn mô-men RMS 0,034 N$\cdot$m và gợn bậc 6 0,028 N$\cdot$m, gần FOC bù (0,030 và 0,022 N$\cdot$m). Phần chênh còn lại đến từ sai lệch bám các sóng hài (Bảng~\ref{tab:9.1}) và từ việc PVC không bù trễ số cho góc định dạng (FOC bù dùng $\theta_a$, (6.5)). Ở 30 vòng/phút (S4), các sóng hài có tần số thấp hơn nên được bám tốt hơn, và PVC + bù có gợn tốc độ thấp nhất trong năm bộ điều khiển (0,40 vòng/phút).
+
+\textbf{So sánh với FOC bù.} Hai phương pháp dùng cùng dòng đặt; khác biệt chỉ nằm ở chỗ vòng dòng ở hệ $d$–$q$ hay hệ $abc$. Trong hệ $d$–$q$, dòng đặt gần như không đổi và back-EMF cơ bản là một hằng số, nên PI đạt sai lệch xác lập bằng 0 cho thành phần chính. Trong hệ $abc$, mọi đại lượng đều xoay chiều, nên PVC chỉ đạt chất lượng tương đương khi có bù back-EMF và băng thông dòng đủ cao so với $6f_e$. Lợi ích được bằng sáng chế nêu (phi tuyến của từng pha không bị trộn sang pha khác) không thể hiện trong mô phỏng này vì nghịch lưu không có thời gian chết (mục 9.7).
+
+\begin{table}[H]
+\centering\small
+\caption{So sánh định tính PVC với các bộ điều khiển trước.}\label{tab:9.4}
+\begin{tabularx}{\linewidth}{@{}lll>{\raggedright\arraybackslash}X@{}}
+\toprule
+Tiêu chí & FOC bù & PVC & PVC + bù \\ \midrule
+Dòng đặt & $i_q^{**} = k_s(\theta_a)\, i_q^*$ & \eqref{eq:9.3}, \eqref{eq:9.4} tại $\theta_e$ & \eqref{eq:9.3}, \eqref{eq:9.4} tại $\theta_e$ \\
+Vòng dòng & 2 PI trên $d$–$q$ & 3 PI pha & 3 PI pha \\
+Bù back-EMF & $\omega_e\lambda\, g_{dq}(\theta_p)$ & Không & $\lambda\omega_e\,\mathbf{f}_{abc}(\theta_e)$ \\
+Bù trễ số & Có ($\theta_p$, $\theta_a$) & Không & Không \\
+Suy yếu từ thông & Không & Có \eqref{eq:9.4} & Có \eqref{eq:9.4} \\
+Gợn mô-men RMS (S2) & 0,030 N$\cdot$m & 0,200 N$\cdot$m & 0,034 N$\cdot$m \\
+Tổn hao đồng (S2) & 0,113 W & 0,515 W & 0,113 W \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Hạn chế}\label{sec:9.7}
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Không có thời gian chết và sụt áp van.} Lợi ích chính được bằng sáng chế nêu (cách ly phi tuyến của từng pha) chưa được đánh giá. Cần thêm mô hình thời gian chết vào Power Stage để so sánh công bằng PVC với FOC trên khía cạnh này.
+\item \textbf{Tốc độ cơ sở cố định.} Bằng sáng chế tính $\omega_b$ theo mô-men đặt; mô hình dùng hằng số \eqref{eq:9.5}. Các kịch bản S1–S4 gần như không đi vào vùng suy yếu từ thông, nên \eqref{eq:9.4} chưa được kiểm chứng.
+\item \textbf{Bộ PI pha đơn giản.} Có thể cải thiện khả năng bám tín hiệu xoay chiều bằng bộ điều khiển cộng hưởng tại $f_e$ và $6f_e$ \cite{r3} hoặc bù trễ số cho góc dòng đặt; các phương án này chưa được xét.
+\item \textbf{Các hạn chế chung} của mô hình động cơ và cảm biến lý tưởng như ở mục 7.5.
+\end{enumerate}
+
+\subsection{Tái lập kết quả}\label{sec:9.8}
+
+\begin{Verbatim}
+% 1. chạy mô phỏng PVC (hai biến thể, khoảng 30 s)
+run('03_Simulation/PVC/run_pvc.m')
+% các bộ điều khiển khác: run_conv_foc, run_comp_foc, run_six_step
+% 2. bảng chỉ tiêu (04_Results/Tables/kpi_comparison.*)
+run('04_Results/make_results.m')
+% 3. hình fig9_* và số liệu chương 9 (04_Results/Tables/pvc_numbers.csv)
+SIMULINK_SCREENSHOTS = true; run('04_Results/make_pvc_figures.m')
+% 4. (tùy chọn) kiểm tra hồi quy
+addpath('03_Simulation/Tests')
+bldc_regression('Controllers', {'pvc','pvcff'}, 'Scenarios', {'S1','S2','S3','S4'})
+\end{Verbatim}
+
+Hình~\ref{fig:9.1} được vẽ trong trang \emph{Fig. 9.1 - Pseudo vector control} của \texttt{foc\_block\_diagram.drawio} và xuất PNG bằng draw.io.
