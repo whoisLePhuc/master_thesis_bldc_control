@@ -11,6 +11,7 @@ and the same test scenarios S1–S4, so that results are directly comparable.
 | `Conventional_FOC/` | Two PI current controllers + cross-coupling + constant fundamental back-EMF compensation (ω_e λ_1) | Sec. 5, Fig. 5.1 |
 | `Compensated_FOC/` | Conventional FOC + angle-based back-EMF compensation (LUT g_d, g_q), digital-delay compensation (θ_p, θ_a) and i_q current shaping (k_s) | Sec. 6, Fig. 6.2 |
 | `Six_Step/` | 120° six-step: Hall sectors (from the encoder angle), PI on the two-phase current I = ½·sᵀi_abc, back-EMF feed-forward 2λω_e, H_PWM–L_ON | Sec. 8, Fig. 8.2 |
+| `PVC/` | Pseudo vector control (US 7,339,346): vector-control current references (power-balance i_q*, field-weakening i_d*) → i_abc*, three phase PI controllers; variant with phase back-EMF feedforward (`PVC_FF = 1`) | Sec. 9, Fig. 9.1 |
 
 ## Adding a new controller
 
@@ -50,6 +51,11 @@ Six_Step/
 ├── Six_Step.slx           # model (powergui discrete 1 us); plant blocks are links to bldc_plant_lib
 ├── six_step_init.m        # common P + six-step gains (Kt = 2*p*lam, current/speed PI) and Hall table SS
 └── run_six_step.m         # run S1-S4, save 04_Results/Raw/<SCEN>_six.mat
+
+PVC/
+├── Pseudo_Vector_Control.slx  # model (powergui discrete 1 us); plant blocks are links to bldc_plant_lib
+├── pvc_init.m             # common P + look-up tables TAB (g_d, g_q) + options PVC (ff, fw, wb)
+└── run_pvc.m              # run S1-S4 for PVC_FF = 0 and 1, save <SCEN>_pvc.mat / <SCEN>_pvcff.mat
 
 Tests/
 ├── bldc_controllers.m     # registry of implemented controllers (model, folder, init script, variables)
@@ -113,7 +119,7 @@ an extra Outport `i_dc` (port 7) logs the measured current I.
 ## Output naming
 
 Results are saved to `04_Results/Raw/` as `<scenario>_<controller>.mat`,
-e.g. `S2_conv.mat`, `S2_comp.mat`, `S2_six.mat` (use a short, unique tag for each new controller).
+e.g. `S2_conv.mat`, `S2_comp.mat`, `S2_six.mat`, `S2_pvc.mat`, `S2_pvcff.mat` (use a short, unique tag for each new controller).
 
 ## Requirements
 

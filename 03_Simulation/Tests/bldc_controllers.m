@@ -1,7 +1,7 @@
 function C = bldc_controllers()
 %BLDC_CONTROLLERS  Registry of the implemented controllers (used by the regression test).
 %   Each entry: tag (result-file suffix), name, model, folder (relative to 03_Simulation),
-%   init (init script name) and vars (workspace variables passed to the model).
+%   init (init script name, or a statement evaluated before the model runs) and vars (workspace variables passed to the model).
 %   Add one entry here when a new controller is implemented.
 
 C = struct('tag', {}, 'name', {}, 'model', {}, 'folder', {}, 'init', {}, 'vars', {});
@@ -14,4 +14,10 @@ C(end+1) = struct('tag', 'comp', 'name', 'Compensated FOC', 'model', 'Compensate
 C(end+1) = struct('tag', 'six', 'name', 'Six-step', 'model', 'Six_Step', ...
     'folder', 'Six_Step', 'init', 'six_step_init', ...
     'vars', {{'P', 'SS', 'SC', 'THETA_OFF', 'DECIM'}});
+C(end+1) = struct('tag', 'pvc', 'name', 'PVC', 'model', 'Pseudo_Vector_Control', ...
+    'folder', 'PVC', 'init', 'PVC_FF = 0; pvc_init', ...
+    'vars', {{'P', 'TAB', 'PVC', 'SC', 'THETA_OFF', 'DECIM'}});
+C(end+1) = struct('tag', 'pvcff', 'name', 'PVC + feedforward', 'model', 'Pseudo_Vector_Control', ...
+    'folder', 'PVC', 'init', 'PVC_FF = 1; pvc_init', ...
+    'vars', {{'P', 'TAB', 'PVC', 'SC', 'THETA_OFF', 'DECIM'}});
 end

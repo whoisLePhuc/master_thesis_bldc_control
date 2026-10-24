@@ -57,7 +57,7 @@ Steady state with 1 N·m load at 100 rpm (scenario S2), identical PI gains for b
 master_thesis_bldc_control/
 ├── 01_Documents/
 │   ├── Theory/
-│   │   ├── Markdown/          # theory documents 01–06 (.md, render on GitHub)
+│   │   ├── Markdown/          # theory documents 01–07 (.md, render on GitHub)
 │   │   ├── Latex/             # same documents as LaTeX sources (XeLaTeX)
 │   │   └── PDF/               # compiled PDFs
 │   └── Thesis/
@@ -68,7 +68,8 @@ master_thesis_bldc_control/
 │   ├── Tests/                 # regression test of all controllers (bldc_regression)
 │   ├── Conventional_FOC/
 │   ├── Compensated_FOC/
-│   └── Six_Step/
+│   ├── Six_Step/
+│   └── PVC/
 ├── 04_Results/
 │   ├── make_results.m         # KPI tables + figures fig7_* from the raw results
 │   ├── make_six_step_figures.m # figures fig8_* and numbers of document 06
@@ -102,6 +103,9 @@ DO_CALIB = true;   run_comp_foc     % re-tune the look-up-table phase (TAB_SHIFT
 
 % from 03_Simulation/Six_Step
 run_six_step                        % scenarios S1–S4 -> 04_Results/Raw/S*_six.mat
+
+% from 03_Simulation/PVC
+run_pvc                             % S1–S4, without/with feedforward -> S*_pvc.mat, S*_pvcff.mat
 ```
 
 To run a model interactively, initialise a scenario and press **Run** in Simulink:
@@ -142,6 +146,7 @@ PDFs are written to `01_Documents/Theory/PDF/`. See [`01_Documents/Theory/Latex/
 | **Conventional FOC** | Two PI current controllers (IMC tuning), cross-coupling decoupling, constant fundamental back-EMF feedforward $\omega_e\lambda_1$ | [`03_Simulation/Conventional_FOC`](03_Simulation/Conventional_FOC) | ✅ S1–S4 |
 | **Compensated FOC** | Conventional FOC + trapezoidal back-EMF feedforward from look-up tables $g_d$, $g_q$, digital-delay compensation $\theta_p$, $\theta_a$, and $i_q$ shaping $i_q^{**} = k_s\,i_q^*$ | [`03_Simulation/Compensated_FOC`](03_Simulation/Compensated_FOC) | ✅ S1–S4 |
 | **Six-step** | 120° trapezoidal commutation from Hall sectors, PI control of the two-phase current, back-EMF feed-forward, H_PWM–L_ON modulation | [`03_Simulation/Six_Step`](03_Simulation/Six_Step) | ✅ S1–S4 |
+| **Pseudo vector control (PVC)** | Current references from vector control (power-balance $i_q^*$, field-weakening $i_d^*$) transformed to phase currents and tracked by three phase PI controllers (after US 7,339,346); variant with phase back-EMF feedforward | [`03_Simulation/PVC`](03_Simulation/PVC) | ✅ S1–S4 |
 | *DTC, MPC, …* | Planned / open for extension | – | – |
 
 Common setup: 8 pole-pair BLDC motor (R = 0.4578 Ω, L = 3.33 mH, λ = 0.171 Wb), 36 V IGBT inverter, SVPWM at 10 kHz, current loop 10 kHz, speed loop 1 kHz, Simscape PMSM block with 120° flat-top back-EMF.
@@ -173,6 +178,7 @@ Theory documents (Vietnamese), available as Markdown, LaTeX and PDF:
 | 04 | Compensated FOC for trapezoidal back-EMF (+ Simulink model) | 6 | [md](01_Documents/Theory/Markdown/04_FOC_compensated.md) | [pdf](01_Documents/Theory/PDF/04_FOC_compensated.pdf) |
 | 05 | Simulation results and comparison | 7 | [md](01_Documents/Theory/Markdown/05_simulation_results.md) | [pdf](01_Documents/Theory/PDF/05_simulation_results.pdf) |
 | 06 | Six-step control and comparison of three controllers (+ Simulink model) | 8 | [md](01_Documents/Theory/Markdown/06_six_step.md) | [pdf](01_Documents/Theory/PDF/06_six_step.pdf) |
+| 07 | Pseudo vector control (PVC) (+ Simulink model) | 9 | [md](01_Documents/Theory/Markdown/07_pseudo_vector_control.md) | [pdf](01_Documents/Theory/PDF/07_pseudo_vector_control.pdf) |
 
 Equations, figures and tables are numbered by chapter, e.g. (3.3), Fig. 5.2, Table 6.1, consistently across all three formats.
 
