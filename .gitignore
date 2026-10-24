@@ -1,0 +1,42 @@
+# ---- MATLAB / Simulink ----
+slprj/
+*.slxc
+*.asv
+*.autosave
+*.mexw64
+codegen/
+sccprj/
+
+# ---- Python ----
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# ---- LaTeX build ----
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+
+# ---- Word temp files ----
+~$*.docx
+~$*.pptx
+
+# ---- Large / regenerable results ----
+04_Results/Raw/**
+!04_Results/Raw/.gitkeep
+
+# ---- References: copyrighted PDFs stay local (keep references.bib) ----
+02_References/**/*.pdf
+
+# ---- OS ----
+Thumbs.db
+desktop.ini
+.DS_Store

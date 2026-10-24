@@ -1,0 +1,16 @@
+* text=auto
+
+# MATLAB text files
+*.m     text diff=matlab
+*.json  text
+
+# Binary files (no diff / merge)
+*.slx   binary
+*.mdl   text
+*.mat   binary
+*.fig   binary
+*.docx  binary
+*.pptx  binary
+*.pdf   binary
+*.png   binary
+*.jpg   binary
