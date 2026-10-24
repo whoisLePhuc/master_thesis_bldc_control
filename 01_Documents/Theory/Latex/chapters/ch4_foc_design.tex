@@ -1,0 +1,102 @@
+% !TEX root = ../03_FOC_conventional.tex
+% ch4_foc_design.tex -- Chương 4 (nguồn: Markdown/03_FOC_conventional.md, chuyển sang LaTeX)
+% Compiled from ../03_FOC_conventional.tex
+
+\section{Thiết kế hệ thống điều khiển FOC}\label{sec:4}
+
+\subsection{Sơ đồ tổng thể}\label{sec:4.1}
+
+FOC gồm hai vòng lồng nhau: \textbf{vòng tốc độ} (chậm, 1 kHz) tạo dòng đặt $i_q^*$, và \textbf{vòng dòng điện} (nhanh, 10 kHz) điều khiển $i_d$, $i_q$ bằng hai bộ PI. Điện áp đặt $u_d$, $u_q$ được đổi về hệ $\alpha\beta$, điều chế SVPWM và đưa tới nghịch lưu.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig4_1_foc_overall.png}
+\caption{Sơ đồ khối FOC. Hai cấu trúc trong bộ tài liệu (FOC thông thường – chương 5, FOC bù – chương 6) \textbf{chỉ khác nhau ở khối "d–q current controller"}; mọi khối còn lại giữ nguyên.}\label{fig:4.1}
+\end{figure}
+
+\subsection{Thiết kế bộ PI dòng điện (phương pháp IMC)}\label{sec:4.2}
+
+Bộ điều khiển dòng được thiết kế theo phương pháp mô hình nội \cite{r1}. Giả sử khâu bù (mục 5.1) đã khử được ghép chéo và back-EMF. Từ (3.3)–(3.4), đối tượng của mỗi trục chỉ còn là một khâu quán tính:
+
+\begin{equation}
+G_i(s) = \frac{I(s)}{U'(s)} = \frac{1}{L s + R}.
+\tag{4.1}\label{eq:4.1}
+\end{equation}
+
+Chọn bộ PI $C_i(s) = K_{p,i} + \dfrac{K_{i,i}}{s}$ với
+
+\begin{equation}
+K_{p,i} = \frac{L}{\tau_c},\qquad K_{i,i} = \frac{R}{\tau_c}
+\quad\Longrightarrow\quad
+C_i(s)\,G_i(s) = \frac{1}{\tau_c s},\qquad
+\frac{I(s)}{I^*(s)} = \frac{1}{\tau_c s + 1}.
+\tag{4.2}\label{eq:4.2}
+\end{equation}
+
+Zero của PI ($s=-R/L$) triệt tiêu cực của đối tượng, nên vòng kín là khâu quán tính bậc 1 với hằng số thời gian $\tau_c$ tự chọn.
+
+\textbf{Chọn $\tau_c$.} Điều khiển số gây trễ khoảng $1{,}5T_s$ (mục 4.6). Với hàm truyền vòng hở $\frac{1}{\tau_c s}e^{-1{,}5T_s s}$, tần số cắt $\omega_c = 1/\tau_c$ và độ dự trữ pha
+
+\begin{equation}
+\varphi_m = 90^\circ - \omega_c\cdot 1{,}5T_s\cdot\frac{180^\circ}{\pi}.
+\tag{4.3}\label{eq:4.3}
+\end{equation}
+
+Chọn băng thông bằng $f_{pwm}/20 = 500$ Hz: $\tau_c = \dfrac{1}{2\pi\cdot 500} = 0{,}318$ ms, $\varphi_m = 90^\circ - 27^\circ = 63^\circ$.
+Khi đó $K_{p,i} = 3{,}33\cdot10^{-3}/3{,}18\cdot10^{-4} = 10{,}46$ V/A và $K_{i,i} = 0{,}4578/3{,}18\cdot10^{-4} = 1438$ V/(A$\cdot$s).
+
+\subsection{Thiết kế bộ PI tốc độ (phương pháp đặt cực)}\label{sec:4.3}
+
+Vòng dòng nhanh hơn nhiều so với vòng tốc độ, nên coi $i_q \approx i_q^*$ và $T_e = K_t\, i_q^*$ với $K_t = \tfrac32 p\lambda_1 = 2{,}495$ N$\cdot$m/A. Đối tượng cơ là $G_\omega(s) = \dfrac{K_t}{J s + B}$. Với $C_\omega = K_{p,\omega} + K_{i,\omega}/s$, phương trình đặc trưng vòng kín
+
+\begin{equation}
+J s^2 + (B + K_t K_{p,\omega})\,s + K_t K_{i,\omega} = 0
+\tag{4.4}\label{eq:4.4}
+\end{equation}
+
+được đồng nhất với $s^2 + 2\zeta\omega_n s + \omega_n^2$:
+
+\begin{equation}
+K_{p,\omega} = \frac{2\zeta\omega_n J - B}{K_t},\qquad K_{i,\omega} = \frac{J\omega_n^2}{K_t}.
+\tag{4.5}\label{eq:4.5}
+\end{equation}
+
+Với $\omega_n = 2\pi\cdot 20$ rad/s, $\zeta = 1$: $K_{p,\omega} = 0{,}148$ A$\cdot$s/rad, $K_{i,\omega} = 9{,}30$ A/rad. Đầu ra được giới hạn $|i_q^*|\le 3$ A.
+
+\begin{ghichu}[Vì sao vẫn có vọt lố khi chọn $\zeta=1$?]
+Bộ PI có zero tại $s = -K_{i,\omega}/K_{p,\omega}$ nằm gần các cực, làm đáp ứng bước có vọt lố khoảng 17–18 \% dù hai cực là cực kép thực. Có thể giảm vọt lố bằng PI hai bậc tự do (trọng số điểm đặt) hoặc tham chiếu dạng dốc.
+\end{ghichu}
+
+\subsection{Chống bão hòa tích phân (anti-windup)}\label{sec:4.4}
+
+Mỗi bộ PI rời rạc (Forward Euler) có giới hạn đầu ra và chống bão hòa kiểu \emph{back-calculation}:
+
+\begin{equation}
+u_k = K_p e_k + x_k,\qquad \bar u_k = \mathrm{sat}(u_k),\qquad
+x_{k+1} = x_k + T\big[K_i e_k + K_b(\bar u_k - u_k)\big],\quad K_b = \frac{K_i}{K_p}.
+\tag{4.6}\label{eq:4.6}
+\end{equation}
+
+Khi đầu ra không bão hòa, $\bar u_k = u_k$ và đây là PI thường; khi bão hòa, số hạng $K_b(\bar u - u)$ kéo tích phân về, tránh vọt lố lớn khi thoát bão hòa.
+
+\subsection{Điều chế vector không gian (SVPWM) kiểu min–max}\label{sec:4.5}
+
+Sau Park ngược và Clarke ngược ta có điện áp pha mong muốn $u_a, u_b, u_c$. Cộng thêm thành phần thứ tự không
+
+\begin{equation}
+u_0 = -\tfrac12\big(\max(u_a,u_b,u_c) + \min(u_a,u_b,u_c)\big),\qquad
+d_x = \tfrac12 + \frac{u_x + u_0}{V_{dc}} \in [0,1],
+\tag{4.7}\label{eq:4.7}
+\end{equation}
+
+cho kết quả tương đương SVPWM cổ điển \cite{r2}. Vùng tuyến tính là $\sqrt{u_d^2 + u_q^2} \le V_{dc}/\sqrt3 = 20{,}78$ V. Độ rộng xung $d_x$ được so sánh với sóng mang tam giác 10 kHz để tạo 6 xung cho nghịch lưu.
+
+\subsection{Trễ trong điều khiển số}\label{sec:4.6}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig4_2_digital_delay.png}
+\caption{Dòng và góc được lấy mẫu tại $kT_s$; độ rộng xung tính xong được áp ở chu kỳ kế tiếp; điện áp trung bình của chu kỳ đó ứng với thời điểm $(k+1{,}5)T_s$. Trong khoảng trễ này rotor quay thêm $1{,}5\,T_s\,\omega_e$ rad điện.}\label{fig:4.2}
+\end{figure}
+
+Trễ trung bình $1{,}5\,T_s$ này được dùng để chọn $\tau_c$ ở mục 4.2. Với FOC thông thường, trễ chỉ ảnh hưởng tới độ dự trữ pha; với FOC bù (Tài liệu 04), trễ còn làm lệch pha khâu bù theo góc và phải được bù trực tiếp.

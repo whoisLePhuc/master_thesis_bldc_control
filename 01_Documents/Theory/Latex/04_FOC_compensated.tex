@@ -1,0 +1,97 @@
+% !TeX program = xelatex
+% =====================================================================
+%  Tài liệu 04 -- Phương pháp FOC bù back-EMF hình thang kết hợp định dạng dòng điện
+%  Biên dịch: latexmk 04_FOC_compensated.tex   (hoặc xelatex 2 lần)
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+\usepackage{style/foc_style}
+
+\title{\vspace{-1.2cm}\textbf{Phương pháp FOC bù back-EMF hình thang kết hợp định dạng dòng điện}}
+\author{\normalsize Tài liệu 04 -- Bộ tài liệu lý thuyết\\[2pt]
+\small Điều khiển định hướng từ trường cho động cơ BLDC có sức phản điện động hình thang}
+\date{\small Tháng 10 năm 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent FOC thông thường coi back-EMF trên hệ $d$–$q$ là hằng số, nên với động cơ BLDC còn để lại một nhiễu điện áp bậc 6 và một gợn mô-men nội tại (Tài liệu 03, mục 5.2). Tài liệu này trình bày phương pháp FOC bù gồm ba thành phần: (i) bù back-EMF hình thang theo góc rotor bằng bảng tra, (ii) bù trễ của điều khiển số trong góc tra, và (iii) định dạng dòng $i_q^*$ để mô-men không phụ thuộc góc. Hai bộ PI, bù ghép chéo, SVPWM và vòng tốc độ được giữ nguyên như FOC thông thường. Phần cuối mô tả mô hình Simulink \texttt{Compensated\_FOC.slx}, đối chiếu từng khối với công thức, quy trình hiệu chỉnh bảng tra và kết quả kiểm chứng ở kịch bản S2.
+
+\vspace{0.5em}
+\noindent\textbf{Từ khóa:} động cơ BLDC; FOC; back-EMF hình thang; bù tiến (feedforward); bù trễ số; định dạng dòng điện; bảng tra; Simulink.
+\end{abstract}
+
+\seriesbox{4}
+
+\tableofcontents
+\newpage
+
+\section*{Danh mục ký hiệu}
+\addcontentsline{toc}{section}{Danh mục ký hiệu}
+
+Các ký hiệu chung ($R$, $L$, $\lambda$, $\lambda_1$, $p$, $\omega_e$, $\theta_e$, $T_s$, $\tau_c$, \ldots{}) giống Tài liệu 03. Ký hiệu riêng của tài liệu này:
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}Xl@{}}
+\toprule
+Ký hiệu & Ý nghĩa & Đơn vị \\ \midrule
+$g_d(\theta),\ g_q(\theta)$ & hình chiếu của back-EMF chuẩn hóa lên trục $d$, $q$ (tuần hoàn $\pi/3$) & – \\
+$b_1$ & hệ số Fourier bậc 1 của back-EMF hình thang, $b_1 = 12/\pi^2 \approx 1{,}2158$ & – \\
+$\theta_p$ & góc dự báo dùng để tra bảng back-EMF & rad \\
+$\theta_a$ & góc dự báo dùng để tra hệ số định dạng dòng & rad \\
+$k_s(\theta)$ & hệ số định dạng dòng, $k_s = b_1/g_q$ & – \\
+$i_q^*$ & dòng đặt trục $q$ (đầu ra PI tốc độ) & A \\
+$i_q^{**}$ & dòng đặt trục $q$ sau định dạng, $i_q^{**} = k_s\, i_q^*$ & A \\
+$e_d,\ e_q$ & back-EMF trên hệ $dq$ được bù & V \\
+$\mathrm{LUT}(\cdot)$ & bảng tra một chiều, nội suy tuyến tính & – \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section*{Nhắc lại các kết quả từ Tài liệu 02, 03}
+\addcontentsline{toc}{section}{Nhắc lại các kết quả từ Tài liệu 02, 03}
+
+\begin{itemize}[leftmargin=*]
+\item Back-EMF và mô-men trên hệ $dq$ (3.5), (3.7):
+\end{itemize}
+
+\[
+e_d = \omega_e\lambda\, g_d(\theta_e), \qquad e_q = \omega_e\lambda\, g_q(\theta_e), \qquad
+T_e = \frac32\,p\,\lambda\,\big(g_d(\theta_e)\, i_d + g_q(\theta_e)\, i_q\big).
+\]
+
+\begin{itemize}[leftmargin=*]
+\item Hình chiếu của back-EMF chuẩn hóa $f_{abc}$ lên hệ $dq$ (3.6):
+\end{itemize}
+
+\[
+f_\alpha = \tfrac23\big(f_a - \tfrac12 f_b - \tfrac12 f_c\big),\quad f_\beta = \tfrac{1}{\sqrt3}\big(f_b - f_c\big),\quad
+g_d = \cos\theta_e\, f_\alpha + \sin\theta_e\, f_\beta,\quad g_q = -\sin\theta_e\, f_\alpha + \cos\theta_e\, f_\beta .
+\]
+
+\begin{itemize}[leftmargin=*]
+\item Phần back-EMF mà FOC thông thường \textbf{không} bù được (5.3):
+\end{itemize}
+
+\[
+\Delta e_d = \omega_e\lambda\, g_d(\theta_e), \qquad \Delta e_q = \omega_e\lambda\big(g_q(\theta_e) - b_1\big).
+\]
+
+\begin{itemize}[leftmargin=*]
+\item Trễ trung bình của điều khiển số là $1{,}5\,T_s$ (Tài liệu 03, mục 4.6, Hình 4.2); vòng dòng kín có dạng $1/(\tau_c s + 1)$ (4.2).
+\end{itemize}
+
+% ---------------- nội dung ----------------
+\setcounter{section}{5}
+\input{chapters/ch6_compensated_foc}
+
+% ---------------- tài liệu tham khảo ----------------
+\begin{thebibliography}{9}
+\small
+\bibitem{r1} J. Y. Hung and Z. Ding, "Design of currents to reduce torque ripple in brushless permanent magnet motors," \emph{IEE Proc. B – Electric Power Applications}, vol. 140, no. 4, pp. 260–266, 1993.
+\bibitem{r2} J. Holtz and L. Springob, "Identification and compensation of torque ripple in high-precision permanent magnet motor drives," \emph{IEEE Trans. Ind. Electron.}, vol. 43, no. 2, pp. 309–320, 1996.
+\bibitem{r3} T. M. Jahns and W. L. Soong, "Pulsating torque minimization techniques for permanent magnet AC motor drives — A review," \emph{IEEE Trans. Ind. Electron.}, vol. 43, no. 2, pp. 321–330, 1996.
+\bibitem{r4} L. Harnefors and H.-P. Nee, "Model-based current control of AC machines using the internal model control method," \emph{IEEE Trans. Ind. Appl.}, vol. 34, no. 1, pp. 133–141, 1998.
+\end{thebibliography}
+
+\end{document}

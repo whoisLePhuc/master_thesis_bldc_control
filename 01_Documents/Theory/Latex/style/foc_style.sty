@@ -1,0 +1,95 @@
+% =====================================================================
+%  foc_style.sty -- common style for the theory documents (01-04)
+%  Based on the preamble of foc_bu_backemf.tex. Compile with XeLaTeX.
+% =====================================================================
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{style/foc_style}[2026/10/24 Theory documents style]
+
+\RequirePackage[a4paper,margin=2.3cm]{geometry}
+\RequirePackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\RequirePackage{babel}
+\babelprovide[import,main]{vietnamese}
+\RequirePackage{amsmath,amssymb,bm}
+\RequirePackage{graphicx,float,caption}
+\RequirePackage{booktabs,array,tabularx}
+\RequirePackage{xcolor}
+\RequirePackage{listings}
+\RequirePackage{enumitem}
+\RequirePackage{titlesec}
+\RequirePackage{amsthm}
+\RequirePackage[hidelinks]{hyperref}
+
+% ---------- figures: shared with the Markdown version ----------
+\graphicspath{{../../Thesis/figures/}}
+
+% ---------- headings ----------
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{2}
+\titleformat{\section}{\large\bfseries}{\thesection.}{0.6em}{\MakeUppercase}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection.}{0.5em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\itshape}{\thesubsubsection.}{0.5em}{}
+\renewcommand{\abstractname}{Tóm tắt}
+\renewcommand{\refname}{Tài liệu tham khảo}
+
+% ---------- numbering by chapter: (3.3), Hình 5.2, Bảng 6.1 ----------
+\numberwithin{equation}{section}
+\numberwithin{figure}{section}
+\numberwithin{table}{section}
+\renewcommand{\figurename}{Hình}
+\renewcommand{\tablename}{Bảng}
+
+\captionsetup{font=small,labelfont=bf,labelsep=period}
+\setlength{\parskip}{0.45em}
+\setlength{\parindent}{0pt}
+\setlength{\emergencystretch}{2em}
+\setlist{itemsep=2pt,topsep=3pt}
+
+% ---------- colours ----------
+\definecolor{cB}{HTML}{2A78D6}
+\definecolor{cC}{HTML}{1BAF7A}
+\definecolor{cO}{HTML}{EB6834}
+\definecolor{cG}{HTML}{6B6A66}
+\definecolor{boxbg}{HTML}{F4F7FB}
+\definecolor{compbg}{HTML}{E8F7F0}
+
+% ---------- note box ("Ghi chú") ----------
+\theoremstyle{remark}
+\newtheorem*{ghichuthm}{Ghi chú}
+\newenvironment{ghichu}[1][]{\begin{ghichuthm}[#1]\normalfont}{\end{ghichuthm}}
+
+% ---------- code (fancyvrb: handles Vietnamese comments under XeLaTeX) ----------
+\RequirePackage{fancyvrb}
+\fvset{frame=single,framerule=0.4pt,rulecolor=\color{cG},fontsize=\small,framesep=2mm}
+% listings kept for optional MATLAB highlighting (English-only code)
+\lstset{basicstyle=\ttfamily\small,frame=single,framerule=0.4pt,rulecolor=\color{cG},
+  backgroundcolor=\color{boxbg},columns=fullflexible,keepspaces=true,
+  keywordstyle=\color{cB},commentstyle=\color{cG}\itshape,
+  extendedchars=true,breaklines=true}
+
+% ---------- symbols ----------
+\newcommand{\we}{\omega_e}
+\newcommand{\wm}{\omega_m}
+\newcommand{\thE}{\theta_e}
+\newcommand{\lamf}{\lambda_1}
+
+% ---------- series box (list of documents) ----------
+% \seriesbox{n}: table of the four documents, document n in bold
+\newcommand{\seriesrow}[4]{\ifnum#1=\seriescurrent\gdef\seriesfmt{\bfseries}\else\gdef\seriesfmt{}\fi{\seriesfmt #2} & {\seriesfmt #3} & {\seriesfmt #4}\\}
+\newcommand{\seriesbox}[1]{%
+  \def\seriescurrent{#1}%
+  \begin{center}\small
+  \begin{tabular}{@{}lll@{}}
+  \toprule
+  Tài liệu & Nội dung & Chương \\ \midrule
+  \seriesrow{1}{01}{Mô hình toán học động cơ BLDC}{2}
+  \seriesrow{2}{02}{Mô hình BLDC trên hệ tọa độ quay}{3}
+  \seriesrow{3}{03}{Thiết kế FOC và FOC thông thường}{4, 5}
+  \seriesrow{4}{04}{FOC bù back-EMF hình thang}{6}
+  \bottomrule
+  \end{tabular}
+  \end{center}}
+
+\endinput

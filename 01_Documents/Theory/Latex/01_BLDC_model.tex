@@ -1,0 +1,67 @@
+% !TeX program = xelatex
+% =====================================================================
+%  Tài liệu 01 -- Mô hình toán học động cơ BLDC có sức phản điện động hình thang
+%  Biên dịch: latexmk 01_BLDC_model.tex   (hoặc xelatex 2 lần)
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+\usepackage{style/foc_style}
+
+\title{\vspace{-1.2cm}\textbf{Mô hình toán học động cơ BLDC có sức phản điện động hình thang}}
+\author{\normalsize Tài liệu 01 -- Bộ tài liệu lý thuyết\\[2pt]
+\small Điều khiển định hướng từ trường cho động cơ BLDC có sức phản điện động hình thang}
+\date{\small Tháng 10 năm 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent Tài liệu xây dựng mô hình toán học của động cơ một chiều không chổi than (BLDC) ba pha trong hệ tọa độ pha $abc$: phương trình điện áp, sức phản điện động (back-EMF) dạng hình thang với đỉnh phẳng 120°, khai triển Fourier của back-EMF và từ thông thành phần cơ bản, biểu thức mô-men điện từ và phương trình chuyển động cơ. Phần cuối đối chiếu mô hình với khối Permanent Magnet Synchronous Machine (back-EMF hình thang) của Simscape Electrical được dùng trong các mô hình Simulink của đề tài. Mô hình này là cơ sở cho việc chuyển sang hệ tọa độ quay ở Tài liệu 02.
+
+\vspace{0.5em}
+\noindent\textbf{Từ khóa:} động cơ BLDC; back-EMF hình thang; khai triển Fourier; mô-men điện từ; Simscape Electrical.
+\end{abstract}
+
+\seriesbox{1}
+
+\tableofcontents
+\newpage
+
+\section*{Danh mục ký hiệu}
+\addcontentsline{toc}{section}{Danh mục ký hiệu}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}Xl@{}}
+\toprule
+Ký hiệu & Ý nghĩa & Đơn vị \\ \midrule
+$v_x,\ i_x,\ e_x$ & điện áp, dòng điện, back-EMF pha $x\in\{a,b,c\}$ & V, A, V \\
+$v_n$ & điện áp điểm trung tính & V \\
+$R$ & điện trở một pha & $\Omega$ \\
+$L_s,\ M,\ L$ & điện cảm riêng, hỗ cảm, điện cảm đồng bộ $L = L_s - M$ & H \\
+$\lambda$ & biên độ từ thông nam châm (ứng với đỉnh phẳng back-EMF) & Wb \\
+$\lambda_1$ & từ thông thành phần cơ bản, $\lambda_1 = b_1\lambda$ & Wb \\
+$p$ & số đôi cực & – \\
+$\omega_m,\ \omega_e = p\,\omega_m$ & tốc độ cơ, tốc độ điện & rad/s \\
+$\theta_m,\ \theta_e = p\,\theta_m$ & góc cơ, góc điện của rotor & rad \\
+$F(\theta)$ & hàm hình thang chuẩn hóa (biên độ 1, đỉnh phẳng 120°) & – \\
+$f_x(\theta_e)$ & dạng back-EMF chuẩn hóa của pha $x$ & – \\
+$b_n$ & hệ số Fourier bậc $n$ của $F$ & – \\
+$T_e,\ T_L$ & mô-men điện từ, mô-men tải & N$\cdot$m \\
+$J,\ B$ & mô-men quán tính, hệ số ma sát nhớt & kg$\cdot$m$^2$, N$\cdot$m$\cdot$s/rad \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% ---------------- nội dung ----------------
+\setcounter{section}{1}
+\input{chapters/ch2_bldc_model}
+
+% ---------------- tài liệu tham khảo ----------------
+\begin{thebibliography}{9}
+\small
+\bibitem{r1} P. Pillay and R. Krishnan, "Modeling, simulation, and analysis of permanent-magnet motor drives, Part II: The brushless DC motor drive," \emph{IEEE Trans. Ind. Appl.}, vol. 25, no. 2, pp. 274–279, 1989.
+\bibitem{r2} C.-M. Ong, \emph{Dynamic Simulation of Electric Machinery Using MATLAB/SIMULINK}. Upper Saddle River, NJ, USA: Prentice Hall, 1997.
+\bibitem{r3} R. Krishnan, \emph{Permanent Magnet Synchronous and Brushless DC Motor Drives}. Boca Raton, FL, USA: CRC Press, 2010.
+\bibitem{r4} R. Carlson, M. Lajoie-Mazenc, and J. C. dos S. Fagundes, "Analysis of torque ripple due to phase commutation in brushless DC machines," \emph{IEEE Trans. Ind. Appl.}, vol. 28, no. 3, pp. 632–638, 1992.
+\end{thebibliography}
+
+\end{document}

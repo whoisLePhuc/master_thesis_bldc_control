@@ -1,0 +1,130 @@
+% !TEX root = ../02_dq_model.tex
+% ch3_dq_model.tex -- Chương 3 (nguồn: Markdown/02_dq_model.md, chuyển sang LaTeX)
+% Compiled from ../02_dq_model.tex
+
+\section{Mô hình động cơ BLDC trên hệ tọa độ quay}\label{sec:3}
+
+FOC điều khiển dòng điện trong một hệ trục \textbf{quay cùng rotor}. Trong hệ trục này, với động cơ sin, các đại lượng xoay chiều trở thành một chiều, và bộ PI có thể điều khiển chúng không sai lệch tĩnh \cite{r1}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig3_1_reference_frames.png}
+\caption{Hệ trục pha $abc$, hệ trục tĩnh $\alpha\beta$ và hệ trục quay $dq$ gắn với rotor. Trục $d$ trùng hướng từ thông nam châm, trục $q$ vượt trước 90°; FOC đặt $\vec i_s$ gần như trùng trục $q$ ($i_d = 0$).}\label{fig:3.1}
+\end{figure}
+
+\subsection{\texorpdfstring{Biến đổi Clarke ($abc\to\alpha\beta$)}{Biến đổi Clarke (abc→αβ)}}\label{sec:3.1}
+
+Sử dụng dạng bất biến biên độ (hệ số $2/3$) \cite{r1}:
+
+\begin{equation}
+\begin{bmatrix} x_\alpha \\ x_\beta \end{bmatrix}
+= \frac{2}{3}\begin{bmatrix} 1 & -\tfrac12 & -\tfrac12 \\ 0 & \tfrac{\sqrt3}{2} & -\tfrac{\sqrt3}{2} \end{bmatrix}
+\begin{bmatrix} x_a \\ x_b \\ x_c \end{bmatrix},
+\qquad
+\begin{bmatrix} x_a \\ x_b \\ x_c \end{bmatrix}
+= \begin{bmatrix} 1 & 0 \\ -\tfrac12 & \tfrac{\sqrt3}{2} \\ -\tfrac12 & -\tfrac{\sqrt3}{2} \end{bmatrix}
+\begin{bmatrix} x_\alpha \\ x_\beta \end{bmatrix}.
+\tag{3.1}\label{eq:3.1}
+\end{equation}
+
+Với hệ số $2/3$, biên độ vector $\alpha\beta$ bằng biên độ đại lượng pha; đổi lại công suất có hệ số $3/2$: $P = \tfrac32 (v_\alpha i_\alpha + v_\beta i_\beta)$. Phép biến đổi ngược ở \eqref{eq:3.1} đúng khi thành phần thứ tự không bằng 0, điều luôn thỏa với dòng điện do $i_a+i_b+i_c=0$.
+
+\subsection{\texorpdfstring{Biến đổi Park ($\alpha\beta\to dq$)}{Biến đổi Park (αβ→ dq)}}\label{sec:3.2}
+
+\begin{equation}
+\begin{bmatrix} x_d \\ x_q \end{bmatrix}
+= \begin{bmatrix} \cos\theta_e & \sin\theta_e \\ -\sin\theta_e & \cos\theta_e \end{bmatrix}
+\begin{bmatrix} x_\alpha \\ x_\beta \end{bmatrix},
+\qquad
+\begin{bmatrix} x_\alpha \\ x_\beta \end{bmatrix}
+= \begin{bmatrix} \cos\theta_e & -\sin\theta_e \\ \sin\theta_e & \cos\theta_e \end{bmatrix}
+\begin{bmatrix} x_d \\ x_q \end{bmatrix}.
+\tag{3.2}\label{eq:3.2}
+\end{equation}
+
+Ma trận Park là ma trận quay trực chuẩn, nên tích vô hướng được bảo toàn: $x_\alpha y_\alpha + x_\beta y_\beta = x_d y_d + x_q y_q$.
+
+\subsection{\texorpdfstring{Mô hình BLDC trong hệ $dq$}{Mô hình BLDC trong hệ dq}}\label{sec:3.3}
+
+Áp dụng \eqref{eq:3.1}–\eqref{eq:3.2} cho (2.1) (thành phần $v_n$ là thứ tự không nên biến mất), và dùng $\frac{d}{dt}\mathbf{P}(\theta_e) = \omega_e\,\frac{d\mathbf{P}}{d\theta_e}$, ta được \cite{r3}, \cite{r4}:
+
+\begin{equation}
+v_d = R\,i_d + L\frac{di_d}{dt} - \omega_e L\, i_q + e_d,
+\tag{3.3}\label{eq:3.3}
+\end{equation}
+
+\begin{equation}
+v_q = R\,i_q + L\frac{di_q}{dt} + \omega_e L\, i_d + e_q.
+\tag{3.4}\label{eq:3.4}
+\end{equation}
+
+Các số hạng $\mp\omega_e L\, i_{q,d}$ là \textbf{ghép chéo} giữa hai trục. Back-EMF trên hệ $dq$ là hình chiếu của (2.2):
+
+\begin{equation}
+e_d = \omega_e\lambda\, g_d(\theta_e), \qquad e_q = \omega_e\lambda\, g_q(\theta_e),
+\tag{3.5}\label{eq:3.5}
+\end{equation}
+
+\begin{equation}
+\boxed{\;
+\begin{aligned}
+f_\alpha &= \tfrac23\big(f_a - \tfrac12 f_b - \tfrac12 f_c\big), &\quad f_\beta &= \tfrac{1}{\sqrt3}\big(f_b - f_c\big),\\
+g_d(\theta_e) &= \cos\theta_e\, f_\alpha + \sin\theta_e\, f_\beta, &\quad g_q(\theta_e) &= -\sin\theta_e\, f_\alpha + \cos\theta_e\, f_\beta .
+\end{aligned}\;}
+\tag{3.6}\label{eq:3.6}
+\end{equation}
+
+Mô-men (2.5) viết lại trên hệ $dq$ (hệ số $3/2$ do Clarke bất biến biên độ, và Park bảo toàn tích vô hướng):
+
+\begin{equation}
+T_e = \frac32\,p\,\lambda\,\big(g_d(\theta_e)\, i_d + g_q(\theta_e)\, i_q\big).
+\tag{3.7}\label{eq:3.7}
+\end{equation}
+
+\subsection{So sánh với động cơ có back-EMF hình sin}\label{sec:3.4}
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{Động cơ sin (PMSM):} $f_x$ là sin, khi đó $g_d \equiv 0$ và $g_q \equiv 1$ (với $\lambda$ là biên độ sin). Back-EMF trên hệ $dq$ là hằng số và $T_e = \tfrac32 p\lambda i_q$, tức mô-men tỉ lệ thẳng với $i_q$.
+\item \textbf{Động cơ hình thang (BLDC):} $g_d$, $g_q$ \textbf{dao động theo góc} với chu kỳ $\pi/3$ (60° điện, tức bậc 6), Hình~\ref{fig:3.2}. Giá trị trung bình $\overline{g_q} = b_1 = 1{,}2158$, $\overline{g_d}=0$, nhưng:
+\end{itemize}
+
+\begin{equation}
+g_q(\theta_e) \in \Big[\tfrac{2}{\sqrt3},\ \tfrac43\Big] = [1{,}1547;\ 1{,}3333], \qquad g_d(\theta_e)\in[-0{,}0237;\ 0{,}0237].
+\tag{3.8}\label{eq:3.8}
+\end{equation}
+
+Biên độ dao động của $g_q$ là $\tfrac12\big(\tfrac43 - \tfrac{2}{\sqrt3}\big)/b_1 \approx 7{,}3\,\%$ so với giá trị trung bình. Nguyên nhân: các bậc điều hòa $6k\pm1$ của back-EMF (bậc 5, 7, 11, 13, \ldots{} ở (2.3)) quay với tốc độ $(6k\pm1)\omega_e$ trong hệ tĩnh, nên khi nhìn từ hệ quay với tốc độ $\omega_e$ chúng trở thành dao động tần số $6k\,\omega_e$ \cite{r2}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig3_2_gdq.png}
+\caption{Hình chiếu của back-EMF hình thang lên hệ $dq$ (tính theo \eqref{eq:3.6}). $g_q$ dao động quanh $b_1$ với chu kỳ 60° điện, $g_d$ rất nhỏ.}\label{fig:3.2}
+\end{figure}
+
+\begin{ghichu}[Tần số của dao động bậc 6]
+Ở tốc độ cơ $n$ (vòng/phút), tần số điện $f_e = p\,n/60$ và dao động trên hệ $dq$ có tần số $f_6 = 6 f_e$. Với động cơ này ($p=8$) tại 100 vòng/phút: $f_e = 13{,}3$ Hz, $f_6 = 80$ Hz, $\omega_e = 83{,}8$ rad/s.
+\end{ghichu}
+
+Hệ quả cho điều khiển: nếu bộ điều khiển giả thiết $g_q$ là hằng số $b_1$ (như động cơ sin), phần dao động $g_q - b_1$ vừa tác động như một nhiễu điện áp bậc 6 lên vòng dòng, vừa làm mô-men dao động theo \eqref{eq:3.7} ngay cả khi $i_q$ phẳng. Hai cơ chế này được phân tích định lượng ở Tài liệu 03, mục 5.2, và được khắc phục bằng FOC bù ở Tài liệu 04.
+
+\subsection{Tương ứng trong mô hình Simulink}\label{sec:3.5}
+
+\begin{table}[H]
+\centering\small
+\caption{Các phép biến đổi của chương này trong mô hình Simulink.}\label{tab:3.1}
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+Công thức & Vị trí trong mô hình & Hiện thực \\ \midrule
+Clarke thuận \eqref{eq:3.1} & khối \texttt{abc\_to\_dq} & Gain với ma trận \texttt{P.Kc} = $\tfrac23\begin{bmatrix}1 & -\frac12 & -\frac12\\ 0 & \frac{\sqrt3}{2} & -\frac{\sqrt3}{2}\end{bmatrix}$ \\
+Park thuận \eqref{eq:3.2} & khối \texttt{abc\_to\_dq} & 4 phép nhân với $\cos\theta_e$, $\sin\theta_e$ và 2 bộ cộng \\
+Park ngược \eqref{eq:3.2} & khối \texttt{SVPWM} & 4 phép nhân và 2 bộ cộng, cho $u_\alpha$, $u_\beta$ \\
+Clarke ngược \eqref{eq:3.1} & khối \texttt{SVPWM} & Gain với ma trận \texttt{P.Kic} \\
+$g_d$, $g_q$ theo \eqref{eq:3.6} & \texttt{comp\_foc\_init.m} (chỉ FOC bù) & Tính sẵn trên một chu kỳ $[0, \pi/3)$, lưu vào bảng tra \texttt{TAB.gd}, \texttt{TAB.gq} \\
+Góc điện $\theta_e$ & tầng ngoài cùng: \texttt{p\_th}, \texttt{theta\_off}, \texttt{theta\_e} & $\theta_e = p\,\theta_m + \texttt{THETA\_OFF}$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Ảnh các khối \texttt{abc\_to\_dq} và \texttt{SVPWM} xem Tài liệu 03, Hình 5.5 và 5.6.
+
+\textbf{Quy ước góc và \texttt{THETA\_OFF}.} Các công thức trong bộ tài liệu dùng $\theta_e$ đo từ trục pha $a$ tới trục $d$ (hướng từ thông nam châm), như Hình~\ref{fig:3.1}. Khối PMSM của Simscape lại báo góc rotor theo quy ước \emph{"rotor flux position when $\theta$ = 0: 90° behind phase A axis"}, tức lệch $\pi/2$ so với quy ước trên. Vì vậy mô hình cộng thêm \texttt{THETA\_OFF} $= -\pi/2$ vào $p\,\theta_m$ trước khi dùng cho Park, Park ngược và bảng tra. Giá trị này đã được kiểm chứng bằng mô phỏng: với \texttt{THETA\_OFF} $= -\pi/2$, $i_d$ dao động quanh 0, mô-men trung bình bằng mô-men tải, và khi quét thêm độ lệch bảng tra \texttt{TAB\_SHIFT} trong $\pm$15°, giá trị tối ưu là 0° (Tài liệu 04, mục 6.7.4).

@@ -1,0 +1,330 @@
+% !TEX root = ../03_FOC_conventional.tex
+% ch5_conventional_foc.tex -- Chương 5 (nguồn: Markdown/03_FOC_conventional.md, chuyển sang LaTeX)
+% Compiled from ../03_FOC_conventional.tex
+
+\section{FOC thông thường và nguồn gốc gợn mô-men}\label{sec:5}
+
+\subsection{Luật điều khiển}\label{sec:5.1}
+
+FOC thông thường được thiết kế như cho động cơ sin \cite{r3}: coi $e_d = 0$ và $e_q = \omega_e\lambda_1$ là hằng số. Từ (3.3)–(3.4):
+
+\begin{equation}
+u_d = \underbrace{K_{p,i}(0 - i_d) + K_{i,i}\!\int(0 - i_d)\,dt}_{\text{PI}_d} \;-\; \underbrace{\omega_e L\, i_q}_{\text{bù ghép chéo}},
+\tag{5.1}\label{eq:5.1}
+\end{equation}
+
+\begin{equation}
+u_q = \underbrace{K_{p,i}(i_q^* - i_q) + K_{i,i}\!\int(i_q^* - i_q)\,dt}_{\text{PI}_q} \;+\; \underbrace{\omega_e L\, i_d}_{\text{bù ghép chéo}} \;+\; \underbrace{\omega_e\lambda_1}_{\text{bù back-EMF cơ bản}}.
+\tag{5.2}\label{eq:5.2}
+\end{equation}
+
+Dòng đặt: $i_d^* = 0$ (không làm yếu từ thông), $i_q^*$ là đầu ra PI tốc độ.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig5_1_conv_current_controller.png}
+\caption{Bộ điều khiển dòng của FOC thông thường: hai PI, bù ghép chéo và bù back-EMF cơ bản hằng số $\omega_e\lambda_1$ trên trục $q$.}\label{fig:5.1}
+\end{figure}
+
+\subsection{Phân tích gợn mô-men}\label{sec:5.2}
+
+So sánh \eqref{eq:5.2} với (3.4), phần back-EMF \textbf{không} được bù là
+
+\begin{equation}
+\Delta e_d = \omega_e\lambda\, g_d(\theta_e), \qquad \Delta e_q = \omega_e\lambda\big(g_q(\theta_e) - b_1\big).
+\tag{5.3}\label{eq:5.3}
+\end{equation}
+
+Đây là nguồn gốc của gợn mô-men khi áp dụng FOC cho động cơ có back-EMF không sin \cite{r4}. Gợn mô-men sinh ra theo \textbf{hai cơ chế} chồng lên nhau.
+
+\textbf{Cơ chế 1: nhiễu điện áp lên vòng dòng.} $\Delta e_q$ là một nhiễu điện áp bậc 6. Với PI theo \eqref{eq:4.2}, hàm truyền từ nhiễu điện áp tới dòng là
+
+\begin{equation}
+\frac{I_q(s)}{-\Delta E_q(s)} = \frac{G_i}{1 + C_i G_i} = \frac{1}{Ls+R}\cdot\frac{\tau_c s}{\tau_c s + 1}.
+\tag{5.4}\label{eq:5.4}
+\end{equation}
+
+Ví dụ số tại 100 vòng/phút ($\omega_6 = 6\omega_e = 503$ rad/s): biên độ đỉnh–đỉnh của nhiễu $\Delta e_q$ là $\omega_e\lambda\big(\tfrac43 - \tfrac{2}{\sqrt3}\big) = 83{,}8\times0{,}171\times0{,}179 = 2{,}56$ V; độ lợi \eqref{eq:5.4} tại $\omega_6$ bằng $0{,}091$ A/V; suy ra dao động $i_q \approx 0{,}23$ A đỉnh–đỉnh.
+
+\textbf{Cơ chế 2: mô-men gợn ngay cả khi $i_q$ phẳng.} Theo (3.7) với $i_d = 0$:
+
+\begin{equation}
+T_e = \tfrac32\,p\,\lambda\, g_q(\theta_e)\, i_q .
+\tag{5.5}\label{eq:5.5}
+\end{equation}
+
+Nếu $i_q$ là hằng số tuyệt đối thì $T_e$ vẫn dao động theo $g_q(\theta_e)$, tức gợn nội tại
+
+\begin{equation}
+\frac{\Delta T_{e,pp}}{T_{e,avg}} = \frac{4/3 - 2/\sqrt3}{b_1} = 14{,}7\ \%.
+\tag{5.6}\label{eq:5.6}
+\end{equation}
+
+\begin{ghichu}[Hệ quả]
+Tăng băng thông vòng dòng chỉ giảm được cơ chế 1, \textbf{không} giảm được cơ chế 2. Muốn mô-men phẳng phải (a) bù đầy đủ back-EMF để triệt nhiễu, và (b) cố ý điều chế $i_q$ theo góc để bù cho $g_q(\theta_e)$. Đó chính là hai thành phần của FOC bù (Tài liệu 04).
+\end{ghichu}
+
+Mục 5.3.7 kiểm chứng các ước lượng này trên mô hình Simulink.
+
+\subsection{Triển khai mô hình Simulink}\label{sec:5.3}
+
+Mục này mô tả mô hình \texttt{Conventional\_FOC.slx} hiện thực FOC thông thường của mục 5.1 trên một động cơ BLDC back-EMF hình thang, ở mức chuyển mạch từng van của nghịch lưu.
+
+\subsubsection{Tổ chức file và cách chạy}\label{sec:5.3.1}
+
+Các file nằm trong \texttt{03\_Simulation/Conventional\_FOC/}:
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+File & Vai trò \\ \midrule
+\texttt{Conventional\_FOC.slx} & Mô hình Simulink (Simscape Electrical – Specialized Power Systems) \\
+\texttt{conv\_foc\_init.m} & Tạo struct thông số \texttt{P}, kịch bản \texttt{SC} (S1–S4), góc lệch \texttt{THETA\_OFF}, hệ số ghi dữ liệu \texttt{DECIM}. Được gọi tự động khi mở mô hình (\texttt{PreLoadFcn}) \\
+\texttt{run\_conv\_foc.m} & Chạy lần lượt S1–S4, lưu kết quả vào \texttt{04\_Results/Raw/<SCEN>\_conv.mat} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{Verbatim}
+% Chạy cả 4 kịch bản
+run_conv_foc
+
+% Chỉ chạy một kịch bản
+SCEN_LIST = {'S2'}; run_conv_foc
+
+% Mở mô hình với một kịch bản để chạy bằng nút Run
+SCEN = 'S3'; conv_foc_init; open_system('Conventional_FOC')
+\end{Verbatim}
+
+Mỗi file kết quả chứa struct \texttt{R} gồm các chuỗi thời gian \texttt{t, w\_ref, TL, w, Te, i\_abc, id, iq, iq\_ref, iq\_cmd} (bước 10 $\mu$s), cùng \texttt{P}, \texttt{SC}, \texttt{THETA\_OFF} và \texttt{meta} (ngày chạy, phiên bản MATLAB, thời gian mô phỏng).
+
+\subsubsection{Cấu hình mô phỏng và các tần số lấy mẫu}\label{sec:5.3.2}
+
+Mô hình là hệ nhiều tốc độ lấy mẫu, mô phỏng với solver bước cố định:
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xll@{}}
+\toprule
+Thành phần & Bước / chu kỳ & Biến \\ \midrule
+Solver (\texttt{FixedStepDiscrete}) và \texttt{powergui} (Discrete) – mạch công suất, động cơ & 1 $\mu$s & \texttt{P.dt} \\
+Lấy mẫu dòng, góc, tốc độ (ZOH); PI dòng; SVPWM; sóng mang PWM & 100 $\mu$s (10 kHz) & \texttt{P.Ts} \\
+PI tốc độ & 1 ms & \texttt{P.Tsw} \\
+Ghi dữ liệu các đầu ra \texttt{w}, \texttt{Te}, \texttt{i\_abc} & 10 $\mu$s & \texttt{DECIM*P.dt} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Thời gian mô phỏng lấy theo kịch bản (\texttt{StopTime = SC.T}). Tham chiếu tốc độ \texttt{w\_ref} và mô-men tải \texttt{TL} là hai Inport ở tầng ngoài cùng, được \texttt{run\_conv\_foc.m} cấp dưới dạng tín hiệu bậc thang (\texttt{Interpolate = off}).
+
+\subsubsection{Sơ đồ tầng ngoài cùng}\label{sec:5.3.3}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig5_sim_conv_root.png}
+\caption{Tầng ngoài cùng của \texttt{Conventional\_FOC.slx}. Hàng trên là đường thuận từ tham chiếu tốc độ tới động cơ; ba hàng dưới là phản hồi góc, dòng và tốc độ, sắp xếp giống Hình~\ref{fig:4.1}.}\label{fig:5.2}
+\end{figure}
+
+Bảng~\ref{tab:5.1} đối chiếu các khối trên Hình~\ref{fig:4.1} với mô hình:
+
+\begin{table}[H]
+\centering\small
+\caption{Đối chiếu sơ đồ khối FOC (Hình~\ref{fig:4.1}) với các khối Simulink.}\label{tab:5.1}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xl>{\raggedright\arraybackslash}X@{}}
+\toprule
+Hình~\ref{fig:4.1} & Khối Simulink & Ghi chú \\ \midrule
+Speed PI & \texttt{Speed PI} & PI rời rạc, $T_\omega$ = 1 ms \\
+d–q current controller & \texttt{Current PI} & Luật \eqref{eq:5.1}–\eqref{eq:5.2} \\
+Inverse Park + SVPWM + $z^{-1}$ & \texttt{SVPWM} & Gộp Park ngược, Clarke ngược, min–max và trễ một chu kỳ \\
+(tạo xung) & \texttt{PWM} & So sánh duty với sóng mang 10 kHz \\
+Three-phase inverter + BLDC & \texttt{Power Stage} & Nghịch lưu IGBT, khối PMSM back-EMF hình thang \\
+Clarke + Park & \texttt{abc\_to\_dq} & (3.1), (3.2) \\
+Encoder & \texttt{ZOH\_th}, \texttt{ZOH\_w} & Lấy mẫu góc và tốc độ cơ tại $T_s$ (encoder lý tưởng) \\
+$\times p$ & \texttt{p\_th}, \texttt{p\_w} & $\theta_e = p\theta_m$, $\omega_e = p\omega_m$ \\
+– & \texttt{theta\_off}, \texttt{theta\_e} & $\theta_e = p\theta_m + \texttt{THETA\_OFF}$ (xem mục 5.3.4) \\
+– & \texttt{ZOH\_i} & Lấy mẫu dòng pha tại $T_s$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Các Outport \texttt{w}, \texttt{Te}, \texttt{i\_abc}, \texttt{idq}, \texttt{iq\_ref}, \texttt{iq\_cmd} chỉ dùng để ghi dữ liệu.
+
+\subsubsection{Các khối con}\label{sec:5.3.4}
+
+\textbf{a) Speed PI.} Sai lệch $e_\omega = \omega_m^* - \omega_m$ đưa vào bộ PID rời rạc (dạng PI, Forward Euler, $T_\omega$ = 1 ms) với $K_p$ = \texttt{P.Kp\_w\_foc}, $K_i$ = \texttt{P.Ki\_w\_foc} theo \eqref{eq:4.5}. Đầu ra giới hạn $\pm$\texttt{P.Imax} = $\pm$3 A, chống bão hòa back-calculation với $K_b = K_i/K_p$ theo \eqref{eq:4.6}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig5_sim_conv_speed_pi.png}
+\caption{Khối \texttt{Speed PI}.}\label{fig:5.3}
+\end{figure}
+
+\textbf{b) Current PI.} Hiện thực trực tiếp \eqref{eq:5.1}–\eqref{eq:5.2}, bố cục giống Hình~\ref{fig:5.1}. Tín hiệu $\omega_e$, $i_d$, $i_q$ được phân phối bằng các nhãn Goto/From (\texttt{[we]}, \texttt{[id]}, \texttt{[iq]}) để tránh dây cắt nhau.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig5_sim_conv_current_pi.png}
+\caption{Khối \texttt{Current PI}.}\label{fig:5.4}
+\end{figure}
+
+\begin{table}[H]
+\centering\small
+\caption{Đối chiếu luật điều khiển \eqref{eq:5.1}–\eqref{eq:5.2} với khối \texttt{Current PI}.}\label{tab:5.2}
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+Thành phần & Khối & Tham số \\ \midrule
+$i_d^* = 0$ & \texttt{id\_ref} (Constant) & 0 \\
+Sai lệch $e_d$, $e_q$ & \texttt{e\_d}, \texttt{e\_q} (Sum) & – \\
+PI$_d$, PI$_q$ \eqref{eq:4.2} & \texttt{PI\_d}, \texttt{PI\_q} (PID Controller, rời rạc, $T_s$) & \texttt{P.Kp\_i}, \texttt{P.Ki\_i}; giới hạn $\pm$\texttt{P.Vm}; $K_b$ = \texttt{P.Ki\_i/P.Kp\_i} \\
+$-\omega_e L i_q$ & \texttt{we*iq} (Product) $\to$ \texttt{-L} (Gain) & \texttt{-P.L} \\
+$+\omega_e L i_d$ & \texttt{we*id} (Product) $\to$ \texttt{L} (Gain) & \texttt{P.L} \\
+$+\omega_e\lambda_1$ & \texttt{lam1} (Gain) & \texttt{P.lam1} \\
+Tổng $u_d$, $u_q$ & \texttt{Sum\_ud}, \texttt{Sum\_uq} & – \\
+Giới hạn $\pm V_{dc}/\sqrt3$ & \texttt{Sat\_d}, \texttt{Sat\_q} (Saturation) & $\pm$\texttt{P.Vm} = $\pm$20,78 V \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{ghichu}[Bão hòa hai lần]
+Mỗi PI tự giới hạn đầu ra $\pm$\texttt{P.Vm}, sau đó phần bù mới được cộng vào và tổng lại bị giới hạn bởi \texttt{Sat\_d}, \texttt{Sat\_q}. Cơ chế chống bão hòa \eqref{eq:4.6} chỉ "thấy" giới hạn bên trong PI, không thấy giới hạn của tổng. Ở 100 vòng/phút điện áp còn xa giới hạn nên không ảnh hưởng; ở tốc độ cao (khi $\omega_e\lambda_1$ lớn) cần đưa giới hạn tổng vào vòng back-calculation.
+\end{ghichu}
+
+\textbf{c) abc\_to\_dq.} Clarke bất biến biên độ (3.1) bằng khối Gain với ma trận \texttt{P.Kc}, sau đó Park (3.2):
+$i_d = i_\alpha\cos\theta_e + i_\beta\sin\theta_e$, $i_q = -i_\alpha\sin\theta_e + i_\beta\cos\theta_e$.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig5_sim_conv_abc_to_dq.png}
+\caption{Khối \texttt{abc\_to\_dq}.}\label{fig:5.5}
+\end{figure}
+
+\textbf{d) SVPWM.} Gồm bốn bước:
+
+\begin{enumerate}[leftmargin=*]
+\item Park ngược: $u_\alpha = u_d\cos\theta_e - u_q\sin\theta_e$, $u_\beta = u_d\sin\theta_e + u_q\cos\theta_e$.
+\item Clarke ngược bằng khối Gain \texttt{iClarke} với ma trận \texttt{P.Kic}, cho $u_a, u_b, u_c$.
+\item Bơm thành phần thứ tự không min–max và chuẩn hóa theo \eqref{eq:4.7}: \texttt{max}, \texttt{min}, \texttt{Sum\_mm}, \texttt{neg\_half} ($\times-$0,5), \texttt{v\_inj}, \texttt{inv\_Vdc} ($\times$1/\texttt{P.Vdc}), \texttt{Bias} (+0,5), \texttt{Sat01} (giới hạn [0, 1]).
+\item Trễ một chu kỳ \texttt{z\_duty} (Unit Delay, $T_s$): duty tính tại $kT_s$ được áp ở chu kỳ sau, đúng như Hình~\ref{fig:4.2}.
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig5_sim_conv_svpwm.png}
+\caption{Khối \texttt{SVPWM}.}\label{fig:5.6}
+\end{figure}
+
+\textbf{e) PWM.} Duty $d_x$ được so sánh với sóng mang tam giác \texttt{Carrier} (Repeating Sequence, chu kỳ \texttt{P.Ts}, biên độ 0–1). Xung van trên là $s_x = (d_x > \text{carrier})$, xung van dưới là $1 - s_x$ (không có thời gian chết). Đầu vào \texttt{en} (hằng \texttt{ones(3,1)}) cho phép khóa xung. Gain \texttt{Gate order} với ma trận hoán vị \texttt{P.Pg} sắp xếp 6 xung theo thứ tự mà khối Universal Bridge yêu cầu.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig5_sim_conv_pwm.png}
+\caption{Khối \texttt{PWM}.}\label{fig:5.7}
+\end{figure}
+
+\textbf{f) Power Stage.} Nguồn DC \texttt{Vdc} (\texttt{P.Vdc} = 36 V) cấp cho nghịch lưu ba pha \texttt{Inverter} (Universal Bridge, IGBT/diode, $R_{on}$ = 1 m$\Omega$, snubber 100 k$\Omega$), nối với khối \texttt{BLDC} (Permanent Magnet Synchronous Machine). Khối \texttt{Meas} (Bus Selector) tách dòng ba pha, tốc độ, góc và mô-men từ bus đo của động cơ.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig5_sim_conv_power_stage.png}
+\caption{Khối \texttt{Power Stage}.}\label{fig:5.8}
+\end{figure}
+
+Cấu hình khối \texttt{BLDC}:
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+Thông số khối & Giá trị \\ \midrule
+Back EMF waveform (\texttt{FluxDistribution}) & Trapezoidal \\
+Flat area of the back EMF waveform & 120° \\
+Rotor type & Round (điện cảm không phụ thuộc góc) \\
+Resistance / Inductance & \texttt{P.R} / \texttt{P.L} \\
+Flux linkage established by magnets & \texttt{P.lam} (biên độ đỉnh phẳng $\lambda$) \\
+Inertia, friction, pole pairs & \texttt{[P.J P.B P.p 0]} \\
+Mechanical input & Torque Tm (= mô-men tải $T_L$) \\
+Rotor flux position when $\theta$ = 0 & 90° behind phase A axis (modified Park) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Do quy ước góc của khối PMSM ("90° behind phase A axis"), trục $d$ của bộ điều khiển phải lệch $-\pi/2$ so với góc đo của khối. Vì vậy góc điện dùng trong bộ điều khiển là $\theta_e = p\,\theta_m + \texttt{THETA\_OFF}$ với \texttt{THETA\_OFF} $= -\pi/2$. Giá trị này đã được hiệu chỉnh trong mô phỏng tham chiếu (quét bốn giá trị $0, \pm\pi/2, \pi$ và chọn giá trị cho sai số tốc độ nhỏ nhất).
+
+\subsubsection{Thông số}\label{sec:5.3.5}
+
+Toàn bộ thông số nằm trong struct \texttt{P} do \texttt{conv\_foc\_init.m} tạo ra.
+
+\begin{table}[H]
+\centering\small
+\caption{Thông số động cơ và bộ điều khiển.}\label{tab:5.3}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xl>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+Thông số & Ký hiệu & Giá trị & Biến \\ \midrule
+Số đôi cực & $p$ & 8 & \texttt{P.p} \\
+Điện trở pha & $R$ & 0,4578 $\Omega$ & \texttt{P.R} \\
+Điện cảm đồng bộ & $L$ & 3,33 mH & \texttt{P.L} \\
+Từ thông nam châm (đỉnh phẳng) & $\lambda$ & 0,171 Wb & \texttt{P.lam} \\
+Từ thông cơ bản & $\lambda_1 = 12\lambda/\pi^2$ & 0,2079 Wb & \texttt{P.lam1} \\
+Mô-men quán tính & $J$ & 1,469$\cdot$10$^{-3}$ kg$\cdot$m$^2$ & \texttt{P.J} \\
+Ma sát nhớt & $B$ & 3,035$\cdot$10$^{-4}$ N$\cdot$m$\cdot$s/rad & \texttt{P.B} \\
+Điện áp DC & $V_{dc}$ & 36 V & \texttt{P.Vdc} \\
+Tần số PWM / chu kỳ vòng dòng & $f_{pwm}$ / $T_s$ & 10 kHz / 0,1 ms & \texttt{P.fpwm} / \texttt{P.Ts} \\
+Chu kỳ vòng tốc độ & $T_\omega$ & 1 ms & \texttt{P.Tsw} \\
+Hằng số thời gian vòng dòng & $\tau_c$ & 0,318 ms & \texttt{P.tau\_c} \\
+PI dòng & $K_{p,i}$ / $K_{i,i}$ & 10,46 V/A / 1438 V/(A$\cdot$s) & \texttt{P.Kp\_i} / \texttt{P.Ki\_i} \\
+Hằng số mô-men FOC & $K_t = 1{,}5p\lambda_1$ & 2,495 N$\cdot$m/A & \texttt{P.Kt\_foc} \\
+PI tốc độ & $K_{p,\omega}$ / $K_{i,\omega}$ & 0,148 / 9,30 & \texttt{P.Kp\_w\_foc} / \texttt{P.Ki\_w\_foc} \\
+Giới hạn dòng / điện áp pha & $I_{max}$ / $V_{dc}/\sqrt3$ & 3 A / 20,78 V & \texttt{P.Imax} / \texttt{P.Vm} \\
+Ma trận Clarke / Clarke ngược & – & (3.1) & \texttt{P.Kc} / \texttt{P.Kic} \\
+Ma trận thứ tự xung & – & hoán vị 6$\times$6 & \texttt{P.Pg} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsubsection{Kịch bản mô phỏng}\label{sec:5.3.6}
+
+\begin{table}[H]
+\centering\small
+\caption{Bốn kịch bản vận hành (dùng chung cho FOC thông thường và FOC bù).}\label{tab:5.4}
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}Xl@{}}
+\toprule
+Kịch bản & Mô tả & Thời gian \\ \midrule
+S1 & Khởi động không tải, tham chiếu 0 $\to$ 100 vòng/phút tại 0,02 s & 0,4 s \\
+S2 & 100 vòng/phút, đóng tải 1 N$\cdot$m tại 0,3 s, cắt tải tại 0,6 s & 0,8 s \\
+S3 & Đảo chiều +100 $\to$ $-$100 vòng/phút tại 0,3 s, không tải & 0,7 s \\
+S4 & Tham chiếu bậc thang 30 $\to$ 60 $\to$ 100 $\to$ 60 $\to$ 30 vòng/phút (mỗi 0,25 s), tải 0,5 N$\cdot$m & 1,25 s \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsubsection{Kết quả kiểm chứng (kịch bản S2)}\label{sec:5.3.7}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig5_sim_conv_S2_results.png}
+\caption{Kết quả FOC thông thường ở kịch bản S2: (a) tốc độ; (b) mô-men điện từ (trung bình trượt một chu kỳ PWM); (c) dòng $i_d$, $i_q$ trong đoạn có tải 1 N$\cdot$m.}\label{fig:5.9}
+\end{figure}
+
+\begin{table}[H]
+\centering\small
+\caption{Chỉ tiêu ở đoạn xác lập có tải (0,45–0,58 s) của kịch bản S2.}\label{tab:5.5}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Chỉ tiêu & Giá trị \\ \midrule
+Tốc độ trung bình & 99,96 vòng/phút \\
+Độ sụt tốc khi đóng tải & 22,9 vòng/phút \\
+Mô-men trung bình & 1,009 N$\cdot$m \\
+Gợn mô-men đỉnh–đỉnh (trung bình 1 chu kỳ PWM) & 0,642 N$\cdot$m ($\approx$ 64 \%) \\
+Gợn mô-men RMS & 0,176 N$\cdot$m \\
+Gợn tốc độ đỉnh–đỉnh & 6,90 vòng/phút \\
+Dao động $i_q$ đỉnh–đỉnh & $\approx$ 0,30 A \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Nhận xét:
+
+\begin{itemize}[leftmargin=*]
+\item Mô hình bám tốc độ đặt và mô-men trung bình bằng mô-men tải, $i_d$ dao động quanh 0: góc lệch \texttt{THETA\_OFF} và chiều các phép biến đổi là đúng.
+\item $i_q$ dao động với chu kỳ 12,5 ms, tức 80 Hz $= 6 f_e$ tại 100 vòng/phút, đúng bậc 6 do $\Delta e_q$ gây ra (cơ chế 1). Biên độ $\approx$ 0,30 A đỉnh–đỉnh (kể cả gợn PWM do lấy mẫu) cùng bậc với ước lượng 0,23 A ở mục 5.2.
+\item Gợn mô-men đỉnh–đỉnh $\approx$ 64 \%, lớn hơn nhiều so với gợn nội tại 14,7 \% của cơ chế 2. Tại điểm làm việc này, dao động $i_q$ ($\pm$ khoảng 0,15 A quanh 0,41 A) chiếm phần lớn, tức cơ chế 1 chiếm ưu thế. Muốn mô-men phẳng phải xử lý cả hai cơ chế, đó là nội dung của FOC bù (Tài liệu 04).
+\item Các chỉ tiêu trong Bảng~\ref{tab:5.5} trùng với kết quả FOC thông thường của mô phỏng tham chiếu ban đầu (\texttt{FOC\_Controller/bldc\_foc\_comp\_blocks.slx}), xác nhận mô hình tách riêng cho kết quả như cũ.
+\end{itemize}

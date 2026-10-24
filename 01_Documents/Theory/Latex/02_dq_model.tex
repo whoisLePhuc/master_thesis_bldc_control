@@ -1,0 +1,74 @@
+% !TeX program = xelatex
+% =====================================================================
+%  Tài liệu 02 -- Mô hình động cơ BLDC trên hệ tọa độ quay
+%  Biên dịch: latexmk 02_dq_model.tex   (hoặc xelatex 2 lần)
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+\usepackage{style/foc_style}
+
+\title{\vspace{-1.2cm}\textbf{Mô hình động cơ BLDC trên hệ tọa độ quay}}
+\author{\normalsize Tài liệu 02 -- Bộ tài liệu lý thuyết\\[2pt]
+\small Điều khiển định hướng từ trường cho động cơ BLDC có sức phản điện động hình thang}
+\date{\small Tháng 10 năm 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent Điều khiển định hướng từ trường (FOC) điều khiển dòng điện trong một hệ trục quay cùng rotor. Tài liệu trình bày biến đổi Clarke ($abc\to\alpha\beta$) và Park ($\alpha\beta\to dq$), từ đó viết lại mô hình BLDC của Tài liệu 01 trên hệ $dq$. Khác với động cơ có back-EMF hình sin, back-EMF hình thang khi chiếu lên hệ $dq$ không còn là hằng số mà được mô tả bằng hai hàm $g_d(\theta_e)$, $g_q(\theta_e)$ dao động bậc 6 quanh giá trị trung bình. Khoảng dao động của $g_q$ ($\pm$7,3 \%) là nguồn gốc của gợn mô-men khi áp dụng FOC thông thường cho BLDC. Phần cuối đối chiếu các phép biến đổi với các khối trong mô hình Simulink.
+
+\vspace{0.5em}
+\noindent\textbf{Từ khóa:} biến đổi Clarke; biến đổi Park; hệ tọa độ quay; back-EMF hình thang; dao động bậc 6.
+\end{abstract}
+
+\seriesbox{2}
+
+\tableofcontents
+\newpage
+
+\section*{Danh mục ký hiệu}
+\addcontentsline{toc}{section}{Danh mục ký hiệu}
+
+\begin{center}\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+Ký hiệu & Ý nghĩa & Đơn vị \\ \midrule
+$x_a, x_b, x_c$ & đại lượng pha (điện áp, dòng điện, back-EMF, \ldots{}) & – \\
+$x_\alpha, x_\beta$ & đại lượng trên hệ trục tĩnh $\alpha\beta$ & – \\
+$x_d, x_q$ & đại lượng trên hệ trục quay $dq$ gắn với rotor & – \\
+$\theta_e,\ \omega_e$ & góc điện và tốc độ điện của rotor & rad, rad/s \\
+$\vec i_s$ & vector không gian dòng stator & A \\
+$f_\alpha, f_\beta$ & back-EMF chuẩn hóa trên hệ $\alpha\beta$ & – \\
+$g_d(\theta_e),\ g_q(\theta_e)$ & back-EMF chuẩn hóa trên hệ $dq$ (hình chiếu của $f_{abc}$) & – \\
+$b_1$ & hệ số Fourier bậc 1 của back-EMF hình thang, $12/\pi^2$ & – \\
+$f_e,\ f_6$ & tần số điện, tần số dao động bậc 6 ($f_6 = 6 f_e$) & Hz \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Các ký hiệu khác ($R$, $L$, $\lambda$, $\lambda_1$, $p$, \ldots{}) giống Tài liệu 01.
+
+\section*{Nhắc lại các kết quả từ Tài liệu 01}
+\addcontentsline{toc}{section}{Nhắc lại các kết quả từ Tài liệu 01}
+
+\begin{itemize}[leftmargin=*]
+\item Phương trình điện áp pha (2.1): $\ v_x = R\,i_x + L\,\dfrac{di_x}{dt} + e_x + v_n,\quad i_a+i_b+i_c = 0.$
+\item Back-EMF hình thang (2.2): $\ e_x = \omega_e\lambda f_x(\theta_e)$ với $f_a = -F(\theta_e)$, $f_b = -F(\theta_e - 2\pi/3)$, $f_c = -F(\theta_e + 2\pi/3)$; $F$ là hình thang đỉnh phẳng 120°, biên độ 1.
+\item Hệ số Fourier bậc 1 và từ thông cơ bản (2.3), (2.4): $\ b_1 = 12/\pi^2 \approx 1{,}2158$, $\ \lambda_1 = b_1\lambda$.
+\item Mô-men điện từ (2.5): $\ T_e = p\,\lambda\,(f_a i_a + f_b i_b + f_c i_c).$
+\end{itemize}
+
+% ---------------- nội dung ----------------
+\setcounter{section}{2}
+\input{chapters/ch3_dq_model}
+
+% ---------------- tài liệu tham khảo ----------------
+\begin{thebibliography}{9}
+\small
+\bibitem{r1} B. K. Bose, \emph{Modern Power Electronics and AC Drives}. Upper Saddle River, NJ, USA: Prentice Hall, 2002.
+\bibitem{r2} T. M. Jahns and W. L. Soong, "Pulsating torque minimization techniques for permanent magnet AC motor drives — A review," \emph{IEEE Trans. Ind. Electron.}, vol. 43, no. 2, pp. 321–330, 1996.
+\bibitem{r3} C.-M. Ong, \emph{Dynamic Simulation of Electric Machinery Using MATLAB/SIMULINK}. Upper Saddle River, NJ, USA: Prentice Hall, 1997.
+\bibitem{r4} R. Krishnan, \emph{Permanent Magnet Synchronous and Brushless DC Motor Drives}. Boca Raton, FL, USA: CRC Press, 2010.
+\end{thebibliography}
+
+\end{document}

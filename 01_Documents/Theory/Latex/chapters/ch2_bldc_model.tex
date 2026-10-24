@@ -1,0 +1,117 @@
+% !TEX root = ../01_BLDC_model.tex
+% ch2_bldc_model.tex -- Chương 2 (nguồn: Markdown/01_BLDC_model.md, chuyển sang LaTeX)
+% Compiled from ../01_BLDC_model.tex
+
+\section{Mô hình toán học động cơ BLDC}\label{sec:2}
+
+\subsection{Phương trình điện áp}\label{sec:2.1}
+
+Xét động cơ BLDC ba pha nối sao, stator đối xứng, rotor nam châm bề mặt (điện cảm không phụ thuộc góc) \cite{r1}–\cite{r3}. Với mỗi pha $x\in\{a,b,c\}$:
+
+\begin{equation}
+v_x = R\,i_x + L\,\frac{di_x}{dt} + e_x + v_n, \qquad i_a+i_b+i_c = 0,
+\tag{2.1}\label{eq:2.1}
+\end{equation}
+
+trong đó $v_x$ là điện áp từ đầu pha tới cực âm nguồn DC, $v_n$ là điện áp điểm trung tính, và $L = L_s - M$ là điện cảm đồng bộ (điện cảm riêng trừ hỗ cảm). Điều kiện $i_a+i_b+i_c=0$ (nối sao, không dây trung tính) cho phép gộp hỗ cảm vào $L$.
+
+\subsection{Sức phản điện động hình thang}\label{sec:2.2}
+
+Back-EMF tỉ lệ với tốc độ và có dạng phụ thuộc góc rotor:
+
+\begin{equation}
+e_x = \omega_e\,\lambda\, f_x(\theta_e), \qquad
+f_a = -F(\theta_e),\quad f_b = -F\!\left(\theta_e - \tfrac{2\pi}{3}\right),\quad f_c = -F\!\left(\theta_e + \tfrac{2\pi}{3}\right).
+\tag{2.2}\label{eq:2.2}
+\end{equation}
+
+Với BLDC lý tưởng, $F$ là hình thang có \textbf{đỉnh phẳng 120°} và \textbf{sườn tuyến tính 60°}, biên độ 1; gốc góc của $F$ chọn tại điểm giữa sườn lên, nên $F(\theta) \approx b_1\sin\theta$. Góc điện $\theta_e$ được đo từ trục pha $a$ tới hướng từ thông nam châm (trục $d$ ở Tài liệu 02). Tại $\theta_e = 0$, từ thông móc vòng pha $a$ cực đại nên $e_a = d\psi_a/dt$ đi qua 0 theo chiều giảm; đó là lý do có dấu trừ trong \eqref{eq:2.2}, giống động cơ sin với $\psi_a = \lambda\cos\theta_e$ và $e_a = -\omega_e\lambda\sin\theta_e$.
+
+Khi chỉ hai pha dẫn (chế độ 6 bước), dòng chạy qua đúng hai pha đang ở đỉnh phẳng nên mô-men không đổi; đó là lý do BLDC được thiết kế với back-EMF hình thang.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig2_1_bemf_abc.png}
+\caption{Back-EMF chuẩn hóa của ba pha theo \eqref{eq:2.2}: đỉnh phẳng 120°, sườn 60°, lệch nhau 120°. Trong mô hình, $e_x = \omega_e\lambda f_x$.}\label{fig:2.1}
+\end{figure}
+
+Hàm $F$ được hiện thực trong \texttt{bldc\_trap.m} (thư mục \texttt{03\_Simulation/Compensated\_FOC}):
+
+\begin{Verbatim}
+function y = bldc_trap(x)
+x = mod(x, 2*pi); a = pi/6;
+y = zeros(size(x));
+k = x < a;                        y(k) = x(k)/a;          % sườn lên
+k = x >= a & x <= pi - a;         y(k) = 1;               % đỉnh phẳng dương
+k = x > pi - a & x < pi + a;      y(k) = (pi - x(k))/a;   % sườn xuống
+k = x >= pi + a & x <= 2*pi - a;  y(k) = -1;              % đỉnh phẳng âm
+k = x > 2*pi - a;                 y(k) = (x(k) - 2*pi)/a; % sườn lên
+end
+\end{Verbatim}
+
+\textbf{Thành phần cơ bản.} Khai triển Fourier hình thang có đỉnh phẳng 120° (nửa sườn $a=\pi/6$) chỉ chứa các bậc lẻ:
+
+\begin{equation}
+F(\theta) = \sum_{n=1,5,7,11,\dots} b_n \sin(n\theta),\qquad
+b_n = \frac{4}{\pi}\,\frac{\sin(n a)}{n^2 a},\qquad
+b_1 = \frac{4}{\pi}\cdot\frac{\sin(\pi/6)}{\pi/6} = \frac{12}{\pi^2} \approx 1{,}2158.
+\tag{2.3}\label{eq:2.3}
+\end{equation}
+
+Bậc 3 và bội của 3 triệt tiêu giữa các dây (nối sao), nên các bậc còn lại là $5, 7, 11, 13,\dots$ Trên hệ tọa độ quay, các bậc $6k \pm 1$ này tạo ra dao động bậc 6 (Tài liệu 02, mục 3.4). Từ thông \textbf{cơ bản} được định nghĩa:
+
+\begin{equation}
+\lambda_1 = b_1\,\lambda = 1{,}2158 \times 0{,}171 = 0{,}2079\ \text{Wb}.
+\tag{2.4}\label{eq:2.4}
+\end{equation}
+
+Thành phần cơ bản lớn hơn biên độ đỉnh phẳng 21,6 \%; cần lưu ý điểm này khi sử dụng mô hình sin cho BLDC (FOC thông thường dùng $\lambda_1$, Tài liệu 03).
+
+\subsection{Mô-men điện từ và phương trình cơ}\label{sec:2.3}
+
+Công suất điện chuyển thành cơ là $\sum e_x i_x$, nên
+
+\begin{equation}
+T_e = \frac{e_a i_a + e_b i_b + e_c i_c}{\omega_m} = p\,\lambda\,\big(f_a i_a + f_b i_b + f_c i_c\big),
+\tag{2.5}\label{eq:2.5}
+\end{equation}
+
+\begin{equation}
+J\,\frac{d\omega_m}{dt} = T_e - T_L - B\,\omega_m, \qquad \frac{d\theta_m}{dt} = \omega_m, \qquad \theta_e = p\,\theta_m .
+\tag{2.6}\label{eq:2.6}
+\end{equation}
+
+\begin{ghichu}[Mô-men ở chế độ 6 bước]
+Ở chế độ 6 bước, tại mỗi thời điểm có hai pha dẫn dòng $\pm I$ và cả hai đang ở đỉnh phẳng $f = \pm 1$. Theo \eqref{eq:2.5}, $T_e = p\lambda(1\cdot I + 1\cdot I) = 2p\lambda\, I$, không phụ thuộc góc. Gợn mô-men thực tế của phương pháp 6 bước đến từ quá trình chuyển dòng giữa các pha \cite{r4}. Với FOC, dòng ba pha liên tục nên mô-men phụ thuộc vào toàn bộ dạng $f_x$, kể cả các sườn; đây là nguồn gốc của gợn mô-men được phân tích ở Tài liệu 03.
+\end{ghichu}
+
+\subsection{Tương ứng với khối PMSM trong Simulink}\label{sec:2.4}
+
+Trong các mô hình \texttt{Conventional\_FOC.slx} và \texttt{Compensated\_FOC.slx}, động cơ được mô phỏng bằng khối \emph{Permanent Magnet Synchronous Machine} (Simscape Electrical – Specialized Power Systems) với back-EMF hình thang. Khối này hiện thực đúng mô hình \eqref{eq:2.1}–\eqref{eq:2.6}.
+
+\begin{table}[H]
+\centering\small
+\caption{Thông số động cơ và cách khai báo trong khối PMSM.}\label{tab:2.1}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xl>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+Thông số & Ký hiệu & Giá trị & Khai báo trong khối \\ \midrule
+Dạng back-EMF & – & hình thang & Back EMF waveform = Trapezoidal \\
+Độ rộng đỉnh phẳng & – & 120° & Flat area of the back EMF waveform = 120 \\
+Kiểu rotor & – & rotor tròn (nam châm bề mặt) & Rotor type = Round \\
+Điện trở pha & $R$ & 0,4578 $\Omega$ & \texttt{P.R} \\
+Điện cảm đồng bộ & $L$ & 3,33 mH & \texttt{P.L} \\
+Từ thông nam châm & $\lambda$ & 0,171 Wb & Flux linkage established by magnets = \texttt{P.lam} \\
+Mô-men quán tính, ma sát, số đôi cực & $J$, $B$, $p$ & 1,469$\cdot$10$^{-3}$ kg$\cdot$m$^2$, 3,035$\cdot$10$^{-4}$ N$\cdot$m$\cdot$s/rad, 8 & \texttt{[P.J P.B P.p 0]} \\
+Đầu vào cơ & $T_L$ & – & Mechanical input = Torque Tm \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Hai hằng số mà khối tự tính từ các thông số trên khớp với mô hình:
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{Hằng số điện áp} (đỉnh dây, mỗi 1000 vòng/phút) bằng 286,5 V. Theo \eqref{eq:2.2}, đỉnh phẳng back-EMF pha là $\omega_e\lambda$, và điện áp dây đỉnh bằng hai lần giá trị đó khi hai pha ở hai đỉnh ngược dấu: $2\,p\,\lambda\,\omega_m = 2\times 8\times 0{,}171\times(1000\cdot 2\pi/60) = 286{,}5$ V.
+\item \textbf{Hằng số mô-men} bằng 2,736 N$\cdot$m/A, đúng bằng $2p\lambda = 2\times 8\times 0{,}171$ của chế độ 6 bước (ghi chú mục 2.3).
+\end{itemize}
+
+Khối PMSM đo góc rotor theo quy ước riêng (\emph{rotor flux position when $\theta$ = 0: 90° behind phase A axis}). Vì vậy góc điện dùng trong bộ điều khiển phải cộng thêm độ lệch \texttt{THETA\_OFF} $= -\pi/2$; xem Tài liệu 02, mục 3.5 và Tài liệu 03, mục 5.3.4.

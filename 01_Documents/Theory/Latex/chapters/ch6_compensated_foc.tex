@@ -1,0 +1,261 @@
+% !TEX root = ../04_FOC_compensated.tex
+% ch6_compensated_foc.tex -- Chương 6 (nguồn: Markdown/04_FOC_compensated.md, chuyển sang LaTeX)
+% Compiled from ../04_FOC_compensated.tex
+
+\section{Phương pháp FOC bù back-EMF hình thang}\label{sec:6}
+
+Các kỹ thuật giảm gợn mô-men cho máy nam châm vĩnh cửu có back-EMF không sin gồm định dạng dòng tối ưu \cite{r1} và bù gợn theo vị trí rotor bằng bảng tra \cite{r2}, \cite{r3}. FOC bù áp dụng các ý tưởng đó: giữ nguyên hai bộ PI, bù ghép chéo, SVPWM và vòng tốc độ, và thay đổi ba chỗ: (1) bù back-EMF đầy đủ trên cả hai trục bằng bảng tra; (2) bù trễ số trong góc tra; (3) định dạng dòng $i_q^*$.
+
+\subsection{Thành phần 1: bù back-EMF hình thang theo góc}\label{sec:6.1}
+
+Thay số hạng hằng $\omega_e\lambda_1$ bằng hình chiếu chính xác (3.5):
+
+\begin{equation}
+u_d = \text{PI}_d(0 - i_d) - \omega_e L\, i_q + \omega_e\lambda\, g_d(\theta_p),
+\tag{6.1}\label{eq:6.1}
+\end{equation}
+
+\begin{equation}
+u_q = \text{PI}_q(i_q^{**} - i_q) + \omega_e L\, i_d + \omega_e\lambda\, g_q(\theta_p).
+\tag{6.2}\label{eq:6.2}
+\end{equation}
+
+Khi $\theta_p$ trùng góc thật tại thời điểm điện áp được áp, nhiễu (5.3) bị khử hoàn toàn, và đối tượng mỗi trục thật sự còn là $1/(Ls+R)$ như giả thiết trong thiết kế IMC (4.1) \cite{r4}. Thành phần này triệt \textbf{cơ chế 1} của gợn mô-men (Tài liệu 03, mục 5.2).
+
+\subsection{Thành phần 2: bù trễ số}\label{sec:6.2}
+
+Theo Hình 4.2, điện áp tính tại $kT_s$ có tác dụng trung bình tại $(k+1{,}5)T_s$. Góc dùng để tra bảng back-EMF là góc dự báo:
+
+\begin{equation}
+\theta_p = \theta_e + 1{,}5\,T_s\,\omega_e .
+\tag{6.3}\label{eq:6.3}
+\end{equation}
+
+Ở 100 vòng/phút, $1{,}5\,T_s\,\omega_e = 0{,}0126$ rad $= 0{,}72^\circ$, nhỏ; nhưng ở tốc độ cao (ví dụ 2000 vòng/phút) sai góc lên tới $14^\circ$, và khâu bù không có \eqref{eq:6.3} sẽ mất tác dụng.
+
+\subsection{\texorpdfstring{Thành phần 3: định dạng dòng $i_q^*$}{Thành phần 3: định dạng dòng iq*}}\label{sec:6.3}
+
+Ý tưởng định dạng dòng để mô-men không đổi với back-EMF không sin được đề xuất trong \cite{r1}. Mục tiêu: $T_e$ không phụ thuộc góc và bằng $K_t\, i_q^*$ với cùng $K_t = \tfrac32 p\lambda_1$ của FOC thông thường, để giữ nguyên thiết kế vòng tốc độ (4.5). Từ (3.7) với $i_d = 0$:
+
+\begin{equation}
+\tfrac32\,p\,\lambda\, g_q(\theta_e)\, i_q = \tfrac32\,p\,\lambda_1\, i_q^*
+\quad\Longrightarrow\quad
+\boxed{\; i_q^{**} = i_q^*\,\frac{\lambda_1/\lambda}{g_q(\theta_a)} = i_q^*\, k_s(\theta_a),\qquad k_s(\theta)=\frac{b_1}{g_q(\theta)} \;}
+\tag{6.4}\label{eq:6.4}
+\end{equation}
+
+$k_s$ nằm trong khoảng $[0{,}912;\ 1{,}053]$: dòng $i_q^{**}$ được \textbf{cố ý} điều chế khoảng $\pm$7 \% ngược pha với $g_q$ (Hình~\ref{fig:6.1}). Thành phần này triệt \textbf{cơ chế 2} (gợn mô-men nội tại 14,7 \% khi $i_q$ phẳng).
+
+Vì vòng dòng có trễ xấp xỉ $\tau_c$ (vòng kín $1/(\tau_c s+1)$) cộng trễ số $1{,}5\,T_s$, góc dùng để tính $k_s$ được dự báo xa hơn:
+
+\begin{equation}
+\theta_a = \theta_e + (1{,}5\,T_s + \tau_c)\,\omega_e .
+\tag{6.5}\label{eq:6.5}
+\end{equation}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig6_1_current_shaping.png}
+\caption{Nguyên lý định dạng dòng trên một chu kỳ $\pi/3$: nhân $i_q^*$ với $k_s(\theta)$ ngược pha với $g_q(\theta)$ làm tích $g_q\,k_s$, tức mô-men, không đổi theo góc. $g_d$ rất nhỏ ($|$g\_d$|$ $\le$ 0,024).}\label{fig:6.1}
+\end{figure}
+
+\subsection{Bảng tra theo góc}\label{sec:6.4}
+
+$g_d$, $g_q$ và $k_s$ chỉ phụ thuộc góc và tuần hoàn $\pi/3$. Vì vậy chỉ cần lưu \textbf{một chu kỳ} $[0, \pi/3)$ và quy góc về chu kỳ đó bằng phép mod:
+
+\begin{equation}
+g(\theta) = \mathrm{LUT}\big(\theta \bmod \tfrac{\pi}{3}\big).
+\tag{6.6}\label{eq:6.6}
+\end{equation}
+
+Phép mod phải cho kết quả trong $[0,\pi/3)$ cả khi $\theta<0$ (lúc quay ngược), như hàm \texttt{mod} của MATLAB. Trong mô phỏng, bảng có 361 điểm (bước 0,17°), nội suy tuyến tính. Đoạn mã tạo bảng (trích \texttt{comp\_foc\_init.m}):
+
+\begin{Verbatim}
+TAB.th = linspace(0, pi/3, 361);
+fa = -bldc_trap(TAB.th); fb = -bldc_trap(TAB.th - 2*pi/3); fc = -bldc_trap(TAB.th + 2*pi/3);
+fal = 2/3*(fa - fb/2 - fc/2);   fbe = (fb - fc)/sqrt(3);       % Clarke
+TAB.gd =  cos(TAB.th).*fal + sin(TAB.th).*fbe;                 % Park
+TAB.gq = -sin(TAB.th).*fal + cos(TAB.th).*fbe;
+TAB.ks = (P.lam1/P.lam)./TAB.gq;                               % current shaping
+\end{Verbatim}
+
+\begin{ghichu}[Hiệu chỉnh gốc góc]
+Bảng tra chỉ đúng khi trục $q$ của bộ điều khiển trùng hướng thành phần cơ bản của back-EMF. Với khối PMSM của Simscape, gốc góc lệch $-\pi/2$ (\texttt{THETA\_OFF}, xem Tài liệu 03, mục 5.3.4). Ngoài ra, script mô phỏng có thể quét thêm độ lệch \texttt{TAB\_SHIFT} của bảng tra trong $\pm$15° và chọn giá trị cho gợn mô-men nhỏ nhất (mục 6.7.4); kết quả hiệu chỉnh là 0°, tức bảng tra khớp đúng mô hình.
+\end{ghichu}
+
+\subsection{Sơ đồ bộ điều khiển dòng của FOC bù}\label{sec:6.5}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig6_2_comp_current_controller.png}
+\caption{Bộ điều khiển dòng của FOC bù. Vùng nền xanh lá là phần thêm vào so với FOC thông thường: góc dự báo $\theta_p$, $\theta_a$; bảng tra $g_d$, $g_q$, $k_s$; bù back-EMF $e_d$, $e_q$ theo góc; và định dạng $i_q^{**} = k_s\, i_q^*$ (khối $\times$ trên trục $q$). Bù hằng $\omega_e\lambda_1$ của FOC thông thường bị bỏ. Trong hình, $\theta_a$ được vẽ dưới dạng $\theta_p + \tau_c\,\omega_e$, tương đương với \eqref{eq:6.5}.}\label{fig:6.2}
+\end{figure}
+
+\subsection{\texorpdfstring{Thuật toán trong một chu kỳ $T_s$}{Thuật toán trong một chu kỳ Ts}}\label{sec:6.6}
+
+\begin{enumerate}[leftmargin=*]
+\item Lấy mẫu $i_a, i_b, i_c$, góc $\theta_e$ và tốc độ $\omega_e$.
+\item Clarke (3.1), Park (3.2) để có $i_d$, $i_q$.
+\item Tính $\theta_p$ theo \eqref{eq:6.3} và $\theta_a$ theo \eqref{eq:6.5}; quy về $[0,\pi/3)$; tra $g_d(\theta_p)$, $g_q(\theta_p)$, $k_s(\theta_a)$.
+\item Định dạng dòng: $i_q^{**} = k_s\, i_q^*$ \eqref{eq:6.4}.
+\item Hai PI dòng, cộng bù ghép chéo và bù back-EMF theo \eqref{eq:6.1}–\eqref{eq:6.2}; giới hạn điện áp; chống bão hòa.
+\item Park ngược, Clarke ngược, SVPWM (4.7); nạp độ rộng xung cho chu kỳ kế tiếp.
+\end{enumerate}
+
+FOC thông thường là trường hợp riêng của thuật toán trên: bỏ bước 3–4 (đặt $g_d = 0$, $g_q = b_1$, $k_s = 1$).
+
+\subsection{Triển khai mô hình Simulink}\label{sec:6.7}
+
+Mô hình \texttt{Compensated\_FOC.slx} dùng chung động cơ, nghịch lưu, PI dòng, PI tốc độ, SVPWM, PWM và kịch bản với \texttt{Conventional\_FOC.slx} (Tài liệu 03, mục 5.3). Chỉ khối \texttt{Current PI} khác. Mục này chỉ mô tả phần khác biệt.
+
+\subsubsection{So sánh cấu trúc với FOC thông thường}\label{sec:6.7.1}
+
+\begin{table}[H]
+\centering\small
+\caption{So sánh cấu trúc hai bộ điều khiển. PI dòng, PI tốc độ, giới hạn và SVPWM giống hệt nhau.}\label{tab:6.1}
+\begin{tabularx}{\linewidth}{@{}ll>{\raggedright\arraybackslash}X@{}}
+\toprule
+ & FOC thông thường & FOC bù \\ \midrule
+Giả thiết back-EMF & sin: $e_d = 0$, $e_q = \omega_e\lambda_1$ & hình thang: $e_{d,q} = \omega_e\lambda\, g_{d,q}(\theta_e)$ \\
+Bù trục $d$ & $-\omega_e L i_q$ & $-\omega_e L i_q + \omega_e\lambda g_d(\theta_p)$ \\
+Bù trục $q$ & $\omega_e L i_d + \omega_e\lambda_1$ & $\omega_e L i_d + \omega_e\lambda g_q(\theta_p)$ \\
+Dòng đặt $i_q$ & $i_q^*$ (hằng ở xác lập) & $k_s(\theta_a)\, i_q^*$ (dao động $\pm$7 \%) \\
+Bù trễ số & không & $\theta_p = \theta_e + 1{,}5T_s\omega_e$, $\theta_a = \theta_e + (1{,}5T_s+\tau_c)\omega_e$ \\
+Khối thêm (Simulink) & – & 3 bảng tra 1-D, 2 khối mod, 2 khối cộng góc, 6 Gain/Product \\
+Yêu cầu cảm biến & góc liên tục (encoder) & góc liên tục, chính xác hơn \\
+Thông tin cần biết & $R, L, \lambda_1$ & $R, L, \lambda$ và dạng back-EMF \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsubsection{Tổ chức file và cách chạy}\label{sec:6.7.2}
+
+Các file nằm trong \texttt{03\_Simulation/Compensated\_FOC/}:
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+File & Vai trò \\ \midrule
+\texttt{Compensated\_FOC.slx} & Mô hình Simulink (Simscape Electrical – Specialized Power Systems) \\
+\texttt{comp\_foc\_init.m} & Tạo \texttt{P} (giống \texttt{conv\_foc\_init.m}, thêm \texttt{P.Td\_ff}, \texttt{P.Td\_sh}), bảng tra \texttt{TAB}, kịch bản \texttt{SC} (S1–S4 và \texttt{CAL}), \texttt{THETA\_OFF}, \texttt{TAB\_SHIFT}, \texttt{DECIM}. Được gọi tự động khi mở mô hình (\texttt{PreLoadFcn}) \\
+\texttt{bldc\_trap.m} & Hàm dạng back-EMF hình thang chuẩn hóa $F(\theta)$, dùng để dựng bảng tra \\
+\texttt{comp\_foc\_calib.mat} & Giá trị đã hiệu chỉnh \texttt{THETA\_OFF}, \texttt{TAB\_SHIFT} \\
+\texttt{run\_comp\_foc.m} & Chạy S1–S4, lưu kết quả vào \texttt{04\_Results/Raw/<SCEN>\_comp.mat}; tùy chọn hiệu chỉnh \texttt{TAB\_SHIFT} trước \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{Verbatim}
+% Chạy cả 4 kịch bản
+run_comp_foc
+
+% Chỉ chạy một kịch bản
+SCEN_LIST = {'S2'}; run_comp_foc
+
+% Hiệu chỉnh lại TAB_SHIFT (7 lần chạy ngắn), rồi chạy S1-S4
+DO_CALIB = true; run_comp_foc
+\end{Verbatim}
+
+Cấu trúc file kết quả giống FOC thông thường (struct \texttt{R}, bước 10 $\mu$s), với hai khác biệt: \texttt{R.iq\_cmd} là dòng đặt đã định dạng $i_q^{**}$ (lấy mẫu tại $T_s$), còn \texttt{R.iq\_ref} là đầu ra PI tốc độ $i_q^*$. File còn lưu thêm \texttt{TAB} và \texttt{TAB\_SHIFT}.
+
+\subsubsection{Sơ đồ tầng ngoài cùng}\label{sec:6.7.3}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig6_sim_comp_root.png}
+\caption{Tầng ngoài cùng của \texttt{Compensated\_FOC.slx}. Bố cục giống Hình 5.2 của Tài liệu 03; khác biệt là \texttt{Current PI} nhận thêm góc $\theta_e$ (cổng \texttt{theta}) và có thêm đầu ra \texttt{iq\_cmd} = $i_q^{**}$.}\label{fig:6.3}
+\end{figure}
+
+Các khối \texttt{Speed PI}, \texttt{abc\_to\_dq}, \texttt{SVPWM}, \texttt{PWM}, \texttt{Power Stage}, các khâu lấy mẫu ZOH và cấu hình solver giống hệt FOC thông thường; xem Tài liệu 03, mục 5.3.2–5.3.4 (Hình 5.3, 5.5–5.8).
+
+\subsubsection{Khối Current PI của FOC bù}\label{sec:6.7.4}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig6_sim_comp_current_pi.png}
+\caption{Khối \texttt{Current PI} của FOC bù, gồm ba vùng: trục $d$ (trên), trục $q$ với định dạng dòng (giữa), và dự báo góc kèm bảng tra back-EMF (dưới). Tín hiệu được phân phối bằng nhãn Goto/From: \texttt{[we]}, \texttt{[iq]}, \texttt{[id]}, \texttt{[theta]}, \texttt{[ed]} (back-EMF trục $d$), \texttt{[ks]} (hệ số định dạng) và \texttt{[period]} (chu kỳ bảng tra).}\label{fig:6.4}
+\end{figure}
+
+\begin{table}[H]
+\centering\small
+\caption{Đối chiếu công thức với các khối trong \texttt{Compensated\_FOC/Current PI}.}\label{tab:6.2}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+Công thức & Khối & Tham số \\ \midrule
+\eqref{eq:6.3} $\theta_p = \theta_e + 1{,}5T_s\omega_e$ & \texttt{Td\_ff} (Gain), \texttt{th\_p} (Sum) & \texttt{P.Td\_ff} = $1{,}5T_s$ = 0,15 ms \\
+\eqref{eq:6.5} $\theta_a = \theta_e + (1{,}5T_s+\tau_c)\omega_e$ & \texttt{Td\_sh} (Gain), \texttt{th\_a} (Sum) & \texttt{P.Td\_sh} = $1{,}5T_s + \tau_c$ = 0,468 ms \\
+Độ lệch hiệu chỉnh bảng tra & \texttt{shift} (Constant), cộng vào \texttt{th\_p} và \texttt{th\_a} & \texttt{TAB\_SHIFT} (= 0) \\
+\eqref{eq:6.6} $\theta \bmod \pi/3$ & \texttt{mod\_p}, \texttt{mod\_a} (Math Function, \texttt{mod}), \texttt{period} (Constant) & \texttt{TAB.period} = $\pi/3$ \\
+$g_d(\theta_p)$, $g_q(\theta_p)$, $k_s(\theta_a)$ & \texttt{g\_d}, \texttt{g\_q}, \texttt{ks} (1-D Lookup Table, nội suy tuyến tính, Clip) & \texttt{TAB.th}, \texttt{TAB.gd}, \texttt{TAB.gq}, \texttt{TAB.ks} \\
+$e_d = \omega_e\lambda g_d$, $e_q = \omega_e\lambda g_q$ & \texttt{we*gd}, \texttt{we*gq} (Product), \texttt{lam\_d}, \texttt{lam\_q} (Gain) & \texttt{P.lam} \\
+\eqref{eq:6.4} $i_q^{**} = k_s\, i_q^*$ & \texttt{iq\_shape} (Product) & – \\
+PI dòng (4.2), giới hạn & \texttt{PI\_d}, \texttt{PI\_q}, \texttt{Sat\_d}, \texttt{Sat\_q} & \texttt{P.Kp\_i}, \texttt{P.Ki\_i}, \texttt{P.Vm} \\
+Bù ghép chéo & \texttt{we*iq} $\to$ \texttt{-L}, \texttt{we*id} $\to$ \texttt{L} & \texttt{P.L} \\
+Tổng \eqref{eq:6.1}, \eqref{eq:6.2} & \texttt{Sum\_ud} ($e_d$ từ trên, PI$_d$ từ trái, $-\omega_e L i_q$ từ dưới), \texttt{Sum\_uq} ($\omega_e L i_d$ từ trên, PI$_q$ từ trái, $e_q$ từ dưới) & – \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Hiệu chỉnh \texttt{TAB\_SHIFT}.} Với \texttt{DO\_CALIB = true}, \texttt{run\_comp\_foc.m} chạy kịch bản \texttt{CAL} (100 vòng/phút, tải 1 N$\cdot$m từ 0,1 s, dài 0,26 s) với 7 giá trị \texttt{TAB\_SHIFT} = $-$15°, $-$10°, \ldots{}, +15°. Mỗi lần chạy đo gợn mô-men đỉnh–đỉnh (trung bình một chu kỳ PWM) trong đoạn $t \ge 0{,}18$ s, rồi giữ giá trị cho gợn nhỏ nhất và lưu vào \texttt{comp\_foc\_calib.mat}. Nếu giá trị tối ưu nằm ở biên dải quét, script cảnh báo: khi đó quy ước góc của khối PMSM có thể khác giả thiết và cần kiểm tra lại \texttt{THETA\_OFF}. Kết quả hiệu chỉnh hiện tại là \texttt{TAB\_SHIFT} = 0°.
+
+\begin{table}[H]
+\centering\small
+\caption{Thông số bổ sung so với FOC thông thường (các thông số khác xem Bảng 5.3, Tài liệu 03).}\label{tab:6.3}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xlll@{}}
+\toprule
+Thông số & Ký hiệu & Giá trị & Biến \\ \midrule
+Trễ dự báo cho bù back-EMF & $1{,}5\,T_s$ & 0,15 ms & \texttt{P.Td\_ff} \\
+Trễ dự báo cho định dạng dòng & $1{,}5\,T_s + \tau_c$ & 0,468 ms & \texttt{P.Td\_sh} \\
+Số điểm bảng tra / chu kỳ bảng & – & 361 / $\pi/3$ (bước 0,17°) & \texttt{TAB.N} / \texttt{TAB.period} \\
+Khoảng giá trị $g_q$ & – & [1,1547; 1,3333] & \texttt{TAB.gq} \\
+Khoảng giá trị $k_s$ & – & [0,912; 1,053] & \texttt{TAB.ks} \\
+Góc lệch khối PMSM & – & $-\pi/2$ & \texttt{THETA\_OFF} \\
+Độ lệch hiệu chỉnh bảng tra & – & 0 & \texttt{TAB\_SHIFT} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsubsection{Kết quả kiểm chứng (kịch bản S2)}\label{sec:6.7.5}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig6_sim_comp_S2_results.png}
+\caption{Kết quả kịch bản S2, FOC bù so với FOC thông thường: (a) tốc độ; (b) mô-men điện từ (trung bình một chu kỳ PWM) trong đoạn có tải; (c) dòng $i_q$ và dòng đặt đã định dạng $i_q^{**}$ của FOC bù.}\label{fig:6.5}
+\end{figure}
+
+\begin{table}[H]
+\centering\small
+\caption{Chỉ tiêu ở đoạn xác lập có tải (0,45–0,58 s) của kịch bản S2.}\label{tab:6.4}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Chỉ tiêu & FOC thông thường & FOC bù & Thay đổi \\ \midrule
+Tốc độ trung bình (vòng/phút) & 99,96 & 100,00 &  \\
+Độ sụt tốc khi đóng tải (vòng/phút) & 22,9 & 21,1 & $-$8 \% \\
+Mô-men trung bình (N$\cdot$m) & 1,009 & 1,004 &  \\
+Gợn mô-men đỉnh–đỉnh (N$\cdot$m) & 0,642 & 0,153 & \textbf{$-$76 \%} \\
+Gợn mô-men RMS (N$\cdot$m) & 0,176 & 0,030 & \textbf{$-$83 \%} \\
+Gợn tốc độ đỉnh–đỉnh (vòng/phút) & 6,90 & 0,87 & \textbf{$-$87 \%} \\
+Dao động $i_q$ đỉnh–đỉnh (A) & $\approx$ 0,30 & $\approx$ 0,10 &  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Nhận xét:
+
+\begin{itemize}[leftmargin=*]
+\item Bù back-EMF theo góc (thành phần 1) loại bỏ gần hết dao động $i_q$ ngoài ý muốn do nhiễu bậc 6: $i_q$ giờ bám sát $i_q^{**}$. Dao động nhỏ còn lại của $i_q$ là \textbf{có chủ đích}, do định dạng dòng (thành phần 3) yêu cầu, với biên độ $i_q^{**}$ khoảng 0,055 A đỉnh–đỉnh ($\approx$ $\pm$7 \% quanh 0,41 A).
+\item Nhờ hai thành phần cùng tác dụng, gợn mô-men giảm khoảng 76 \% (đỉnh–đỉnh) và 83 \% (RMS), gợn tốc độ giảm 87 \%.
+\item Đáp ứng quá độ hầu như không đổi (độ sụt tốc khi đóng tải giảm nhẹ), vì PI dòng, PI tốc độ và hằng số mô-men $K_t$ dùng cho thiết kế được giữ nguyên.
+\item Các chỉ tiêu trùng với kết quả FOC bù của mô phỏng tham chiếu ban đầu, xác nhận mô hình tách riêng cho kết quả như cũ. So sánh đầy đủ hai bộ điều khiển trên cả bốn kịch bản sẽ được trình bày trong tài liệu kết quả mô phỏng.
+\end{itemize}
+
+\begin{ghichu}[Hạn chế và lưu ý khi triển khai thực tế]
+
+\begin{enumerate}[leftmargin=*]
+\item \emph{Dạng back-EMF thực không lý tưởng.} Bảng tra dựng từ hình thang lý tưởng. Với động cơ thật cần đo back-EMF dây khi quay hở mạch, chuẩn hóa và tính lại $g_d$, $g_q$ theo (3.6). Sai số $\lambda$ chỉ ảnh hưởng tỉ lệ lên phần bù; sai số \emph{dạng} sóng mới gây gợn còn lại.
+\item \emph{Độ chính xác góc.} Bảng có chu kỳ 60° điện; sai góc vài độ điện đã làm lệch pha bù. Cảm biến Hall 6 sector không đủ; cần encoder hoặc nội suy Hall/bộ quan sát góc tốt.
+\item \emph{Băng thông vòng dòng.} Định dạng dòng yêu cầu $i_q$ bám tín hiệu tần số $f_6 = 6pn/60$. Điều kiện gần đúng là $f_6$ nhỏ hơn nhiều so với băng thông 500 Hz; ở tốc độ cao hiệu quả định dạng giảm dần (đã bù một phần nhờ $\tau_c$ trong \eqref{eq:6.5}).
+\item \emph{Giới hạn điện áp.} Khi tốc độ vượt giới hạn điện áp của FOC, $V_{dc}/(\sqrt3\,p\lambda_1) \approx 119$ vòng/phút (ví dụ lúc vọt lố ở S3), vòng dòng bão hòa. Đây là giới hạn chung, không do khâu bù.
+\item \emph{Khối lượng tính toán.} Thêm 3 lần tra bảng, 2 phép mod và vài phép nhân mỗi chu kỳ 100 $\mu$s, không đáng kể với vi điều khiển như STM32, TI C2000.
+\end{enumerate}
+\end{ghichu}

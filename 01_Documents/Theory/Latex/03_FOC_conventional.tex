@@ -1,0 +1,110 @@
+% !TeX program = xelatex
+% =====================================================================
+%  Tài liệu 03 -- Thiết kế hệ thống điều khiển FOC và FOC thông thường cho động cơ BLDC có back-EMF hình thang
+%  Biên dịch: latexmk 03_FOC_conventional.tex   (hoặc xelatex 2 lần)
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+\usepackage{style/foc_style}
+
+\title{\vspace{-1.2cm}\textbf{Thiết kế hệ thống điều khiển FOC và FOC thông thường cho động cơ BLDC có back-EMF hình thang}}
+\author{\normalsize Tài liệu 03 -- Bộ tài liệu lý thuyết\\[2pt]
+\small Điều khiển định hướng từ trường cho động cơ BLDC có sức phản điện động hình thang}
+\date{\small Tháng 10 năm 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent Tài liệu trình bày cấu trúc tổng thể của hệ điều khiển định hướng từ trường (FOC) cho động cơ BLDC, cách thiết kế các bộ điều khiển PI dòng điện (phương pháp mô hình nội – IMC) và PI tốc độ (phương pháp đặt cực), cơ chế chống bão hòa tích phân, điều chế vector không gian kiểu min–max và ảnh hưởng của trễ trong điều khiển số. Trên cơ sở đó, luật điều khiển của FOC thông thường được xây dựng với giả thiết back-EMF hình sin, và hai cơ chế sinh gợn mô-men khi áp dụng luật này cho động cơ có back-EMF hình thang được phân tích định lượng. Phần cuối mô tả chi tiết mô hình Simulink \texttt{Conventional\_FOC.slx} hiện thực FOC thông thường, đối chiếu từng khối với các công thức, và kiểm chứng phân tích gợn mô-men bằng kết quả mô phỏng kịch bản S2.
+
+\vspace{0.5em}
+\noindent\textbf{Từ khóa:} động cơ BLDC; điều khiển định hướng từ trường; IMC; SVPWM; gợn mô-men; Simulink.
+\end{abstract}
+
+\seriesbox{3}
+
+\tableofcontents
+\newpage
+
+\section*{Danh mục ký hiệu}
+\addcontentsline{toc}{section}{Danh mục ký hiệu}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}Xl@{}}
+\toprule
+Ký hiệu & Ý nghĩa & Đơn vị \\ \midrule
+$v_x,\ i_x,\ e_x$ & điện áp, dòng điện, back-EMF pha $x\in\{a,b,c\}$ & V, A, V \\
+$R,\ L$ & điện trở và điện cảm đồng bộ một pha & $\Omega$, H \\
+$\lambda$ & biên độ từ thông nam châm (ứng với đỉnh phẳng back-EMF) & Wb \\
+$\lambda_1$ & từ thông thành phần cơ bản, $\lambda_1 = b_1\lambda$ & Wb \\
+$p$ & số đôi cực & – \\
+$\omega_m,\ \omega_e = p\,\omega_m$ & tốc độ cơ, tốc độ điện & rad/s \\
+$\theta_m,\ \theta_e = p\,\theta_m$ & góc cơ, góc điện của rotor & rad \\
+$g_d(\theta_e),\ g_q(\theta_e)$ & hình chiếu của back-EMF chuẩn hóa lên trục $d$, $q$ & – \\
+$u_d,\ u_q$ & điện áp đặt trên hệ $dq$ (đầu ra bộ điều khiển dòng) & V \\
+$T_e,\ T_L$ & mô-men điện từ, mô-men tải & N$\cdot$m \\
+$J,\ B$ & mô-men quán tính, hệ số ma sát nhớt & kg$\cdot$m$^2$, N$\cdot$m$\cdot$s/rad \\
+$K_t$ & hằng số mô-men dùng cho thiết kế, $K_t = \tfrac32 p\lambda_1$ & N$\cdot$m/A \\
+$T_s,\ f_{pwm}$ & chu kỳ lấy mẫu vòng dòng, tần số PWM ($T_s = 1/f_{pwm}$) & s, Hz \\
+$T_\omega$ & chu kỳ lấy mẫu vòng tốc độ & s \\
+$\tau_c$ & hằng số thời gian mong muốn của vòng dòng & s \\
+$d_x$ & độ rộng xung (duty) pha $x$ & – \\
+$x^*$ & giá trị đặt (tham chiếu) của $x$ & – \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section*{Nhắc lại các kết quả từ Tài liệu 01, 02}
+\addcontentsline{toc}{section}{Nhắc lại các kết quả từ Tài liệu 01, 02}
+
+Đánh số phương trình trong bộ tài liệu theo chương. Các phương trình của chương 2, 3 được dùng lại trong tài liệu này là:
+
+\begin{itemize}[leftmargin=*]
+\item Hệ số Fourier bậc 1 của back-EMF hình thang (đỉnh phẳng 120°) và từ thông cơ bản (2.3), (2.4):
+\end{itemize}
+
+\[
+b_1 = \frac{12}{\pi^2} \approx 1{,}2158, \qquad \lambda_1 = b_1\lambda = 0{,}2079\ \text{Wb}.
+\]
+
+\begin{itemize}[leftmargin=*]
+\item Phương trình điện áp trên hệ $dq$ (3.3), (3.4):
+\end{itemize}
+
+\[
+v_d = R\,i_d + L\frac{di_d}{dt} - \omega_e L\, i_q + e_d, \qquad
+v_q = R\,i_q + L\frac{di_q}{dt} + \omega_e L\, i_d + e_q .
+\]
+
+\begin{itemize}[leftmargin=*]
+\item Back-EMF và mô-men trên hệ $dq$ (3.5), (3.7):
+\end{itemize}
+
+\[
+e_d = \omega_e\lambda\, g_d(\theta_e), \qquad e_q = \omega_e\lambda\, g_q(\theta_e), \qquad
+T_e = \frac32\,p\,\lambda\,\big(g_d(\theta_e)\, i_d + g_q(\theta_e)\, i_q\big).
+\]
+
+\begin{itemize}[leftmargin=*]
+\item Khoảng dao động của $g_q$, $g_d$ với back-EMF hình thang, chu kỳ $\pi/3$ (60° điện, bậc 6) (3.8):
+\end{itemize}
+
+\[
+g_q(\theta_e) \in \Big[\tfrac{2}{\sqrt3},\ \tfrac43\Big] = [1{,}1547;\ 1{,}3333], \qquad g_d(\theta_e)\in[-0{,}0237;\ 0{,}0237].
+\]
+
+% ---------------- nội dung ----------------
+\setcounter{section}{3}
+\input{chapters/ch4_foc_design}
+\input{chapters/ch5_conventional_foc}
+
+% ---------------- tài liệu tham khảo ----------------
+\begin{thebibliography}{9}
+\small
+\bibitem{r1} L. Harnefors and H.-P. Nee, "Model-based current control of AC machines using the internal model control method," \emph{IEEE Trans. Ind. Appl.}, vol. 34, no. 1, pp. 133–141, 1998.
+\bibitem{r2} D. G. Holmes and T. A. Lipo, \emph{Pulse Width Modulation for Power Converters: Principles and Practice}. Piscataway, NJ, USA: IEEE Press / Wiley, 2003.
+\bibitem{r3} B. K. Bose, \emph{Modern Power Electronics and AC Drives}. Upper Saddle River, NJ, USA: Prentice Hall, 2002.
+\bibitem{r4} T. M. Jahns and W. L. Soong, "Pulsating torque minimization techniques for permanent magnet AC motor drives — A review," \emph{IEEE Trans. Ind. Electron.}, vol. 43, no. 2, pp. 321–330, 1996.
+\end{thebibliography}
+
+\end{document}
