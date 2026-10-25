@@ -33,7 +33,11 @@ Common/                    # shared by every controller -- edit here only
 ├── bldc_run_scenario.m    # [R, so, tSim] = bldc_run_scenario(mdl, SC, vars): simulate + collect outputs
 ├── bldc_metrics.m         # M = bldc_metrics(R, SC, P): speed/torque/current metrics in SC.win
 ├── bldc_trap.m            # normalized trapezoidal back-EMF shape F(theta)
-└── bldc_plant_lib.slx     # Simulink library: Power Stage, PWM, SVPWM, abc_to_dq
+├── bldc_set_inverter.m    # P = bldc_set_inverter(P, Td, Vf): dead time and device forward voltages (default off)
+├── bldc_sim_input.m       # SimulationInput for one scenario (used by bldc_run_scenario and parsim studies)
+├── bldc_collect.m         # collect the outputs of one run (struct R)
+├── bldc_ss_indicators.m   # steady-state indicators in a window (ripple, 6th harmonic, THD, I_rms, P_Cu)
+└── bldc_plant_lib.slx     # Simulink library: Power Stage, PWM (with optional dead time), SVPWM, abc_to_dq
 
 Conventional_FOC/
 ├── Conventional_FOC.slx   # model (powergui discrete 1 us); plant blocks are links to bldc_plant_lib
@@ -56,6 +60,10 @@ PVC/
 ├── Pseudo_Vector_Control.slx  # model (powergui discrete 1 us); plant blocks are links to bldc_plant_lib
 ├── pvc_init.m             # common P + look-up tables TAB (g_d, g_q) + options PVC (ff, fw, wb)
 └── run_pvc.m              # run S1-S4 for PVC_FF = 0 and 1, save <SCEN>_pvc.mat / <SCEN>_pvcff.mat
+
+Studies/
+├── run_inverter_nonideal.m  # all controllers with dead time / device drops (S2, S4) -> 04_Results/Tables/inverter_nonideal.*
+└── run_sweep_speed_load.m   # steady-state sweep speed x load x inverter case (parsim) -> 04_Results/Tables/sweep_speed_load*.csv
 
 Tests/
 ├── bldc_controllers.m     # registry of implemented controllers (model, folder, init script, variables)

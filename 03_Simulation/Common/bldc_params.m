@@ -7,7 +7,7 @@ function P = bldc_params()
 %   Every controller init script starts from this struct, so that all control
 %   strategies are evaluated on exactly the same motor and inverter.
 %
-%   See also BLDC_SCENARIO, BLDC_RUN_SCENARIO.
+%   See also BLDC_SCENARIO, BLDC_RUN_SCENARIO, BLDC_SET_INVERTER.
 
 % ---------------- motor ----------------
 P = struct();
@@ -25,6 +25,9 @@ P.Tsw  = 1e-3;                      % speed-loop sampling (s)
 P.dt   = 1e-6;                      % solver / powergui step (s)
 P.Imax = 3;                         % current limit (A)
 P.Vm   = P.Vdc/sqrt(3);             % phase-voltage limit, linear SVPWM range (V)
+
+% ---------------- inverter non-idealities (off by default, see BLDC_SET_INVERTER) ----------------
+P = bldc_set_inverter(P, 0, [0 0]);   % dead time P.Td (s), forward voltages P.Vf = [IGBT diode] (V)
 
 % ---------------- trapezoidal back-EMF ----------------
 P.b1   = 4/pi*sin(pi/6)/(pi/6);     % fundamental Fourier coefficient = 12/pi^2 = 1.2158
