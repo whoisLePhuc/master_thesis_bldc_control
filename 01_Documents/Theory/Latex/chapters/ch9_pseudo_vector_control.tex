@@ -183,7 +183,7 @@ Mô hình \texttt{Pseudo\_Vector\_Control.slx} nằm trong thư mục \texttt{03
 \begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig9_sim_pvc_root.png}
-\caption{Tầng ngoài cùng của mô hình \texttt{Pseudo\_Vector\_Control.slx}. Khối PVC Ctrl thay cho Current PI và SVPWM của mô hình FOC; Speed PI, PWM, Power Stage và phần đo góc/tốc độ được giữ nguyên.}\label{fig:9.4}
+\caption{Tầng ngoài cùng của mô hình \texttt{Pseudo\_Vector\_Control.slx}. Khối PVC Ctrl thay cho Current PI và SVPWM của mô hình FOC; Speed PI, PWM, Power Stage và phần đo góc/tốc độ được giữ nguyên. Các khối Current Sensor (sau \texttt{ZOH\_i}) và Position Sensor (sau \texttt{ZOH\_th}) được thêm ở chương 9–10 để mô phỏng sai số đo dòng và encoder; mặc định chúng lý tưởng.}\label{fig:9.4}
 \end{figure}
 
 Khối PVC Ctrl (Hình~\ref{fig:9.5}) hiện thực các phương trình của mục 9.2–9.3: hai bảng \texttt{g\_d}, \texttt{g\_q} \eqref{eq:9.1}; nhánh \texttt{abs\_we}–\texttt{inv\_p}–\texttt{wb\_over\_wm}–\texttt{sqrt}–\texttt{sin\_adv} tính $i_d^*$ \eqref{eq:9.4}; nhánh \texttt{lam1\_lam}–\texttt{num}–\texttt{div\_gq} tính $i_q^*$ \eqref{eq:9.3}; khối \texttt{InvPark\_i} tạo dòng đặt pha \eqref{eq:9.6}; khối \texttt{PI\_abc} là ba bộ PI pha dạng véc-tơ \eqref{eq:9.7}; nhánh \texttt{InvPark\_e}–\texttt{ff\_on} là bù back-EMF \eqref{eq:9.10}; nhánh \texttt{max}, \texttt{min}, \texttt{neg\_half}, \texttt{v\_inj} là điều chế min–max \eqref{eq:9.11}.
@@ -642,7 +642,7 @@ run_sensor_error('Controllers', {'comp','pvc','pvcff'}, 'Points', [100 1], ...
                  'File', 'sensor_error_long.csv')
 check_zero_sequence()                                     % Hình 9.16, (9.16)
 run_high_speed()                                          % Bảng 9.9, kịch bản S5
-run('04_Results/make_step1_figures.m')                    % Hình 9.14-9.17
+run('04_Results/make_pvc_study_figures.m')                    % Hình 9.14-9.17
 \end{Verbatim}
 
 Hình~\ref{fig:9.1} được vẽ trong trang \emph{Fig. 9.1 - Pseudo vector control} của \texttt{foc\_block\_diagram.drawio} và xuất PNG bằng draw.io.

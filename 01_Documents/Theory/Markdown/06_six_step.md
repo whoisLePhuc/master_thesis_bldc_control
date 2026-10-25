@@ -184,7 +184,7 @@ Mô hình `Six_Step.slx` nằm trong thư mục `03_Simulation/Six_Step` và đ�
 
 ![Hình 8.3](../../Thesis/figures/fig8_sim_six_root.png)
 
-*Hình 8.3. Tầng ngoài cùng của mô hình `Six_Step.slx`. Khối Six-Step Ctrl thay cho Current PI và SVPWM của mô hình FOC; Speed PI, PWM, Power Stage và phần đo góc/tốc độ được giữ nguyên.*
+*Hình 8.3. Tầng ngoài cùng của mô hình `Six_Step.slx`. Khối Six-Step Ctrl thay cho Current PI và SVPWM của mô hình FOC; Speed PI, PWM, Power Stage và phần đo góc/tốc độ được giữ nguyên. Các khối Current Sensor (sau `ZOH_i`) và Position Sensor (sau `ZOH_th`) được thêm ở chương 9–10 để mô phỏng sai số đo dòng và encoder; mặc định chúng lý tưởng.*
 
 Khối Six-Step Ctrl (Hình 8.4) hiện thực trực tiếp các phương trình (8.3), (8.4), (8.6) và (8.7): chuỗi `th_shift`–`mod_2pi`–`to_sector`–`floor`–`sat_0_5` tính sector, khối tra trực tiếp `Hall table` (bảng `SS.tab` 3×6) cho $\mathbf{s}_{abc}$, nhánh `s.*i`–`sum_si`–`half` tính $I$, khối `PI_I` cộng bù `2lam` tạo $V^*$, và nhánh `s*m`–`max0`, `abs_s` tạo $d_{abc}$, $en_{abc}$ qua hai khâu trễ `z_duty`, `z_en`.
 

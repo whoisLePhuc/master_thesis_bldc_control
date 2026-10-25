@@ -58,7 +58,7 @@ for c = 1:numel(C)
                 vars = cellfun(@(n) {n, W.(n)}, C(c).vars, 'UniformOutput', false);
                 vars = vertcat(vars{:});
                 [R, ~, tSim] = bldc_run_scenario(C(c).model, W.SC, vars);
-                P = W.P; SC = W.SC; inv = CASES(k); %#ok<NASGU>
+                P = W.P; SC = W.SC; inv = CASES(k);
                 save(f, 'R', 'P', 'SC', 'inv');
                 fprintf('  %-6s %s %-6s simulated in %4.1f s\n', C(c).tag, SCEN, CASES(k).name, tSim);
             else

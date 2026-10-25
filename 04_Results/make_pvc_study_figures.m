@@ -1,4 +1,4 @@
-%% MAKE_STEP1_FIGURES  Figures of the follow-up studies of PVC (Theory doc 07, Sec. 9.8-9.10)
+%% MAKE_PVC_STUDY_FIGURES  Figures of the follow-up studies of PVC (Theory doc 07, Sec. 9.8-9.10)
 %  Reads (written by 03_Simulation/Studies/...)
 %    04_Results/Tables/voltage_limit.csv      run_voltage_limit
 %    04_Results/Tables/sensor_error.csv       run_sensor_error
@@ -10,7 +10,7 @@
 %    fig9_16_zero_seq.png     zero-sequence wind-up of the PVC phase PI controllers
 %    fig9_17_high_speed.png   scenario S5: speed, d-axis current, speed reached vs copper loss
 %
-%  Usage:  >> make_step1_figures
+%  Usage:  >> make_pvc_study_figures
 
 here   = fileparts(mfilename('fullpath'));
 repo   = fileparts(here);
@@ -127,4 +127,4 @@ end
 set(gca, 'XScale', 'log'); grid on; xlabel('Copper loss (W, log scale)'); ylabel('Speed reached (rpm)');
 title('(c) Steady-state speed vs copper loss at 0.25 N\cdotm (torque ripple RMS in brackets)'); xlim([5e-3 100]); ylim([116 133]);
 exportgraphics(f, fullfile(figDir, 'fig9_17_high_speed.png'), 'Resolution', 150); close(f);
-fprintf('make_step1_figures: figures in %s\n', figDir);
+fprintf('make_pvc_study_figures: figures in %s\n', figDir);

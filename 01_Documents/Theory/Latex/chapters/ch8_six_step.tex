@@ -174,7 +174,7 @@ Mô hình \texttt{Six\_Step.slx} nằm trong thư mục \texttt{03\_Simulation/S
 \begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig8_sim_six_root.png}
-\caption{Tầng ngoài cùng của mô hình \texttt{Six\_Step.slx}. Khối Six-Step Ctrl thay cho Current PI và SVPWM của mô hình FOC; Speed PI, PWM, Power Stage và phần đo góc/tốc độ được giữ nguyên.}\label{fig:8.3}
+\caption{Tầng ngoài cùng của mô hình \texttt{Six\_Step.slx}. Khối Six-Step Ctrl thay cho Current PI và SVPWM của mô hình FOC; Speed PI, PWM, Power Stage và phần đo góc/tốc độ được giữ nguyên. Các khối Current Sensor (sau \texttt{ZOH\_i}) và Position Sensor (sau \texttt{ZOH\_th}) được thêm ở chương 9–10 để mô phỏng sai số đo dòng và encoder; mặc định chúng lý tưởng.}\label{fig:8.3}
 \end{figure}
 
 Khối Six-Step Ctrl (Hình~\ref{fig:8.4}) hiện thực trực tiếp các phương trình \eqref{eq:8.3}, \eqref{eq:8.4}, \eqref{eq:8.6} và \eqref{eq:8.7}: chuỗi \texttt{th\_shift}–\texttt{mod\_2pi}–\texttt{to\_sector}–\texttt{floor}–\texttt{sat\_0\_5} tính sector, khối tra trực tiếp \texttt{Hall table} (bảng \texttt{SS.tab} 3$\times$6) cho $\mathbf{s}_{abc}$, nhánh \texttt{s.*i}–\texttt{sum\_si}–\texttt{half} tính $I$, khối \texttt{PI\_I} cộng bù \texttt{2lam} tạo $V^*$, và nhánh \texttt{s*m}–\texttt{max0}, \texttt{abs\_s} tạo $d_{abc}$, $en_{abc}$ qua hai khâu trễ \texttt{z\_duty}, \texttt{z\_en}.

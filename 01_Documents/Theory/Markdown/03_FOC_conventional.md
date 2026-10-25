@@ -297,7 +297,7 @@ Thời gian mô phỏng lấy theo kịch bản (`StopTime = SC.T`). Tham chiế
 
 ![Hình 5.2](../../Thesis/figures/fig5_sim_conv_root.png)
 
-*Hình 5.2. Tầng ngoài cùng của `Conventional_FOC.slx`. Hàng trên là đường thuận từ tham chiếu tốc độ tới động cơ; ba hàng dưới là phản hồi góc, dòng và tốc độ, sắp xếp giống Hình 4.1.*
+*Hình 5.2. Tầng ngoài cùng của `Conventional_FOC.slx`. Hàng trên là đường thuận từ tham chiếu tốc độ tới động cơ; ba hàng dưới là phản hồi góc, dòng và tốc độ, sắp xếp giống Hình 4.1. Các khối Current Sensor (sau `ZOH_i`) và Position Sensor (sau `ZOH_th`) được thêm ở chương 9–10 để mô phỏng sai số đo dòng và encoder; mặc định chúng lý tưởng.*
 
 Bảng 5.1 đối chiếu các khối trên Hình 4.1 với mô hình:
 

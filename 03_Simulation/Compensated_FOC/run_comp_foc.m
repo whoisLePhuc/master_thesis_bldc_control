@@ -26,7 +26,7 @@ load_system(fullfile(here, [mdl '.slx']));
 %  Sweep the phase shift of the back-EMF tables in +/-15 deg (CAL scenario: 100 rpm,
 %  1 N.m from 0.1 s) and keep the value giving the smallest peak-to-peak torque ripple.
 if DO_CALIB
-    SCEN = 'CAL'; TAB_SHIFT = 0; comp_foc_init;
+    SCEN = 'CAL'; TAB_SHIFT = 0; comp_foc_init;  %#ok<UNRCH> (DO_CALIB may be set before running the script)
     shv = (-15:5:15)*pi/180; rp = inf(size(shv));
     fprintf('--- TAB_SHIFT calibration (%d runs) ---\n', numel(shv));
     for c = 1:numel(shv)

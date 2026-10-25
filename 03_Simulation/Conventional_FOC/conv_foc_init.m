@@ -12,6 +12,7 @@
 %  Variables created in the workspace: P, SC, SCEN, sc_name, THETA_OFF, DECIM, RPM
 
 addpath(fullfile(fileparts(which('conv_foc_init')), '..', 'Common'));
+bldc_cache_setup();             % Simulink caches in <repo>/.cache
 if ~exist('SCEN', 'var'), SCEN = 'S2'; end
 DECIM = 10;                     % log every 10 solver steps (10 us)
 RPM   = 2*pi/60;

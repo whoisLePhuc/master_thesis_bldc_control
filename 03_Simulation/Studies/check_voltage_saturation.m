@@ -34,12 +34,11 @@ for vd = opt.Vdc
     Pv = setVdc(P, vd);
     in = bldc_sim_input(m, SC, {'P', Pv; 'TAB', TAB; 'SC', SC; 'THETA_OFF', THETA_OFF; 'TAB_SHIFT', TAB_SHIFT; 'DECIM', DECIM});
     so = sim(in.setModelParameter('SignalLogging', 'on', 'SignalLoggingName', 'logsout'));
-    [uq, kq] = sig(so, 'uq_raw', SC.win); uqs = sig(so, 'uq_sat', SC.win);
+    uq = sig(so, 'uq_raw', SC.win); uqs = sig(so, 'uq_sat', SC.win);
     ud = sig(so, 'ud_raw', SC.win); uds = sig(so, 'ud_sat', SC.win); D = sig(so, 'duty', SC.win);
     clip = mean(abs(uq - uqs) > 1e-9 | abs(ud - uds) > 1e-9);
     M = bldc_ss_indicators(bldc_collect(so, m, SC), Pv, SC.win);
     rows(end+1, :) = {'comp', vd, 100*clip, 100*mean(any(D <= 1e-6 | D >= 1 - 1e-6, 2)), max(abs([uq; ud])), Pv.Vm, M.Te_rms}; %#ok<AGROW>
-    clear kq
 end
 close_system(m, 0); rmpath(pwd);
 

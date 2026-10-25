@@ -197,7 +197,7 @@ Mô hình `Pseudo_Vector_Control.slx` nằm trong thư mục `03_Simulation/PVC`
 
 ![Hình 9.4](../../Thesis/figures/fig9_sim_pvc_root.png)
 
-*Hình 9.4. Tầng ngoài cùng của mô hình `Pseudo_Vector_Control.slx`. Khối PVC Ctrl thay cho Current PI và SVPWM của mô hình FOC; Speed PI, PWM, Power Stage và phần đo góc/tốc độ được giữ nguyên.*
+*Hình 9.4. Tầng ngoài cùng của mô hình `Pseudo_Vector_Control.slx`. Khối PVC Ctrl thay cho Current PI và SVPWM của mô hình FOC; Speed PI, PWM, Power Stage và phần đo góc/tốc độ được giữ nguyên. Các khối Current Sensor (sau `ZOH_i`) và Position Sensor (sau `ZOH_th`) được thêm ở chương 9–10 để mô phỏng sai số đo dòng và encoder; mặc định chúng lý tưởng.*
 
 Khối PVC Ctrl (Hình 9.5) hiện thực các phương trình của mục 9.2–9.3: hai bảng `g_d`, `g_q` (9.1); nhánh `abs_we`–`inv_p`–`wb_over_wm`–`sqrt`–`sin_adv` tính $i_d^*$ (9.4); nhánh `lam1_lam`–`num`–`div_gq` tính $i_q^*$ (9.3); khối `InvPark_i` tạo dòng đặt pha (9.6); khối `PI_abc` là ba bộ PI pha dạng véc-tơ (9.7); nhánh `InvPark_e`–`ff_on` là bù back-EMF (9.10); nhánh `max`, `min`, `neg_half`, `v_inj` là điều chế min–max (9.11).
 
@@ -568,7 +568,7 @@ run_sensor_error('Controllers', {'comp','pvc','pvcff'}, 'Points', [100 1], ...
                  'File', 'sensor_error_long.csv')
 check_zero_sequence()                                     % Hình 9.16, (9.16)
 run_high_speed()                                          % Bảng 9.9, kịch bản S5
-run('04_Results/make_step1_figures.m')                    % Hình 9.14-9.17
+run('04_Results/make_pvc_study_figures.m')                    % Hình 9.14-9.17
 ```
 
 Hình 9.1 được vẽ trong trang *Fig. 9.1 - Pseudo vector control* của `foc_block_diagram.drawio` và xuất PNG bằng draw.io.

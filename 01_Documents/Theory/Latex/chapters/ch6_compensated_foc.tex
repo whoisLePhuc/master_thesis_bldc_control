@@ -72,7 +72,8 @@ Phép mod phải cho kết quả trong $[0,\pi/3)$ cả khi $\theta<0$ (lúc qua
 
 \begin{Verbatim}
 TAB.th = linspace(0, pi/3, 361);
-fa = -bldc_trap(TAB.th); fb = -bldc_trap(TAB.th - 2*pi/3); fc = -bldc_trap(TAB.th + 2*pi/3);
+fa = -bldc_trap(TAB.th);
+fb = -bldc_trap(TAB.th - 2*pi/3); fc = -bldc_trap(TAB.th + 2*pi/3);
 fal = 2/3*(fa - fb/2 - fc/2);   fbe = (fb - fc)/sqrt(3);       % Clarke
 TAB.gd =  cos(TAB.th).*fal + sin(TAB.th).*fbe;                 % Park
 TAB.gq = -sin(TAB.th).*fal + cos(TAB.th).*fbe;
@@ -137,7 +138,7 @@ Các file nằm trong \texttt{03\_Simulation/Compensated\_FOC/}:
 \toprule
 File & Vai trò \\ \midrule
 \texttt{Compensated\_FOC.slx} & Mô hình Simulink (Simscape Electrical – Specialized Power Systems) \\
-\texttt{comp\_foc\_init.m} & Tạo \texttt{P} (\texttt{bldc\_params}, thêm \texttt{P.Td\_ff}, \texttt{P.Td\_sh}), bảng tra \texttt{TAB} (dùng \texttt{bldc\_trap}), kịch bản \texttt{SC} (\texttt{bldc\_scenario}, S1–S4 và \texttt{CAL}), \texttt{THETA\_OFF}, \texttt{TAB\_SHIFT}, \texttt{DECIM}. Được gọi tự động khi mở mô hình (\texttt{PreLoadFcn}) \\
+\texttt{comp\_foc\_init.m} & Tạo \texttt{P} (\texttt{bldc\_params}, thêm \texttt{P.Td\_ff}, \texttt{P.Td\_sh}), bảng tra \texttt{TAB} (dùng \texttt{bldc\_trap}), kịch bản \texttt{SC} (\texttt{bldc\_scenario}, S1–S4 và \texttt{CAL}), \texttt{THETA\_OFF}, \texttt{TAB\_SHIFT}, \texttt{DECIM}; biến tùy chọn \texttt{VLIM} ghi đè \texttt{P.vlim} (\texttt{VLIM = 0} tái lập số liệu chương 7–9). Được gọi tự động khi mở mô hình (\texttt{PreLoadFcn}) \\
 \texttt{comp\_foc\_calib.mat} & Giá trị đã hiệu chỉnh \texttt{THETA\_OFF}, \texttt{TAB\_SHIFT} \\
 \texttt{run\_comp\_foc.m} & Chạy S1–S4, lưu kết quả vào \texttt{04\_Results/Raw/<SCEN>\_comp.mat}; tùy chọn hiệu chỉnh \texttt{TAB\_SHIFT} trước \\
 \bottomrule
@@ -162,7 +163,7 @@ Cấu trúc file kết quả giống FOC thông thường (struct \texttt{R}, b�
 \begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig6_sim_comp_root.png}
-\caption{Tầng ngoài cùng của \texttt{Compensated\_FOC.slx}. Bố cục giống Hình 5.2 của Tài liệu 03; khác biệt là \texttt{Current PI} nhận thêm góc $\theta_e$ (cổng \texttt{theta}) và có thêm đầu ra \texttt{iq\_cmd} = $i_q^{**}$.}\label{fig:6.3}
+\caption{Tầng ngoài cùng của \texttt{Compensated\_FOC.slx}. Bố cục giống Hình 5.2 của Tài liệu 03; khác biệt là \texttt{Current PI} nhận thêm góc $\theta_e$ (cổng \texttt{theta}) và có thêm đầu ra \texttt{iq\_cmd} = $i_q^{**}$. Các khối Current Sensor (sau \texttt{ZOH\_i}) và Position Sensor (sau \texttt{ZOH\_th}) được thêm ở chương 9–10 để mô phỏng sai số đo dòng và encoder; mặc định chúng lý tưởng.}\label{fig:6.3}
 \end{figure}
 
 Các khối \texttt{Speed PI}, \texttt{abc\_to\_dq}, \texttt{SVPWM}, \texttt{PWM}, \texttt{Power Stage}, các khâu lấy mẫu ZOH và cấu hình solver giống hệt FOC thông thường (bốn khối \texttt{abc\_to\_dq}, \texttt{SVPWM}, \texttt{PWM}, \texttt{Power Stage} là liên kết tới cùng thư viện \texttt{Common/bldc\_plant\_lib.slx}); xem Tài liệu 03, mục 5.3.2–5.3.4 (Hình 5.3, 5.5–5.8).
@@ -172,7 +173,7 @@ Các khối \texttt{Speed PI}, \texttt{abc\_to\_dq}, \texttt{SVPWM}, \texttt{PWM
 \begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig6_sim_comp_current_pi.png}
-\caption{Khối \texttt{Current PI} của FOC bù, gồm ba vùng: trục $d$ (trên), trục $q$ với định dạng dòng (giữa), và dự báo góc kèm bảng tra back-EMF (dưới). Tín hiệu được phân phối bằng nhãn Goto/From: \texttt{[we]}, \texttt{[iq]}, \texttt{[id]}, \texttt{[theta]}, \texttt{[ed]} (back-EMF trục $d$), \texttt{[ks]} (hệ số định dạng) và \texttt{[period]} (chu kỳ bảng tra).}\label{fig:6.4}
+\caption{Khối \texttt{Current PI} của FOC bù, gồm ba vùng: trục $d$ (trên), trục $q$ với định dạng dòng (giữa), và dự báo góc kèm bảng tra back-EMF (dưới). Tín hiệu được phân phối bằng nhãn Goto/From: \texttt{[we]}, \texttt{[iq]}, \texttt{[id]}, \texttt{[theta]}, \texttt{[ed]} (back-EMF trục $d$), \texttt{[ks]} (hệ số định dạng) và \texttt{[period]} (chu kỳ bảng tra). Bản hiện tại có thêm khối \texttt{VLim} (bộ giới hạn điện áp, thay hai khối \texttt{Sat\_d}, \texttt{Sat\_q} ban đầu) và khối \texttt{FW} (suy yếu từ thông, mặc định tắt), xem Tài liệu 07, mục 9.8 và 9.10.}\label{fig:6.4}
 \end{figure}
 
 \begin{table}[H]
@@ -188,7 +189,8 @@ Công thức & Khối & Tham số \\ \midrule
 $g_d(\theta_p)$, $g_q(\theta_p)$, $k_s(\theta_a)$ & \texttt{g\_d}, \texttt{g\_q}, \texttt{ks} (1-D Lookup Table, nội suy tuyến tính, Clip) & \texttt{TAB.th}, \texttt{TAB.gd}, \texttt{TAB.gq}, \texttt{TAB.ks} \\
 $e_d = \omega_e\lambda g_d$, $e_q = \omega_e\lambda g_q$ & \texttt{we*gd}, \texttt{we*gq} (Product), \texttt{lam\_d}, \texttt{lam\_q} (Gain) & \texttt{P.lam} \\
 \eqref{eq:6.4} $i_q^{**} = k_s\, i_q^*$ & \texttt{iq\_shape} (Product) & – \\
-PI dòng (4.2), giới hạn & \texttt{PI\_d}, \texttt{PI\_q}, \texttt{Sat\_d}, \texttt{Sat\_q} & \texttt{P.Kp\_i}, \texttt{P.Ki\_i}, \texttt{P.Vm} \\
+PI dòng (4.2), giới hạn điện áp & \texttt{PI\_d}, \texttt{PI\_q}, \texttt{VLim} (MATLAB Function, gọi \texttt{Common/bldc\_vlim.m}) & \texttt{P.Kp\_i}, \texttt{P.Ki\_i}, \texttt{P.Vm}, \texttt{P.vlim} (mặc định 3: lục giác nghịch lưu; 0: kẹp riêng $u_d$, $u_q$ như bản gốc, mục 9.8) \\
+Suy yếu từ thông (9.18), tùy chọn & \texttt{Mux\_u}, \texttt{z\_u} (Unit Delay), \texttt{FW} (MATLAB Function) thay cho hằng \texttt{id\_ref} = 0 & \texttt{P.FW} (mặc định tắt, $i_d^* = 0$) \\
 Bù ghép chéo & \texttt{we*iq} $\to$ \texttt{-L}, \texttt{we*id} $\to$ \texttt{L} & \texttt{P.L} \\
 Tổng \eqref{eq:6.1}, \eqref{eq:6.2} & \texttt{Sum\_ud} ($e_d$ từ trên, PI$_d$ từ trái, $-\omega_e L i_q$ từ dưới), \texttt{Sum\_uq} ($\omega_e L i_d$ từ trên, PI$_q$ từ trái, $e_q$ từ dưới) & – \\
 \bottomrule

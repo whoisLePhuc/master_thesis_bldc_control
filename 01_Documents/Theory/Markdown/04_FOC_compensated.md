@@ -197,7 +197,7 @@ Các file nằm trong `03_Simulation/Compensated_FOC/`:
 | File | Vai trò |
 |---|---|
 | `Compensated_FOC.slx` | Mô hình Simulink (Simscape Electrical – Specialized Power Systems) |
-| `comp_foc_init.m` | Tạo `P` (`bldc_params`, thêm `P.Td_ff`, `P.Td_sh`), bảng tra `TAB` (dùng `bldc_trap`), kịch bản `SC` (`bldc_scenario`, S1–S4 và `CAL`), `THETA_OFF`, `TAB_SHIFT`, `DECIM`. Được gọi tự động khi mở mô hình (`PreLoadFcn`) |
+| `comp_foc_init.m` | Tạo `P` (`bldc_params`, thêm `P.Td_ff`, `P.Td_sh`), bảng tra `TAB` (dùng `bldc_trap`), kịch bản `SC` (`bldc_scenario`, S1–S4 và `CAL`), `THETA_OFF`, `TAB_SHIFT`, `DECIM`; biến tùy chọn `VLIM` ghi đè `P.vlim` (`VLIM = 0` tái lập số liệu chương 7–9). Được gọi tự động khi mở mô hình (`PreLoadFcn`) |
 | `comp_foc_calib.mat` | Giá trị đã hiệu chỉnh `THETA_OFF`, `TAB_SHIFT` |
 | `run_comp_foc.m` | Chạy S1–S4, lưu kết quả vào `04_Results/Raw/<SCEN>_comp.mat`; tùy chọn hiệu chỉnh `TAB_SHIFT` trước |
 
@@ -218,7 +218,7 @@ Cấu trúc file kết quả giống FOC thông thường (struct `R`, bước 1
 
 ![Hình 6.3](../../Thesis/figures/fig6_sim_comp_root.png)
 
-*Hình 6.3. Tầng ngoài cùng của `Compensated_FOC.slx`. Bố cục giống Hình 5.2 của Tài liệu 03; khác biệt là `Current PI` nhận thêm góc $\theta_e$ (cổng `theta`) và có thêm đầu ra `iq_cmd` = $i_q^{**}$.*
+*Hình 6.3. Tầng ngoài cùng của `Compensated_FOC.slx`. Bố cục giống Hình 5.2 của Tài liệu 03; khác biệt là `Current PI` nhận thêm góc $\theta_e$ (cổng `theta`) và có thêm đầu ra `iq_cmd` = $i_q^{**}$. Các khối Current Sensor (sau `ZOH_i`) và Position Sensor (sau `ZOH_th`) được thêm ở chương 9–10 để mô phỏng sai số đo dòng và encoder; mặc định chúng lý tưởng.*
 
 Các khối `Speed PI`, `abc_to_dq`, `SVPWM`, `PWM`, `Power Stage`, các khâu lấy mẫu ZOH và cấu hình solver giống hệt FOC thông thường (bốn khối `abc_to_dq`, `SVPWM`, `PWM`, `Power Stage` là liên kết tới cùng thư viện `Common/bldc_plant_lib.slx`); xem Tài liệu 03, mục 5.3.2–5.3.4 (Hình 5.3, 5.5–5.8).
 
@@ -226,7 +226,7 @@ Các khối `Speed PI`, `abc_to_dq`, `SVPWM`, `PWM`, `Power Stage`, các khâu l
 
 ![Hình 6.4](../../Thesis/figures/fig6_sim_comp_current_pi.png)
 
-*Hình 6.4. Khối `Current PI` của FOC bù, gồm ba vùng: trục $d$ (trên), trục $q$ với định dạng dòng (giữa), và dự báo góc kèm bảng tra back-EMF (dưới). Tín hiệu được phân phối bằng nhãn Goto/From: `[we]`, `[iq]`, `[id]`, `[theta]`, `[ed]` (back-EMF trục $d$), `[ks]` (hệ số định dạng) và `[period]` (chu kỳ bảng tra).*
+*Hình 6.4. Khối `Current PI` của FOC bù, gồm ba vùng: trục $d$ (trên), trục $q$ với định dạng dòng (giữa), và dự báo góc kèm bảng tra back-EMF (dưới). Tín hiệu được phân phối bằng nhãn Goto/From: `[we]`, `[iq]`, `[id]`, `[theta]`, `[ed]` (back-EMF trục $d$), `[ks]` (hệ số định dạng) và `[period]` (chu kỳ bảng tra). Bản hiện tại có thêm khối `VLim` (bộ giới hạn điện áp, thay hai khối `Sat_d`, `Sat_q` ban đầu) và khối `FW` (suy yếu từ thông, mặc định tắt), xem Tài liệu 07, mục 9.8 và 9.10.*
 
 *Bảng 6.2. Đối chiếu công thức với các khối trong `Compensated_FOC/Current PI`.*
 
@@ -239,7 +239,8 @@ Các khối `Speed PI`, `abc_to_dq`, `SVPWM`, `PWM`, `Power Stage`, các khâu l
 | $g_d(\theta_p)$, $g_q(\theta_p)$, $k_s(\theta_a)$ | `g_d`, `g_q`, `ks` (1-D Lookup Table, nội suy tuyến tính, Clip) | `TAB.th`, `TAB.gd`, `TAB.gq`, `TAB.ks` |
 | $e_d = \omega_e\lambda g_d$, $e_q = \omega_e\lambda g_q$ | `we*gd`, `we*gq` (Product), `lam_d`, `lam_q` (Gain) | `P.lam` |
 | (6.4) $i_q^{**} = k_s\, i_q^*$ | `iq_shape` (Product) | – |
-| PI dòng (4.2), giới hạn | `PI_d`, `PI_q`, `Sat_d`, `Sat_q` | `P.Kp_i`, `P.Ki_i`, `P.Vm` |
+| PI dòng (4.2), giới hạn điện áp | `PI_d`, `PI_q`, `VLim` (MATLAB Function, gọi `Common/bldc_vlim.m`) | `P.Kp_i`, `P.Ki_i`, `P.Vm`, `P.vlim` (mặc định 3: lục giác nghịch lưu; 0: kẹp riêng $u_d$, $u_q$ như bản gốc, mục 9.8) |
+| Suy yếu từ thông (9.18), tùy chọn | `Mux_u`, `z_u` (Unit Delay), `FW` (MATLAB Function) thay cho hằng `id_ref` = 0 | `P.FW` (mặc định tắt, $i_d^* = 0$) |
 | Bù ghép chéo | `we*iq` → `-L`, `we*id` → `L` | `P.L` |
 | Tổng (6.1), (6.2) | `Sum_ud` ($e_d$ từ trên, PI$_d$ từ trái, $-\omega_e L i_q$ từ dưới), `Sum_uq` ($\omega_e L i_d$ từ trên, PI$_q$ từ trái, $e_q$ từ dưới) | – |
 
