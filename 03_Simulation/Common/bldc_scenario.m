@@ -9,6 +9,7 @@ function [SC, sc_name] = bldc_scenario(SCEN)
 %
 %   SCEN : 'S1' no-load start-up         'S2' load step
 %          'S3' speed reversal           'S4' staircase speed reference
+%          'S5' high speed: 100 -> 140 rpm at 0.3 s, 0.25 N.m (base speed 119 rpm, field weakening)
 %          'CAL' short run used for look-up-table calibration (Compensated FOC)
 %
 %   See also BLDC_PARAMS, BLDC_RUN_SCENARIO, BLDC_METRICS.
@@ -29,6 +30,9 @@ switch SCEN
         sc_name = 'Staircase speed reference';
         SC = struct('T',1.25, 't_ref',[0 0.25 0.5 0.75 1.0], ...
                     'w_ref',[30 60 100 60 30]*RPM, 't_load',0, 'TL',0.5);
+    case 'S5'
+        sc_name = 'High speed (above base speed)';
+        SC = struct('T',0.8, 't_ref',[0 0.02 0.3], 'w_ref',[0 100 140]*RPM, 't_load',[0 0.15], 'TL',[0 0.25]);
     case 'CAL'
         sc_name = 'Look-up table calibration';
         SC = struct('T',0.26, 't_ref',[0 0.01], 'w_ref',[0 100]*RPM, 't_load',[0 0.1], 'TL',[0 1]);
@@ -47,6 +51,7 @@ switch SCEN
     case 'S2',  win = [0.45 0.58];   % 100 rpm, 1 N.m load
     case 'S3',  win = [0.50 0.70];   % -100 rpm after reversal
     case 'S4',  win = [1.10 1.25];   % 30 rpm, 0.5 N.m load (last step)
+    case 'S5',  win = [0.60 0.80];   % 140 rpm reference (above base speed), 0.25 N.m load
     case 'CAL', win = [0.18 0.26];   % 100 rpm, 1 N.m load
     otherwise,  win = [NaN NaN];
 end

@@ -99,7 +99,7 @@ v_{PI,x} = K_{p,i}\, e_x + K_{i,i}\!\int e_x\,dt, \qquad e_x = i_x^* - i_x,\quad
 \tag{9.7}\label{eq:9.7}
 \end{equation}
 
-với cùng hệ số IMC như FOC ($K_{p,i} = L/\tau_c = 10{,}46$ V/A, $K_{i,i} = R/\tau_c = 1438$ V/(A$\cdot$s), $\tau_c = 0{,}318$ ms), giới hạn $\pm$$V_{dc}/\sqrt3$ và chống bão hòa back-calculation. Ba dòng pha luôn có tổng bằng 0 (động cơ nối sao, không nối trung tính) nên tổng ba sai lệch cũng bằng 0 và ba khâu tích phân không trôi theo thứ tự không.
+với cùng hệ số IMC như FOC ($K_{p,i} = L/\tau_c = 10{,}46$ V/A, $K_{i,i} = R/\tau_c = 1438$ V/(A$\cdot$s), $\tau_c = 0{,}318$ ms), giới hạn $\pm$$V_{dc}/\sqrt3$ và chống bão hòa back-calculation. Ba dòng pha luôn có tổng bằng 0 (động cơ nối sao, không nối trung tính) nên tổng ba sai lệch cũng bằng 0 và ba khâu tích phân không trôi theo thứ tự không. Điều này chỉ đúng khi dòng đo không có sai số; trường hợp có lệch không được xét ở mục 9.9.
 
 \subsubsection{Bám tín hiệu xoay chiều}\label{sec:9.3.2}
 
@@ -275,12 +275,12 @@ S4 & Gợn tốc độ ở 30 vòng/phút (vòng/phút) & 3,62 & 0,81 & 2,02 & 2
 
 \textbf{PVC + bù back-EMF.} Khi bù $\lambda\omega_e\mathbf{f}_{abc}$ vào đầu ra PI \eqref{eq:9.10}, sai lệch \eqref{eq:9.9} bị loại bỏ: $i_d \approx 0{,}02$ A, dòng RMS và tổn hao đồng bằng FOC bù. Gợn mô-men RMS 0,034 N$\cdot$m và gợn bậc 6 0,028 N$\cdot$m, gần FOC bù (0,030 và 0,022 N$\cdot$m). Phần chênh còn lại đến từ sai lệch bám các sóng hài (Bảng~\ref{tab:9.1}) và từ việc PVC không bù trễ số cho góc định dạng (FOC bù dùng $\theta_a$, (6.5)). Ở 30 vòng/phút (S4), các sóng hài có tần số thấp hơn nên được bám tốt hơn, và PVC + bù có gợn tốc độ thấp nhất trong năm bộ điều khiển (0,40 vòng/phút).
 
-\textbf{So sánh với FOC bù.} Hai phương pháp dùng cùng dòng đặt; khác biệt chỉ nằm ở chỗ vòng dòng ở hệ $d$–$q$ hay hệ $abc$. Trong hệ $d$–$q$, dòng đặt gần như không đổi và back-EMF cơ bản là một hằng số, nên PI đạt sai lệch xác lập bằng 0 cho thành phần chính. Trong hệ $abc$, mọi đại lượng đều xoay chiều, nên PVC chỉ đạt chất lượng tương đương khi có bù back-EMF và băng thông dòng đủ cao so với $6f_e$. Lợi ích được bằng sáng chế nêu (phi tuyến của từng pha không bị trộn sang pha khác) không thể hiện trong mô phỏng này vì nghịch lưu không có thời gian chết (mục 9.7).
+\textbf{So sánh với FOC bù.} Hai phương pháp dùng cùng dòng đặt; khác biệt chỉ nằm ở chỗ vòng dòng ở hệ $d$–$q$ hay hệ $abc$. Trong hệ $d$–$q$, dòng đặt gần như không đổi và back-EMF cơ bản là một hằng số, nên PI đạt sai lệch xác lập bằng 0 cho thành phần chính. Trong hệ $abc$, mọi đại lượng đều xoay chiều, nên PVC chỉ đạt chất lượng tương đương khi có bù back-EMF và băng thông dòng đủ cao so với $6f_e$. Lợi ích được bằng sáng chế nêu (phi tuyến của từng pha không bị trộn sang pha khác) được kiểm chứng riêng ở mục 9.7 với nghịch lưu có thời gian chết và sụt áp van.
 
 \begin{table}[H]
 \centering\small
 \caption{So sánh định tính PVC với các bộ điều khiển trước.}\label{tab:9.4}
-\begin{tabularx}{\linewidth}{@{}lll>{\raggedright\arraybackslash}X@{}}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xlll@{}}
 \toprule
 Tiêu chí & FOC bù & PVC & PVC + bù \\ \midrule
 Dòng đặt & $i_q^{**} = k_s(\theta_a)\, i_q^*$ & \eqref{eq:9.3}, \eqref{eq:9.4} tại $\theta_e$ & \eqref{eq:9.3}, \eqref{eq:9.4} tại $\theta_e$ \\
@@ -290,20 +290,330 @@ Bù trễ số & Có ($\theta_p$, $\theta_a$) & Không & Không \\
 Suy yếu từ thông & Không & Có \eqref{eq:9.4} & Có \eqref{eq:9.4} \\
 Gợn mô-men RMS (S2) & 0,030 N$\cdot$m & 0,200 N$\cdot$m & 0,034 N$\cdot$m \\
 Tổn hao đồng (S2) & 0,113 W & 0,515 W & 0,113 W \\
+Gợn mô-men RMS (S2, 2 $\mu$s + 0,8 V, mục 9.7) & 0,127 N$\cdot$m & 0,238 N$\cdot$m & 0,079 N$\cdot$m \\
+Gợn mô-men RMS (100 vòng/phút, 1 N$\cdot$m, 2 $\mu$s + 0,8 V, $V_{dc}$ = 48 V) & 0,059 N$\cdot$m & – & 0,060 N$\cdot$m \\
+Gợn mô-men RMS (S2, 2 $\mu$s + 0,8 V, FOC bù giới hạn lục giác V3, mục 9.8) & 0,049 N$\cdot$m & – & 0,077 N$\cdot$m \\
+Gợn mô-men RMS, lệch 30 mA pha a, 3 cảm biến (100 vòng/phút, 1 N$\cdot$m, sau 2,9 s, mục 9.9) & 0,032 N$\cdot$m & 0,264 N$\cdot$m & 0,572 N$\cdot$m \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\subsection{Hạn chế}\label{sec:9.7}
+\subsection{Kiểm chứng với nghịch lưu không lý tưởng}\label{sec:9.7}
+
+Mục này kiểm tra lập luận chính của bằng sáng chế: phi tuyến của nghịch lưu ảnh hưởng tới PVC ít hơn FOC vì mỗi pha được điều khiển riêng. Các kết quả ở mục 9.5 dùng nghịch lưu lý tưởng nên chưa trả lời được câu hỏi này.
+
+\subsubsection{Mô hình thời gian chết và sụt áp van}\label{sec:9.7.1}
+
+Khối PWM dùng chung (\texttt{bldc\_plant\_lib.slx}) được bổ sung một khâu trễ bật: mỗi tín hiệu điều khiển van chỉ lên mức 1 sau thời gian chết $T_d$ (làm tròn theo bước giải 1 $\mu$s) và xuống mức 0 ngay lập tức. Khối Universal Bridge dùng điện áp thuận $V_f$ cho IGBT và diode. Cả hai được đặt bằng \texttt{bldc\_set\_inverter} và mặc định tắt, nên mọi kết quả trước đó không đổi (kiểm tra hồi quy đạt toàn bộ). Sai lệch điện áp pha trung bình gây ra là
+
+\begin{equation}
+\Delta v_x \approx -\Big(\frac{T_d}{T_s}\,V_{dc} + V_f\Big)\,\mathrm{sign}(i_x),
+\tag{9.12}\label{eq:9.12}
+\end{equation}
+
+tức một sóng vuông theo dấu dòng pha, biên độ 0,72 V + 0,8 V = 1,52 V với $T_d = 2$ $\mu$s, $V_f = 0{,}8$ V. Sóng vuông này chứa các hài bậc 5, 7, \ldots{} nên gây gợn bậc 6 trong hệ $d$–$q$. Bốn trường hợp được xét: lý tưởng, $T_d$ = 1 $\mu$s, $T_d$ = 2 $\mu$s và $T_d$ = 2 $\mu$s + $V_f$ = 0,8 V.
+
+\subsubsection{Kết quả tại kịch bản S2}\label{sec:9.7.2}
+
+\begin{table}[H]
+\centering\small
+\caption{Gợn mô-men RMS và biên độ gợn bậc 6 ở S2 (1 N$\cdot$m, 100 vòng/phút) với các trường hợp nghịch lưu (\texttt{Studies/run\_inverter\_nonideal.m}).}\label{tab:9.5}
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+Bộ điều khiển & Gợn RMS: lý tưởng / 1 $\mu$s / 2 $\mu$s / 2 $\mu$s + 0,8 V (N$\cdot$m) & T6: lý tưởng / 1 $\mu$s / 2 $\mu$s / 2 $\mu$s + 0,8 V (N$\cdot$m) \\ \midrule
+FOC thường & 0,177 / 0,158 / 0,183 / 0,199 & 0,239 / 0,211 / 0,249 / 0,266 \\
+FOC bù & 0,030 / 0,032 / 0,040 / 0,127 & 0,022 / 0,008 / 0,040 / 0,136 \\
+Six-step & 0,043 / 0,044 / 0,045 / 0,043 & 0,023 / 0,020 / 0,023 / 0,018 \\
+PVC & 0,200 / 0,209 / 0,216 / 0,238 & 0,264 / 0,280 / 0,292 / 0,326 \\
+PVC + bù & 0,034 / 0,032 / 0,041 / 0,079 & 0,028 / 0,013 / 0,041 / 0,087 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Với thời gian chết đơn thuần, FOC bù và PVC + bù bị ảnh hưởng như nhau (gợn RMS 0,040 và 0,041 N$\cdot$m ở 2 $\mu$s). Ở 1 $\mu$s, gợn bậc 6 của cả hai còn giảm, có thể do thành phần bậc 6 do \eqref{eq:9.12} gây ra ngược pha với phần gợn còn lại tại điểm làm việc này. Khi có thêm sụt áp van, mô-men của FOC bù xuất hiện các xung sụt sâu tới khoảng 0,6 N$\cdot$m sáu lần mỗi chu kỳ điện, còn PVC + bù chỉ sụt tới khoảng 0,75 N$\cdot$m (Hình~\ref{fig:9.10}). Six-step gần như không bị ảnh hưởng vì van dưới của pha âm dẫn liên tục và mỗi lúc chỉ một nhánh băm xung.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig9_10_dt_torque.png}
+\caption{Mô-men ở S2 (trung bình một chu kỳ PWM) với nghịch lưu lý tưởng và với thời gian chết 2 $\mu$s + sụt áp van 0,8 V: FOC bù (trên) và PVC + bù (dưới).}\label{fig:9.10}
+\end{figure}
+
+\subsubsection{Quét theo tốc độ và tải}\label{sec:9.7.3}
+
+Để biết kết quả ở S2 có đại diện hay không, năm bộ điều khiển được mô phỏng ở chế độ xác lập tại 20, 40, 60, 80, 100 vòng/phút và 0,25; 0,5; 1 N$\cdot$m, với ba trường hợp nghịch lưu (225 lượt chạy song song, \texttt{Studies/run\_sweep\_speed\_load.m}). Mỗi lượt đánh giá trên một số nguyên chu kỳ điện, tối thiểu 0,1 s.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig9_11_sweep_ripple.png}
+\caption{Gợn mô-men RMS theo tốc độ ở ba mức tải của FOC bù, PVC + bù và six-step; đường liền: nghịch lưu lý tưởng, đường đứt: thời gian chết 2 $\mu$s + sụt áp van 0,8 V.}\label{fig:9.11}
+\end{figure}
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{Nghịch lưu lý tưởng:} PVC + bù và FOC bù có gợn RMS tương đương trên toàn dải (0,025–0,035 so với 0,026–0,030 N$\cdot$m). PVC + bù chỉ kém hơn đôi chút ở 100 vòng/phút, do sai lệch bám các sóng hài định dạng tăng theo tần số (Bảng~\ref{tab:9.1}).
+\item \textbf{Thời gian chết 2 $\mu$s + sụt áp van 0,8 V, từ 20 đến 80 vòng/phút:} FOC bù tốt bằng hoặc tốt hơn PVC + bù, ví dụ ở 1 N$\cdot$m, 40–80 vòng/phút: 0,041–0,047 so với 0,048–0,056 N$\cdot$m.
+\item \textbf{Cùng điều kiện, tại 100 vòng/phút:} PVC + bù tốt hơn rõ (0,033; 0,051; 0,077 N$\cdot$m so với 0,064; 0,108; 0,121 N$\cdot$m ở 0,25; 0,5; 1 N$\cdot$m). Đây chính là điểm làm việc của S2.
+\item \textbf{Phân tích \eqref{eq:9.9} đúng trên toàn dải:} dòng $i_d$ của PVC không bù khớp lý thuyết trong khoảng 5 \% ở mọi tốc độ và không phụ thuộc tải, đúng như phân tích tuyến tính dự báo (Hình~\ref{fig:9.12}a). Tổn hao đồng của PVC không bù tăng nhanh theo tốc độ, trong khi các bộ khác gần như không đổi (Hình~\ref{fig:9.12}b).
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig9_12_sweep_pvc.png}
+\caption{(a) Dòng $i_d$ của PVC không bù theo tốc độ: đường là \eqref{eq:9.9}, điểm là mô phỏng ở ba mức tải; (b) tổn hao đồng theo tốc độ ở 1 N$\cdot$m của năm bộ điều khiển (nghịch lưu lý tưởng).}\label{fig:9.12}
+\end{figure}
+
+\subsubsection{Vai trò của giới hạn điện áp}\label{sec:9.7.4}
+
+Ưu thế của PVC + bù chỉ xuất hiện ở 100 vòng/phút, nơi điện áp cần thiết gần chạm giới hạn: back-EMF dây đã khoảng 28,7 V, cộng thêm sụt áp \eqref{eq:9.12} trên hai pha. Để kiểm tra, các bộ giới hạn điện áp trong bộ điều khiển và hệ số điều chế được ghi lại trong cửa sổ xác lập (\texttt{Studies/check\_voltage\_saturation.m}), với $V_{dc}$ = 36 V và 48 V.
+
+\begin{table}[H]
+\centering\small
+\caption{Hoạt động của giới hạn điện áp tại 100 vòng/phút, 1 N$\cdot$m, thời gian chết 2 $\mu$s + sụt áp van 0,8 V. Giới hạn trong bộ điều khiển là $V_{dc}/\sqrt3$: FOC bù giới hạn riêng $u_d$, $u_q$; PVC giới hạn từng điện áp pha.}\label{tab:9.6}
+\begin{tabularx}{\linewidth}{@{}ll>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}Xl@{}}
+\toprule
+Bộ điều khiển & $V_{dc}$ (V) & Thời gian giới hạn tác động (\%) & Hệ số điều chế bị kẹp ở 0 hoặc 1 (\%) & Điện áp yêu cầu lớn nhất (V) & Gợn mô-men RMS (N$\cdot$m) \\ \midrule
+FOC bù & 36 & 14,7 & 0 & 22,6 & 0,127 \\
+PVC + bù & 36 & 11,3 & 0 & 22,0 & 0,079 \\
+FOC bù & 48 & 0 & 0 & 21,9 & 0,059 \\
+PVC + bù & 48 & 0 & 0 & 22,0 & 0,060 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig9_13_sweep_vdc.png}
+\caption{Gợn mô-men RMS tại 100 vòng/phút với thời gian chết 2 $\mu$s + sụt áp van 0,8 V, ở $V_{dc}$ = 36 V và 48 V.}\label{fig:9.13}
+\end{figure}
+
+Ở 36 V, điện áp yêu cầu vượt giới hạn $V_{dc}/\sqrt3 = 20{,}8$ V trong 11–15 \% thời gian ở cả hai bộ điều khiển, trong khi hệ số điều chế không lần nào bị kẹp, tức nghịch lưu vẫn còn dư điện áp. FOC bù cắt cả thành phần $u_q$, nên sai lệch điện áp rơi vào cả ba pha đúng lúc back-EMF hình thang đạt đỉnh, gây các xung sụt ở Hình~\ref{fig:9.10}. PVC chỉ cắt điện áp của pha đang vượt ngưỡng nên ảnh hưởng nhẹ hơn. Khi $V_{dc}$ = 48 V, không còn giới hạn nào tác động và gợn RMS của hai bộ gần bằng nhau: 0,059 và 0,060 N$\cdot$m ở 1 N$\cdot$m; ở ba mức tải, PVC + bù chỉ còn tốt hơn 0–16 \%, thay vì 36–53 \% ở 36 V (Hình~\ref{fig:9.13}). Như vậy ưu thế quan sát được ở S2 đến từ cách đặt giới hạn điện áp trong bộ điều khiển. Mục~\ref{sec:9.8} kiểm tra trực tiếp giải thích này bằng cách thay bộ giới hạn của FOC bù.
+
+\subsubsection{Kết luận kiểm chứng}\label{sec:9.7.5}
 
 \begin{enumerate}[leftmargin=*]
-\item \textbf{Không có thời gian chết và sụt áp van.} Lợi ích chính được bằng sáng chế nêu (cách ly phi tuyến của từng pha) chưa được đánh giá. Cần thêm mô hình thời gian chết vào Power Stage để so sánh công bằng PVC với FOC trên khía cạnh này.
-\item \textbf{Tốc độ cơ sở cố định.} Bằng sáng chế tính $\omega_b$ theo mô-men đặt; mô hình dùng hằng số \eqref{eq:9.5}. Các kịch bản S1–S4 gần như không đi vào vùng suy yếu từ thông, nên \eqref{eq:9.4} chưa được kiểm chứng.
+\item Phân tích sai lệch dòng \eqref{eq:9.9} của PVC đúng trên toàn dải 20–100 vòng/phút và mọi mức tải: PVC theo đúng bằng sáng chế (không bù back-EMF) có dòng phản kháng và tổn hao đồng tăng nhanh theo tốc độ.
+\item Với thời gian chết và sụt áp van, PVC có bù back-EMF tương đương FOC bù trong phần lớn dải làm việc; mô phỏng không cho thấy lợi ích của việc tách phi tuyến theo từng pha.
+\item Khác biệt duy nhất (100 vòng/phút, 36 V) do cách giới hạn điện áp và biến mất khi có đủ điện áp dự trữ (khẳng định ở mục~\ref{sec:9.8}).
+\item Six-step ít nhạy nhất với thời gian chết và sụt áp van.
+\end{enumerate}
+
+\subsection{Bộ giới hạn điện áp của FOC bù}\label{sec:9.8}
+
+Mục 9.7.4 cho thấy ưu thế của PVC + bù ở 100 vòng/phút, 36 V có thể đến từ bộ giới hạn điện áp, nhưng chưa thử một bộ giới hạn khác cho FOC bù. Mục này thử trực tiếp: giữ nguyên mọi phần khác của FOC bù và chỉ thay bộ giới hạn.
+
+\subsubsection{Bốn chiến lược giới hạn}\label{sec:9.8.1}
+
+Khối VLim (MATLAB Function, gọi \texttt{Common/bldc\_vlim.m}) thay cho hai khối Sat\_d, Sat\_q của mô hình FOC bù. Tham số \texttt{P.vlim} chọn một trong bốn chiến lược, với $\mathbf{u}^* = [u_d^*, u_q^*]^T$ là điện áp yêu cầu (tổng của PI, bù chéo và bù back-EMF) và $\mathbf{v}^* = [v_a^*, v_b^*, v_c^*]^T$ là điện áp pha tương ứng sau Park ngược:
+
+\begin{equation}
+\begin{aligned}
+&\text{V0:}\ \ u_x = \mathrm{sat}_{\pm V_m}(u_x^*),\ x \in \{d, q\} &&\text{(mô hình gốc)}\\
+&\text{V1:}\ \ \mathbf{u} = \min\!\Big(1, \tfrac{V_m}{|\mathbf{u}^*|}\Big)\,\mathbf{u}^* &&\text{(giới hạn biên độ vector)}\\
+&\text{V2:}\ \ \mathbf{v} = \mathrm{sat}_{\pm V_m}(\mathbf{v}^*),\ \mathbf{u} = \text{Park}(\mathbf{v}) &&\text{(kẹp từng pha, như khối Sat\_v của PVC)}\\
+&\text{V3:}\ \ \mathbf{u} = \min\!\Big(1, \tfrac{V_{dc}}{\max_x v_x^* - \min_x v_x^*}\Big)\,\mathbf{u}^* &&\text{(lục giác của nghịch lưu)}
+\end{aligned}
+\tag{9.13}\label{eq:9.13}
+\end{equation}
+
+với $V_m = V_{dc}/\sqrt3$. V3 chỉ giới hạn khi điện áp dây yêu cầu vượt $V_{dc}$, tức đúng giới hạn vật lý của nghịch lưu khi dùng bơm thứ tự không min–max \eqref{eq:9.11}; V0–V2 bảo thủ hơn. Giá trị mặc định \texttt{P.vlim = 0} giữ nguyên mô hình gốc: kiểm tra hồi quy S1–S4 của cả năm bộ điều khiển (180 chỉ tiêu) đều đạt sau khi thay khối.
+
+\subsubsection{Kết quả}\label{sec:9.8.2}
+
+FOC bù với V0–V3 và PVC + bù được mô phỏng ở chế độ xác lập tại 80 và 100 vòng/phút, 0,25; 0,5; 1 N$\cdot$m, $V_{dc}$ = 36 và 48 V, nghịch lưu lý tưởng và có thời gian chết 2 $\mu$s + sụt áp van 0,8 V (120 lượt chạy, \texttt{Studies/run\_voltage\_limit.m}).
+
+\begin{table}[H]
+\centering\small
+\caption{Gợn mô-men RMS (N$\cdot$m) tại 100 vòng/phút với thời gian chết 2 $\mu$s + sụt áp van 0,8 V.}\label{tab:9.7}
+\begin{tabular}{@{}llccccc@{}}
+\toprule
+$V_{dc}$ & Tải (N$\cdot$m) & FOC bù V0 (gốc) & V1 & V2 & V3 & PVC + bù \\ \midrule
+36 V & 0,25 & 0,064 & 0,064 & 0,054 & 0,041 & \textbf{0,033} \\
+36 V & 0,5 & 0,108 & 0,110 & 0,066 & \textbf{0,049} & 0,051 \\
+36 V & 1 & 0,121 & 0,124 & 0,065 & \textbf{0,049} & 0,077 \\
+48 V & 0,25 & 0,045 & 0,045 & 0,045 & 0,045 & 0,045 \\
+48 V & 0,5 & 0,052 & 0,052 & 0,052 & 0,052 & 0,044 \\
+48 V & 1 & 0,059 & 0,059 & 0,059 & 0,059 & 0,061 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig9_14_vlim.png}
+\caption{Gợn mô-men RMS của FOC bù với bốn bộ giới hạn \eqref{eq:9.13} và của PVC + bù, tại 100 vòng/phút, thời gian chết 2 $\mu$s + sụt áp van 0,8 V: (a) $V_{dc}$ = 36 V; (b) $V_{dc}$ = 48 V.}\label{fig:9.14}
+\end{figure}
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{Khi giới hạn không tác động} (80 vòng/phút; 48 V; hoặc nghịch lưu lý tưởng), V0–V3 cho kết quả trùng nhau tới bốn chữ số, đúng như mong đợi.
+\item \textbf{V1 không tốt hơn V0.} Giới hạn biên độ vector giữ nguyên góc nhưng vẫn cắt cả ba pha cùng lúc. Với back-EMF hình thang, điện áp yêu cầu chỉ vượt vòng tròn $V_m$ ở các góc gần đỉnh hình thang, nên điều cần thiết là cho phép điện áp pha dùng phần lục giác nằm ngoài vòng tròn chứ không phải giữ góc.
+\item \textbf{V2 (cùng cách giới hạn với PVC)} giảm gợn của FOC bù xuống 0,054–0,066 N$\cdot$m. Ở 1 N$\cdot$m, FOC bù với V2 đã tốt hơn PVC + bù (0,065 so với 0,077 N$\cdot$m).
+\item \textbf{V3 (lục giác)} cho gợn 0,041–0,049 N$\cdot$m, giảm 36–60 \% so với V0 và gần với kết quả ở 48 V. FOC bù với V3 tốt hơn PVC + bù ở 0,5 và 1 N$\cdot$m; chỉ ở 0,25 N$\cdot$m PVC + bù còn tốt hơn một chút (0,033 so với 0,041 N$\cdot$m).
+\end{itemize}
+
+Như vậy, khi so sánh với cùng một cách giới hạn điện áp, ưu thế của PVC + bù ở S2 không còn. Kết luận của mục 9.7.4 được khẳng định trực tiếp: nguyên nhân là bộ giới hạn, không phải việc điều khiển từng pha. Với nghịch lưu không lý tưởng ở gần tốc độ cơ sở, bộ giới hạn V3 nên được dùng cho FOC bù.
+
+\subsection{Sai số đo dòng}\label{sec:9.9}
+
+Lập luận thứ hai của bằng sáng chế là sai số của mạch đo dòng một pha bị biến đổi Park trộn sang các pha khác ở FOC, còn PVC thì không. Mục này kiểm tra lập luận đó.
+
+\subsubsection{Mô hình cảm biến}\label{sec:9.9.1}
+
+Khối Current Sensor (thêm vào \texttt{bldc\_plant\_lib.slx}, đặt sau khâu lấy mẫu dòng ở cả bốn mô hình) cho dòng đo
+
+\begin{equation}
+\mathbf{i}_{meas} = \mathbf{M}\,\big(\mathbf{g} \circ \mathbf{i}_{abc} + \boldsymbol{\delta}\big), \qquad
+\mathbf{M} = \mathbf{I}_3 \ \ \text{(3 cảm biến)} \quad\text{hoặc}\quad
+\mathbf{M} = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ -1 & -1 & 0 \end{bmatrix} \ \ \text{(2 cảm biến)},
+\tag{9.14}\label{eq:9.14}
+\end{equation}
+
+với $\boldsymbol{\delta}$ là độ lệch không và $\mathbf{g}$ là hệ số khuếch đại của từng cảm biến, đặt bằng \texttt{bldc\_set\_sensor}; với 2 cảm biến, $i_c = -i_a - i_b$ được tính từ hai dòng đo. Mặc định $\mathbf{g} = \mathbf{1}$, $\boldsymbol{\delta} = \mathbf{0}$, $\mathbf{M} = \mathbf{I}_3$ cho $\mathbf{i}_{meas} = \mathbf{i}_{abc}$ chính xác, nên các kết quả trước không đổi. Bốn trường hợp được xét: lệch $\delta_a$ = 30 mA (1 \% của $I_{max}$) ở pha a, và hệ số khuếch đại pha b lớn hơn 3 \%, mỗi trường hợp với 3 và 2 cảm biến.
+
+\subsubsection{Phân tích}\label{sec:9.9.2}
+
+\textbf{FOC.} Với 3 cảm biến, lệch $\delta_a$ qua biến đổi Clarke cho sai lệch $\Delta i_\alpha = \tfrac23\delta_a$, $\Delta i_\beta = 0$. Trên hệ $d$–$q$ đây là một vector biên độ $\tfrac23\delta_a$ quay ngược với tần số $f_e$. Vòng dòng ép dòng đo bằng dòng đặt, nên dòng thực mang sai lệch đó và mô-men có thành phần tần số $f_e$ biên độ
+
+\begin{equation}
+\Delta T_1 = K_t \cdot \tfrac{2}{3}\,\delta_a\ \ \text{(3 cảm biến)}, \qquad \Delta T_1 = K_t \cdot \tfrac{2}{\sqrt3}\,\delta_a\ \ \text{(2 cảm biến)},
+\tag{9.15}\label{eq:9.15}
+\end{equation}
+
+tức 0,050 và 0,086 N$\cdot$m khi vòng tốc độ hở. Với 2 cảm biến, lệch của pha a đi vào cả $i_c$ tính được nên ảnh hưởng lớn hơn $\sqrt3$ lần. Sai số hệ số khuếch đại $\varepsilon$ ở pha b tạo sai lệch tỉ lệ với $i_b$, trên hệ $d$–$q$ gồm một thành phần một chiều và một thành phần tần số $2f_e$ biên độ khoảng $\varepsilon I/3$.
+
+\textbf{PVC với 3 cảm biến.} Ba dòng thực luôn có tổng bằng 0 và ba dòng đặt cũng vậy, nhưng tổng ba dòng đo bằng $\delta_a + \delta_b + \delta_c \neq 0$. Do đó tổng ba sai lệch $e_a + e_b + e_c = -\sum\delta$ không thể bằng 0, dù dòng thực có thế nào. Phần vi sai của sai lệch được ba bộ PI triệt tiêu như FOC (dòng thực có cùng sai lệch tần số $f_e$ như \eqref{eq:9.15}), còn phần thứ tự không làm ba khâu tích phân trôi đều với tốc độ
+
+\begin{equation}
+\frac{dv_0}{dt} = -\frac{K_{i,i}}{3}\,(\delta_a + \delta_b + \delta_c),
+\tag{9.16}\label{eq:9.16}
+\end{equation}
+
+tức $-$14,4 V/s với $\delta_a$ = 30 mA. Điện áp thứ tự không $v_0$ không tới được động cơ vì bị điều chế min–max loại bỏ, nhưng nó được cộng vào cả ba điện áp pha trước giới hạn $\pm V_m$ của từng bộ PI và của khối Sat\_v. Sau vài phần mười giây, các giới hạn này tác động lệch nhau giữa ba pha và làm méo điện áp. Mục 9.3.1 nêu rằng ba khâu tích phân không trôi theo thứ tự không vì tổng ba sai lệch bằng 0; điều đó chỉ đúng khi dòng đo không có sai số. Với 2 cảm biến, tổng ba dòng đo luôn bằng 0 nên không có hiện tượng trôi.
+
+\subsubsection{Kết quả}\label{sec:9.9.3}
+
+Năm bộ điều khiển được mô phỏng ở 100 vòng/phút, 1 N$\cdot$m và 30 vòng/phút, 0,5 N$\cdot$m với nghịch lưu lý tưởng (50 lượt chạy, \texttt{Studies/run\_sensor\_error.m}, cửa sổ đánh giá bắt đầu tại 0,25 s). Riêng FOC bù, PVC và PVC + bù được chạy thêm tới 3 s, đánh giá trong khoảng 2,9–3 s.
+
+\begin{table}[H]
+\centering\small
+\caption{Gợn mô-men RMS (N$\cdot$m) / gợn tốc độ đỉnh–đỉnh (vòng/phút) tại 100 vòng/phút, 1 N$\cdot$m, nghịch lưu lý tưởng.}\label{tab:9.8}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xccccc@{}}
+\toprule
+Bộ điều khiển & Lý tưởng & \begin{tabular}[c]{@{}c@{}}Lệch $\delta_a$,\\3 cảm biến\end{tabular} & \begin{tabular}[c]{@{}c@{}}Lệch $\delta_a$,\\2 cảm biến\end{tabular} & \begin{tabular}[c]{@{}c@{}}Hệ số pha b,\\3 cảm biến\end{tabular} & \begin{tabular}[c]{@{}c@{}}Hệ số pha b,\\2 cảm biến\end{tabular} \\ \midrule
+FOC thường & 0,174 / 6,8 & 0,167 / 8,4 & 0,163 / 9,6 & 0,171 / 6,8 & 0,169 / 7,0 \\
+FOC bù & 0,030 / 0,8 & 0,032 / 2,9 & 0,036 / 4,9 & 0,031 / 1,6 & 0,033 / 1,8 \\
+Six-step & 0,045 / 1,2 & 0,046 / 3,1 & 0,052 / 4,8 & 0,045 / 1,9 & 0,045 / 2,3 \\
+PVC & 0,201 / 7,6 & 0,261 / 12,4 & 0,198 / 9,9 & 0,197 / 7,8 & 0,197 / 8,2 \\
+PVC + bù & 0,034 / 1,0 & \textbf{0,247 / 20,9} & 0,040 / 5,3 & 0,035 / 1,9 & 0,036 / 2,2 \\
+PVC + bù, sau 2,9 s & 0,034 / 1,0 & \textbf{0,572 / 42,9} & 0,039 / 4,9 & – & – \\
+FOC bù, sau 2,9 s & 0,030 / 0,9 & 0,032 / 3,0 & 0,038 / 5,0 & – & – \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig9_15_sensor.png}
+\caption{Ảnh hưởng của sai số đo dòng tại 100 vòng/phút, 1 N$\cdot$m: (a) gợn mô-men RMS; (b) gợn tốc độ đỉnh–đỉnh.}\label{fig:9.15}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig9_16_zero_seq.png}
+\caption{PVC + bù với lệch 30 mA ở pha a, 3 cảm biến: (a) thành phần thứ tự không ở đầu ra ba bộ PI pha, so với \eqref{eq:9.16}; (b) mô-men chuẩn hóa theo tải.}\label{fig:9.16}
+\end{figure}
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{Lệch không, FOC và six-step.} Gợn mô-men RMS hầu như không đổi nhưng gợn tốc độ của FOC bù và six-step tăng 2,7–5,8 lần. Thành phần $f_e$ của sai số (13,3 Hz ở 100 vòng/phút) nằm trong băng thông vòng tốc độ (20 Hz), nên vòng tốc độ bù phần lớn mô-men dao động và biến nó thành dao động tốc độ: biên độ mô-men tần số $f_e$ mô phỏng là 0,016 và 0,027 N$\cdot$m, nhỏ hơn giá trị vòng hở \eqref{eq:9.15} nhưng tỉ số giữa 2 và 3 cảm biến (1,71) khớp với $\sqrt3$. Ở 30 vòng/phút ($f_e$ = 4 Hz), vòng tốc độ bù gần hết và gợn mô-men tần số $f_e$ chỉ còn 0,002–0,003 N$\cdot$m ở mọi bộ điều khiển.
+\item \textbf{Lệch không, PVC + bù, 2 cảm biến.} Kết quả gần như FOC bù (0,040 so với 0,036 N$\cdot$m; 5,3 so với 4,9 vòng/phút). Sai lệch của pha a vẫn lan sang các pha khác, đúng như phân tích, vì dòng thực phải có tổng bằng 0.
+\item \textbf{Lệch không, PVC + bù, 3 cảm biến.} Thành phần thứ tự không trôi đúng với tốc độ \eqref{eq:9.16}: độ dốc mô phỏng $-$14,38 V/s (Hình~\ref{fig:9.16}a). Bộ PI pha đầu tiên chạm giới hạn $\pm V_m$ sau 0,69 s ở 100 vòng/phút và 1,23 s ở 30 vòng/phút. Sau đó $v_0$ dừng lại ở khoảng $-$10,5 V và $-$17,4 V, nhưng mô-men dao động mạnh: gợn RMS 0,57 N$\cdot$m (57 \% tải) và gợn tốc độ 43 vòng/phút ở 100 vòng/phút; 0,072 N$\cdot$m (gấp 2,8 lần lý tưởng) ở 30 vòng/phút. Đây là kiểu hỏng không có ở FOC, vì biến đổi Clarke tự loại bỏ thành phần thứ tự không của dòng đo.
+\item \textbf{Sai số hệ số khuếch đại.} Mọi bộ điều khiển có thêm gợn tần số $2f_e$ cỡ 0,005–0,019 N$\cdot$m (100 vòng/phút), lớn hơn ở cấu hình 2 cảm biến. PVC không có ưu thế nào so với FOC bù.
+\end{itemize}
+
+Như vậy mô phỏng không ủng hộ lập luận thứ hai của bằng sáng chế: với cùng cấu hình cảm biến, sai số đo của một pha ảnh hưởng tới PVC giống như FOC; với 3 cảm biến, PVC còn có thêm hiện tượng trôi thứ tự không. Nếu dùng PVC, cần đo 2 pha, hoặc trừ thành phần trung bình $\tfrac13\sum e_x$ khỏi sai lệch trước ba bộ PI. Cách thứ hai tương đương với việc chiếu sai lệch lên mặt phẳng $\alpha\beta$, tức đã gần với FOC trên hệ tọa độ đứng yên.
+
+\subsection{Vùng tốc độ cao và suy yếu từ thông}\label{sec:9.10}
+
+\subsubsection{Giới hạn của suy yếu từ thông với động cơ này}\label{sec:9.10.1}
+
+Bỏ qua điện trở, tốc độ lớn nhất của FOC với dòng $i_d = -I_d$ là tốc độ tại đó biên độ điện áp cơ bản $\omega_e(\lambda_1 - L I_d)$ bằng $V_m$:
+
+\begin{equation}
+\omega_{max} = \omega_b\,\frac{\lambda_1}{\lambda_1 - L\,I_d}, \qquad \frac{\lambda_1}{L} = 62{,}4\ \text{A}.
+\tag{9.17}\label{eq:9.17}
+\end{equation}
+
+Dòng đặc trưng $\lambda_1/L$ lớn hơn giới hạn dòng $I_{max}$ = 3 A khoảng 20 lần, nên ngay cả với $i_d = -3$ A, tốc độ chỉ tăng từ 119,3 lên 125,3 vòng/phút (5 \%). Six-step có tốc độ không tải lớn nhất $V_{dc}/(2p\lambda) = 125{,}7$ vòng/phút, vì dùng trực tiếp điện áp dây $V_{dc}$. Động cơ này có từ thông lớn và điện cảm nhỏ, tức không được thiết kế cho vùng suy yếu từ thông. Mục này vẫn kiểm tra luật \eqref{eq:9.4} của bằng sáng chế, vốn không được kích hoạt trong S1–S4.
+
+\subsubsection{Suy yếu từ thông cho FOC bù}\label{sec:9.10.2}
+
+Để so sánh công bằng với PVC, FOC bù được thêm khâu suy yếu từ thông kiểu phản hồi điện áp (khối FW, mặc định tắt):
+
+\begin{equation}
+i_d^* = \mathrm{sat}_{[-I_{d,max},\,0]}\Big(K_{fw}\!\int \big(k\,V_m - |\mathbf{u}^*|\big)\,dt\Big),
+\tag{9.18}\label{eq:9.18}
+\end{equation}
+
+với $|\mathbf{u}^*|$ là biên độ điện áp yêu cầu trước bộ giới hạn (trễ một chu kỳ lấy mẫu), $K_{fw}$ = 500 A/(V$\cdot$s), $k$ = 0,95, $I_{d,max} = I_{max}$ (\texttt{P.FW}). Khâu này không có giới hạn tổng dòng $\sqrt{i_d^2 + i_q^2} \le I_{max}$, giống PVC.
+
+\subsubsection{Kịch bản S5}\label{sec:9.10.3}
+
+Kịch bản S5: tăng tốc lên 100 vòng/phút, tải 0,25 N$\cdot$m từ 0,15 s, tại 0,3 s đặt 140 vòng/phút, cao hơn tốc độ mọi bộ điều khiển đạt được; đánh giá trong khoảng 0,6–0,8 s (\texttt{Studies/run\_high\_speed.m}).
+
+\begin{table}[H]
+\centering\small
+\caption{Kết quả xác lập ở S5 ($V_{dc}$ = 36 V, nghịch lưu lý tưởng, tải 0,25 N$\cdot$m). FW: suy yếu từ thông.}\label{tab:9.9}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xccccccc@{}}
+\toprule
+Biến thể & \begin{tabular}[c]{@{}c@{}}Tốc độ\\(v/ph)\end{tabular} & \begin{tabular}[c]{@{}c@{}}Gợn tốc độ\\đ–đ (v/ph)\end{tabular} & \begin{tabular}[c]{@{}c@{}}Gợn mô-men\\RMS (N$\cdot$m)\end{tabular} & \begin{tabular}[c]{@{}c@{}}$i_d$ TB\\(A)\end{tabular} & \begin{tabular}[c]{@{}c@{}}Dòng RMS\\(A)\end{tabular} & \begin{tabular}[c]{@{}c@{}}Tổn hao\\đồng (W)\end{tabular} & \begin{tabular}[c]{@{}c@{}}Dòng pha\\đỉnh (A)\end{tabular} \\ \midrule
+FOC thường & 118,4 & 24,2 & 0,781 & 0,00 & 0,241 & 0,079 & 1,55 \\
+FOC bù (V0) & 118,5 & 24,3 & 0,783 & 0,00 & 0,239 & 0,079 & 1,41 \\
+FOC bù (V0) + FW \eqref{eq:9.18} & 124,8 & 34,4 & 1,137 & $-$3,00 & 2,154 & 6,37 & 3,10 \\
+\textbf{FOC bù (V3)} & \textbf{125,1} & \textbf{1,8} & \textbf{0,057} & 0,00 & 0,087 & 0,010 & 1,41 \\
+FOC bù (V3) + FW & 131,0 & 18,1 & 0,613 & $-$3,00 & 2,133 & 6,25 & 3,09 \\
+\textbf{Six-step} & \textbf{125,3} & \textbf{1,4} & \textbf{0,053} & 0,00 & 0,078 & 0,008 & 1,45 \\
+PVC, FW \eqref{eq:9.4} & 126,1 & 11,5 & 0,385 & +0,43 & 0,438 & 0,264 & 1,36 \\
+PVC + bù, FW \eqref{eq:9.4} & 127,7 & 19,4 & 0,697 & +0,20 & 0,610 & 0,511 & 1,40 \\
+PVC + bù, không FW & 125,5 & 16,8 & 0,596 & +0,98 & 0,859 & 1,01 & 2,17 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.6\textheight,keepaspectratio]{fig9_17_high_speed.png}
+\caption{Kịch bản S5: (a) tốc độ; (b) dòng trục d; (c) tốc độ xác lập theo tổn hao đồng, trong ngoặc là gợn mô-men RMS.}\label{fig:9.17}
+\end{figure}
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{Bộ giới hạn quyết định nhiều nhất.} Với V0, FOC dừng ở 118,4 vòng/phút và dao động mạnh (gợn mô-men 0,78 N$\cdot$m, tức 3 lần tải; gợn tốc độ 24 vòng/phút). Chỉ cần đổi sang V3, FOC bù đạt 125,1 vòng/phút với gợn 0,057 N$\cdot$m và không tốn thêm dòng, tương đương six-step (125,3 vòng/phút, 0,053 N$\cdot$m). Đây là cách mở rộng tốc độ hiệu quả nhất với động cơ này.
+\item \textbf{Suy yếu từ thông tốn kém.} FW \eqref{eq:9.18} đưa $i_d$ tới giới hạn $-$3 A nhưng chỉ thêm khoảng 6 vòng/phút (V3: 125,1 $\to$ 131,0), đúng như \eqref{eq:9.17} dự báo. Cái giá là tổn hao đồng tăng 600 lần (0,010 $\to$ 6,25 W) và dòng pha đỉnh vượt $I_{max}$. Mô-men vẫn dao động mạnh (0,61 N$\cdot$m), vì dòng định dạng của FOC bù cần dư điện áp cho các sóng hài bậc 6, mà vùng suy yếu từ thông không còn điện áp dư.
+\item \textbf{Luật \eqref{eq:9.4} của PVC không hoạt động như dự định.} Dòng $i_d$ trung bình của PVC là dương (+0,43 và +0,20 A), ngược với $i_d^* < 0$ của \eqref{eq:9.4}. Nguyên nhân là ở tải nhẹ $|T^*/K_t|$ nhỏ nên $i_d^*$ nhỏ, trong khi sai lệch \eqref{eq:9.9} và bão hòa điện áp tạo dòng $i_d$ dương lớn hơn. PVC đạt 126–128 vòng/phút chủ yếu nhờ khối Sat\_v (kẹp từng pha tạo điện áp pha đỉnh bằng, giống quá điều chế): khi tắt FW, PVC + bù vẫn đạt 125,5 vòng/phút. Mọi biến thể PVC đều dao động mạnh (gợn mô-men 0,39–0,70 N$\cdot$m).
+\end{itemize}
+
+Kết luận: với động cơ có $\lambda_1/L \gg I_{max}$, suy yếu từ thông gần như không có ích; giới hạn tốc độ thực tế do điện áp nghịch lưu quyết định, và cách dùng hết điện áp (V3 cho FOC bù, hoặc six-step) quan trọng hơn mọi luật suy yếu từ thông. Các kết luận ở S1–S4 (tối đa 100 vòng/phút) không bị ảnh hưởng.
+
+\subsection{Kết luận về PVC}\label{sec:9.11}
+
+\begin{enumerate}[leftmargin=*]
+\item Phân tích sai lệch dòng \eqref{eq:9.9} của PVC đúng trên toàn dải 20–100 vòng/phút và mọi mức tải: PVC theo đúng bằng sáng chế (không bù back-EMF) có dòng phản kháng và tổn hao đồng tăng nhanh theo tốc độ.
+\item Với thời gian chết và sụt áp van, PVC có bù back-EMF tương đương FOC bù. Khác biệt ở 100 vòng/phút, 36 V do bộ giới hạn điện áp: khi FOC bù dùng giới hạn lục giác (V3), nó tốt hơn PVC + bù ở 0,5–1 N$\cdot$m (mục 9.8).
+\item Với sai số đo dòng, PVC không có ưu thế; với 3 cảm biến có lệch không, PVC bị trôi thứ tự không \eqref{eq:9.16} và chất lượng suy giảm mạnh sau chưa tới 1 s (mục 9.9).
+\item Luật suy yếu từ thông \eqref{eq:9.4} không tạo được $i_d$ âm ở tải nhẹ; với động cơ này suy yếu từ thông nói chung không đáng giá (mục 9.10).
+\item Six-step ít nhạy nhất với thời gian chết và sụt áp van; cùng với FOC bù dùng giới hạn V3, nó đạt tốc độ cao nhất mà không cần dòng phụ.
+\end{enumerate}
+
+Hai lợi ích bằng sáng chế nêu (tách phi tuyến nghịch lưu và sai số đo theo từng pha) đều không được mô phỏng xác nhận. Ưu điểm thực của PVC chỉ là cấu trúc: không cần biến đổi Park trong vòng hồi tiếp.
+
+\subsection{Hạn chế}\label{sec:9.12}
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Mô hình phi tuyến đơn giản.} Thời gian chết cố định, sụt áp van hằng số, lệch không và hệ số khuếch đại của cảm biến dòng không đổi theo thời gian và nhiệt độ; chưa xét nhiễu đo, độ phân giải ADC và độ trễ của mạch lọc. Kết luận ở mục 9.7 và 9.9 chỉ áp dụng cho các phi tuyến đã mô hình hóa.
+\item \textbf{Suy yếu từ thông.} Bằng sáng chế tính $\omega_b$ theo mô-men đặt; mô hình dùng hằng số \eqref{eq:9.5}. Luật \eqref{eq:9.4} chỉ được kiểm tra ở S5 với một mức tải (0,25 N$\cdot$m) và trên một động cơ có $\lambda_1/L \gg I_{max}$, vốn không phù hợp cho suy yếu từ thông; khâu FW \eqref{eq:9.18} của FOC bù chưa có giới hạn tổng dòng và chưa được chỉnh định tối ưu.
 \item \textbf{Bộ PI pha đơn giản.} Có thể cải thiện khả năng bám tín hiệu xoay chiều bằng bộ điều khiển cộng hưởng tại $f_e$ và $6f_e$ \cite{r3} hoặc bù trễ số cho góc dòng đặt; các phương án này chưa được xét.
+\item \textbf{Giới hạn điện áp.} Bốn chiến lược \eqref{eq:9.13} chỉ được áp dụng cho FOC bù; PVC vẫn dùng kẹp từng pha $\pm V_m$. Chống bão hòa của PI dòng chỉ dựa trên giới hạn đầu ra PI, không dùng điện áp thực sau bộ giới hạn. Kết quả ở các chương trước vẫn dùng V0 để giữ khả năng so sánh.
 \item \textbf{Các hạn chế chung} của mô hình động cơ và cảm biến lý tưởng như ở mục 7.5.
 \end{enumerate}
 
-\subsection{Tái lập kết quả}\label{sec:9.8}
+\subsection{Tái lập kết quả}\label{sec:9.13}
 
 \begin{Verbatim}
 % 1. chạy mô phỏng PVC (hai biến thể, khoảng 30 s)
@@ -316,6 +626,23 @@ SIMULINK_SCREENSHOTS = true; run('04_Results/make_pvc_figures.m')
 % 4. (tùy chọn) kiểm tra hồi quy
 addpath('03_Simulation/Tests')
 bldc_regression('Controllers', {'pvc','pvcff'}, 'Scenarios', {'S1','S2','S3','S4'})
+% 5. kiểm chứng mục 9.7 (khoảng 25 phút; quét dùng parsim)
+addpath('03_Simulation/Studies')
+run_inverter_nonideal()                                   % Bảng 9.5
+run_sweep_speed_load('Cases', {'ideal','dt2','dt2vf'})   % Hình 9.11, 9.12
+run_sweep_speed_load('Controllers', {'comp','pvcff'}, 'Speeds', [60 80 100], ...
+                     'Cases', {'ideal','dt2vf'}, 'Vdc', 48)
+check_voltage_saturation()                                % Bảng 9.6
+run('04_Results/make_sweep_figures.m')                    % Hình 9.10-9.13
+% 6. bộ giới hạn, sai số đo dòng, tốc độ cao (mục 9.8-9.10, khoảng 15 phút)
+run_voltage_limit()                                       % Bảng 9.7 (P.vlim = 0..3)
+run_sensor_error()                                        % Bảng 9.8
+run_sensor_error('Controllers', {'comp','pvc','pvcff'}, 'Points', [100 1], ...
+                 'Cases', {'ideal','offA3','offA2'}, 'Tstart', 2.9, ...
+                 'File', 'sensor_error_long.csv')
+check_zero_sequence()                                     % Hình 9.16, (9.16)
+run_high_speed()                                          % Bảng 9.9, kịch bản S5
+run('04_Results/make_step1_figures.m')                    % Hình 9.14-9.17
 \end{Verbatim}
 
 Hình~\ref{fig:9.1} được vẽ trong trang \emph{Fig. 9.1 - Pseudo vector control} của \texttt{foc\_block\_diagram.drawio} và xuất PNG bằng draw.io.

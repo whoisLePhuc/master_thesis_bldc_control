@@ -9,7 +9,7 @@ and the same test scenarios S1–S4, so that results are directly comparable.
 | Folder | Controller | Theory |
 |---|---|---|
 | `Conventional_FOC/` | Two PI current controllers + cross-coupling + constant fundamental back-EMF compensation (ω_e λ_1) | Sec. 5, Fig. 5.1 |
-| `Compensated_FOC/` | Conventional FOC + angle-based back-EMF compensation (LUT g_d, g_q), digital-delay compensation (θ_p, θ_a) and i_q current shaping (k_s) | Sec. 6, Fig. 6.2 |
+| `Compensated_FOC/` | Conventional FOC + angle-based back-EMF compensation (LUT g_d, g_q), digital-delay compensation (θ_p, θ_a) and i_q current shaping (k_s); options: voltage limiter `P.vlim`, field weakening `P.FW` (both off by default) | Sec. 6, Fig. 6.2; Sec. 9.8, 9.10 |
 | `Six_Step/` | 120° six-step: Hall sectors (from the encoder angle), PI on the two-phase current I = ½·sᵀi_abc, back-EMF feed-forward 2λω_e, H_PWM–L_ON | Sec. 8, Fig. 8.2 |
 | `PVC/` | Pseudo vector control (US 7,339,346): vector-control current references (power-balance i_q*, field-weakening i_d*) → i_abc*, three phase PI controllers; variant with phase back-EMF feedforward (`PVC_FF = 1`) | Sec. 9, Fig. 9.1 |
 
@@ -34,10 +34,12 @@ Common/                    # shared by every controller -- edit here only
 ├── bldc_metrics.m         # M = bldc_metrics(R, SC, P): speed/torque/current metrics in SC.win
 ├── bldc_trap.m            # normalized trapezoidal back-EMF shape F(theta)
 ├── bldc_set_inverter.m    # P = bldc_set_inverter(P, Td, Vf): dead time and device forward voltages (default off)
+├── bldc_set_sensor.m      # P = bldc_set_sensor(P, off, gain, nsens): current-sensor offsets/gains, 2 or 3 sensors (default ideal)
+├── bldc_vlim.m            # voltage limiter of the d-q current loop, P.vlim = 0..3 (VLim block of Compensated FOC)
 ├── bldc_sim_input.m       # SimulationInput for one scenario (used by bldc_run_scenario and parsim studies)
 ├── bldc_collect.m         # collect the outputs of one run (struct R)
 ├── bldc_ss_indicators.m   # steady-state indicators in a window (ripple, 6th harmonic, THD, I_rms, P_Cu)
-└── bldc_plant_lib.slx     # Simulink library: Power Stage, PWM (with optional dead time), SVPWM, abc_to_dq
+└── bldc_plant_lib.slx     # Simulink library: Power Stage, PWM (with optional dead time), SVPWM, abc_to_dq, Current Sensor
 
 Conventional_FOC/
 ├── Conventional_FOC.slx   # model (powergui discrete 1 us); plant blocks are links to bldc_plant_lib
@@ -63,7 +65,12 @@ PVC/
 
 Studies/
 ├── run_inverter_nonideal.m  # all controllers with dead time / device drops (S2, S4) -> 04_Results/Tables/inverter_nonideal.*
-└── run_sweep_speed_load.m   # steady-state sweep speed x load x inverter case (parsim) -> 04_Results/Tables/sweep_speed_load*.csv
+├── run_sweep_speed_load.m   # steady-state sweep speed x load x inverter case (parsim) -> 04_Results/Tables/sweep_speed_load*.csv
+├── check_voltage_saturation.m # voltage-limiter activity, Compensated FOC vs PVC + ff -> voltage_saturation.csv
+├── run_voltage_limit.m      # Compensated FOC with limiters P.vlim = 0..3 vs PVC + ff (parsim) -> voltage_limit.csv
+├── run_sensor_error.m       # all controllers with current-sensor offset/gain errors (parsim) -> sensor_error*.csv
+├── check_zero_sequence.m    # zero-sequence wind-up of the PVC phase PIs with a sensor offset -> Raw/zero_sequence_drift.mat
+└── run_high_speed.m         # scenario S5 (above base speed), field-weakening variants -> high_speed.csv
 
 Tests/
 ├── bldc_controllers.m     # registry of implemented controllers (model, folder, init script, variables)
@@ -123,6 +130,7 @@ an extra Outport `i_dc` (port 7) logs the measured current I.
 | S2 | 100 rpm, 1 N·m load step at 0.3 s, removed at 0.6 s |
 | S3 | Speed reversal +100 -> -100 rpm at 0.3 s |
 | S4 | Staircase 30-60-100-60-30 rpm, 0.5 N·m load |
+| S5 | High speed: 100 -> 140 rpm at 0.3 s, 0.25 N·m (above the 119 rpm base speed; studies only, not in the regression test) |
 
 ## Output naming
 

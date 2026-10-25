@@ -1,9 +1,11 @@
 %% MAKE_SWEEP_FIGURES  Figures of the speed-load sweep and inverter non-ideality study
-%  Reads 04_Results/Tables/sweep_speed_load.csv (and sweep_speed_load_Vdc48.csv if present),
+%  Reads 04_Results/Raw/S2_{comp,pvcff}_{ideal,dt2vf}.mat (run_inverter_nonideal),
+%  04_Results/Tables/sweep_speed_load.csv (and sweep_speed_load_Vdc48.csv if present),
 %  written by 03_Simulation/Studies/run_sweep_speed_load.m, and writes
-%    01_Documents/Thesis/figures/fig9_sweep_ripple.png    torque ripple vs speed and load
-%    01_Documents/Thesis/figures/fig9_sweep_pvc.png       PVC d-axis current error and copper loss vs speed
-%    01_Documents/Thesis/figures/fig9_sweep_vdc.png       effect of the DC-link voltage at 100 rpm
+%    01_Documents/Thesis/figures/fig9_10_dt_torque.png       S2 torque with dead time + device drops
+%    01_Documents/Thesis/figures/fig9_11_sweep_ripple.png    torque ripple vs speed and load
+%    01_Documents/Thesis/figures/fig9_12_sweep_pvc.png       PVC d-axis current error and copper loss vs speed
+%    01_Documents/Thesis/figures/fig9_13_sweep_vdc.png       effect of the DC-link voltage at 100 rpm
 %
 %  Usage:  >> make_sweep_figures
 
@@ -22,6 +24,24 @@ nm  = struct('conv', 'conventional FOC', 'comp', 'compensated FOC', 'six', 'six-
 loads = unique(T.Load_Nm)'; speeds = unique(T.Speed_rpm)';
 pick = @(tag, cs, L) sortrows(T(T.Controller == tag & T.Case == cs & T.Load_Nm == L, :), 'Speed_rpm');
 
+% ---------------- S2 torque with dead time + device drops ----------------
+rawDir = fullfile(here, 'Raw');
+f = figure('Visible', 'off', 'Position', [100 100 900 480], 'Color', 'w');
+tiledlayout(2, 1, 'TileSpacing', 'compact', 'Padding', 'compact');
+for c = {'comp', 'pvcff'}
+    nexttile; hold on;
+    for cs = {'ideal', 'dt2vf'}
+        d = load(fullfile(rawDir, sprintf('S2_%s_%s.mat', c{1}, cs{1})), 'R', 'P'); R = d.R;
+        k = R.t >= 0.45 & R.t <= 0.50; Tm = movmean(R.Te, round(d.P.Ts/(R.t(2) - R.t(1))));
+        if strcmp(cs{1}, 'ideal'), st = {'Color', col.(c{1}), 'LineWidth', 1.2}; else, st = {'Color', [0.25 0.25 0.25], 'LineWidth', 1}; end
+        plot(R.t(k), Tm(k), st{:});
+    end
+    yline(1, 'k:'); grid on; ylim([0.5 1.3]); ylabel('T_e (N\cdotm)'); title(nm.(c{1}));
+    legend('ideal inverter', '2 \mus dead time + 0.8 V', 'Location', 'southeast');
+end
+xlabel('Time (s)');
+exportgraphics(f, fullfile(figDir, 'fig9_10_dt_torque.png'), 'Resolution', 150); close(f);
+
 % ---------------- torque ripple vs speed ----------------
 sel = {'comp', 'pvcff', 'six'};
 f = figure('Visible', 'off', 'Position', [100 100 900 760], 'Color', 'w');
@@ -39,7 +59,7 @@ for i = 1:numel(loads)
 end
 xlabel('Speed (rpm)');
 lg = legend(h, lab, 'NumColumns', 3); lg.Layout.Tile = 'south';
-exportgraphics(f, fullfile(figDir, 'fig9_sweep_ripple.png'), 'Resolution', 150); close(f);
+exportgraphics(f, fullfile(figDir, 'fig9_11_sweep_ripple.png'), 'Resolution', 150); close(f);
 
 % ---------------- PVC d-axis current error and copper loss ----------------
 w = linspace(1, max(speeds)*1.1, 200)*2*pi/60*P.p;
@@ -60,7 +80,7 @@ for c = {'conv', 'comp', 'six', 'pvc', 'pvcff'}
 end
 grid on; xlabel('Speed (rpm)'); ylabel('Copper loss (W)'); title('(b) Copper loss at 1 N\cdotm');
 legend(cellfun(@(c) nm.(c), {'conv', 'comp', 'six', 'pvc', 'pvcff'}, 'UniformOutput', false), 'Location', 'northwest');
-exportgraphics(f, fullfile(figDir, 'fig9_sweep_pvc.png'), 'Resolution', 150); close(f);
+exportgraphics(f, fullfile(figDir, 'fig9_12_sweep_pvc.png'), 'Resolution', 150); close(f);
 
 % ---------------- DC-link voltage check at 100 rpm ----------------
 f48 = fullfile(tabDir, 'sweep_speed_load_Vdc48.csv');
@@ -78,6 +98,6 @@ if exist(f48, 'file')
     grid on; ylabel('T_e ripple RMS (N\cdotm)'); title('100 rpm, 2 \mus dead time + 0.8 V device drops');
     legend('compensated FOC, V_{dc} = 36 V', 'PVC + feedforward, V_{dc} = 36 V', ...
            'compensated FOC, V_{dc} = 48 V', 'PVC + feedforward, V_{dc} = 48 V', 'Location', 'northwest');
-    exportgraphics(f, fullfile(figDir, 'fig9_sweep_vdc.png'), 'Resolution', 150); close(f);
+    exportgraphics(f, fullfile(figDir, 'fig9_13_sweep_vdc.png'), 'Resolution', 150); close(f);
 end
 fprintf('make_sweep_figures: figures in %s\n', figDir);
