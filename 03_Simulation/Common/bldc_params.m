@@ -7,7 +7,7 @@ function P = bldc_params()
 %   Every controller init script starts from this struct, so that all control
 %   strategies are evaluated on exactly the same motor and inverter.
 %
-%   See also BLDC_SCENARIO, BLDC_RUN_SCENARIO, BLDC_SET_INVERTER, BLDC_SET_SENSOR, BLDC_VLIM.
+%   See also BLDC_SCENARIO, BLDC_RUN_SCENARIO, BLDC_SET_INVERTER, BLDC_SET_SENSOR, BLDC_SET_PLANT, BLDC_SET_ENCODER, BLDC_VLIM.
 
 % ---------------- motor ----------------
 P = struct();
@@ -32,8 +32,13 @@ P = bldc_set_inverter(P, 0, [0 0]);   % dead time P.Td (s), forward voltages P.V
 % ---------------- current-sensor errors (off by default, see BLDC_SET_SENSOR) ----------------
 P = bldc_set_sensor(P, [0 0 0], [1 1 1], 3);   % offsets P.CS.off (A), gains P.CS.gain, 3 phase sensors
 
+% ---------------- motor mismatch and position sensor (off by default) ----------------
+P = bldc_set_plant(P);           % P.MIS: factors on R, L, lam and back-EMF flat top (deg) of the motor block only
+P = bldc_set_encoder(P, 0, 0);   % P.ENC: encoder resolution (0 = ideal) and mounting offset
+
 % ---------------- voltage limiter of the d-q current loop (Compensated FOC, see BLDC_VLIM) ----------------
-P.vlim = 0;    % 0: clamp u_d, u_q to +/-Vm | 1: |u_dq| <= Vm | 2: phase clamp +/-Vm | 3: inverter hexagon
+P.vlim = 3;    % 0: clamp u_d, u_q to +/-Vm (used up to Sec. 9) | 1: |u_dq| <= Vm | 2: phase clamp +/-Vm
+               % 3: inverter hexagon (default since Sec. 10, see Sec. 9.8 and 10.3)
 
 % ---------------- field weakening of Compensated FOC (voltage feedback, off by default) ----------------
 %  i_d* = min(0, max(-Idmax, Ki*integral(k*Vm - |u_dq|)))  with |u_dq| = requested voltage before the limiter

@@ -9,6 +9,8 @@ function T = run_sweep_speed_load(varargin)
 %   evaluation window [0.25, 0.25 + k/fe] (k whole electrical periods, at least 0.1 s).
 %
 %   Options (name-value):
+%     'Vlim'         voltage limiter of Compensated FOC, P.vlim (default 0 = original, as in Sec. 9.7-9.9;
+%                    the model default is 3 since Sec. 10)
 %     'Controllers'  tags (default: all registered)
 %     'Speeds'       rpm   (default [20 40 60 80 100])
 %     'Loads'        N.m   (default [0.25 0.5 1])
@@ -22,6 +24,7 @@ function T = run_sweep_speed_load(varargin)
 
 ip = inputParser;
 ip.addParameter('Controllers', {});
+ip.addParameter('Vlim', 0);   % Compensated FOC limiter; 0 (original) reproduces the published tables
 ip.addParameter('Speeds', [20 40 60 80 100]);
 ip.addParameter('Loads', [0.25 0.5 1]);
 ip.addParameter('Cases', {'ideal', 'dt2vf'});
@@ -62,6 +65,7 @@ for c = 1:numel(C)
             for k = 1:numel(CASES)
                 W = W0; W.SC = SC;
                 W.P = bldc_set_inverter(W.P, CASES(k).Td, CASES(k).Vf);
+                W.P.vlim = opt.Vlim;                                % limiter of Compensated FOC (BLDC_VLIM)
                 if opt.Vdc ~= W.P.Vdc                          % DC-link voltage and derived limits
                     W.P.Vdc = opt.Vdc; W.P.Vm = opt.Vdc/sqrt(3);
                     if isfield(W, 'PVC'), W.PVC.wb = W.P.Vm/(W.P.p*W.P.lam1); end

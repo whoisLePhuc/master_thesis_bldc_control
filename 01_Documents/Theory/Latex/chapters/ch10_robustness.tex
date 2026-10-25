@@ -1,0 +1,245 @@
+% Chapter 10 -- Robustness (Theory doc 08). Pure body, see 08_robustness.tex.
+\section{Độ bền vững}\label{sec:10}
+
+
+
+\subsection{Phương pháp}\label{sec:10.1}
+
+\subsubsection{Mở rộng mô hình}\label{sec:10.1.1}
+
+Bộ điều khiển luôn dùng thông số danh định ($R$, $L$, $\lambda$ trong \texttt{P}) và bảng tra back-EMF đỉnh phẳng 120$^\circ$. Hai thay đổi trong thư viện dùng chung \texttt{bldc\_plant\_lib.slx} cho phép đối tượng lệch khỏi giả định đó:
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{Động cơ} (khối Permanent Magnet Synchronous Machine): điện trở, điện cảm và từ thông nhân với các hệ số \texttt{P.MIS.R}, \texttt{P.MIS.L}, \texttt{P.MIS.lam}; độ rộng đỉnh phẳng của back-EMF là \texttt{P.MIS.flat} (độ điện). Các giá trị được đặt bằng \texttt{bldc\_set\_plant}.
+\item \textbf{Cảm biến vị trí} (khối Position Sensor, đặt sau khâu lấy mẫu góc ở cả bốn mô hình): góc cơ đo được là
+\end{itemize}
+
+\begin{equation}
+\theta_{meas} = Q\,\Big\lfloor \frac{\theta}{Q} \Big\rfloor + \frac{\Delta\theta_e}{p}, \qquad Q = \frac{2\pi}{N_{enc}},
+\tag{10.1}\label{eq:10.1}
+\end{equation}
+
+với $N_{enc}$ là số xung trên một vòng cơ và $\Delta\theta_e$ là lệch góc lắp đặt (độ điện), đặt bằng \texttt{bldc\_set\_encoder}. Góc đo được dùng cho mọi phép biến đổi Park, mọi bảng tra và việc xác định sector của six-step; tốc độ đo vẫn lý tưởng.
+
+Mặc định (\texttt{P.MIS} = 1, 1, 1, 120$^\circ$; $N_{enc}$ = 0, tức không lượng tử hóa; $\Delta\theta_e$ = 0) cho kết quả trùng với mô hình cũ: kiểm tra hồi quy S1–S4 của năm bộ điều khiển (180 chỉ tiêu) đều đạt.
+
+Khối máy điện của Simscape tạo back-EMF pha theo
+
+\begin{equation}
+e_x = \lambda\,\omega_e\,\frac{\mathrm{sat}_{\pm c}\big(\cos(\theta_e - \varphi_x)\big)}{c}, \qquad c = \cos\frac{\Theta_{flat}}{2},
+\tag{10.2}\label{eq:10.2}
+\end{equation}
+
+tức đỉnh phẳng rộng $\Theta_{flat}$ và sườn là các đoạn cosin. Với $\Theta_{flat}$ = 120$^\circ$, dạng này gần như trùng với hình thang sườn thẳng \texttt{bldc\_trap} dùng trong bảng tra (sai khác của $g_q$ dưới 0,2 \%).
+
+\subsubsection{Các trường hợp}\label{sec:10.1.2}
+
+
+\begin{table}[H]
+\centering\small
+\caption{Các trường hợp sai lệch (\texttt{Studies/run\_robustness.m}).}\label{tab:10.1}
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+Nhóm & Trường hợp \\ \midrule
+Dạng back-EMF & đỉnh phẳng 100$^\circ$, 110$^\circ$, 130$^\circ$, 140$^\circ$ (bảng tra: 120$^\circ$) \\
+Thông số động cơ & $\lambda$ −10 \%, +10 \%; $L$ −20 \%, +20 \%; $R$ +30 \% \\
+Độ phân giải encoder & 256, 1024, 4096 xung/vòng cơ (11,25$^\circ$, 2,81$^\circ$, 0,70$^\circ$ điện) \\
+Lệch góc encoder & −10$^\circ$, −5$^\circ$, +5$^\circ$, +10$^\circ$ điện \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Sáu biến thể được chạy: FOC thường, FOC bù (giới hạn gốc V0), FOC bù với giới hạn lục giác V3 (mục 9.8), six-step, PVC và PVC + bù. Mỗi lượt chạy ở chế độ xác lập (tăng tốc tại 0,02 s, đóng tải tại 0,12 s, đánh giá từ 0,25 s trên một số nguyên chu kỳ điện, tối thiểu 0,1 s) tại hai điểm làm việc 100 vòng/phút, 1 N$\cdot$m và 30 vòng/phút, 0,5 N$\cdot$m với nghịch lưu lý tưởng (204 lượt), và tại 100 vòng/phút, 1 N$\cdot$m với thời gian chết 2 $\mu$s + sụt áp van 0,8 V (102 lượt).
+
+\subsection{Dạng back-EMF}\label{sec:10.2}
+
+
+\begin{table}[H]
+\centering\small
+\caption{Gợn mô-men RMS (N$\cdot$m) theo độ rộng đỉnh phẳng của back-EMF động cơ, 100 vòng/phút, 1 N$\cdot$m, nghịch lưu lý tưởng.}\label{tab:10.2}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xccccc@{}}
+\toprule
+Đỉnh phẳng & FOC thường & FOC bù & Six-step & PVC & PVC + bù \\ \midrule
+100$^\circ$ & \textbf{0,063} & 0,120 & 0,075 & 0,116 & 0,122 \\
+110$^\circ$ & 0,116 & 0,064 & \textbf{0,034} & 0,147 & 0,066 \\
+120$^\circ$ (danh định) & 0,174 & \textbf{0,030} & 0,045 & 0,201 & 0,034 \\
+130$^\circ$ & 0,195 & 0,069 & \textbf{0,046} & 0,258 & 0,072 \\
+140$^\circ$ & 0,211 & 0,125 & \textbf{0,047} & 0,315 & 0,127 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig10_1_bemf_shape.png}
+\caption{Gợn mô-men RMS theo độ rộng đỉnh phẳng của back-EMF động cơ (bảng tra của bộ điều khiển: 120$^\circ$): (a) 100 vòng/phút, 1 N$\cdot$m; (b) 30 vòng/phút, 0,5 N$\cdot$m; (c) 100 vòng/phút, 1 N$\cdot$m với thời gian chết 2 $\mu$s + sụt áp van 0,8 V. Trục tung thang log.}\label{fig:10.1}
+\end{figure}
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{FOC bù và PVC + bù} chỉ tốt khi dạng back-EMF đúng như bảng tra. Lệch 10$^\circ$ làm gợn tăng 1,9–2,3 lần; lệch 20$^\circ$ làm gợn tăng 3,6–4,2 lần, gấp đôi FOC thường ở 100$^\circ$.
+\item \textbf{Six-step} gần như không đổi khi đỉnh phẳng rộng hơn 120$^\circ$ (0,045–0,047 N$\cdot$m): hai pha dẫn vẫn nằm trọn trên đỉnh phẳng trong suốt sector. Khi đỉnh phẳng hẹp hơn 120$^\circ$, đầu và cuối mỗi sector rơi vào sườn và gợn tăng (0,075 N$\cdot$m ở 100$^\circ$). Ở 110$^\circ$, gợn của six-step lại thấp hơn danh định (0,034 N$\cdot$m), có thể vì phần sụt mô-men khi chuyển mạch (mục 8.3) được bù một phần bởi sườn back-EMF.
+\item \textbf{FOC thường} tốt dần khi đỉnh phẳng hẹp lại, vì back-EMF gần sin hơn; ở 100$^\circ$ nó có gợn thấp nhất (0,063 N$\cdot$m).
+\end{itemize}
+
+\subsubsection{Cơ chế: bù back-EMF sai lệch}\label{sec:10.2.1}
+
+Sai lệch dạng back-EMF ảnh hưởng FOC bù qua hai đường. Thứ nhất, khâu định dạng dòng $k_s = (\lambda_1/\lambda)/g_q^{tab}$ không còn khớp với $g_q$ thật, nên mô-men $\tfrac32 p\lambda\, g_q\, i_q^{**}$ không còn phẳng dù dòng bám hoàn hảo (gợn "tĩnh"). Thứ hai, khâu bù $\omega_e\lambda\,g_{dq}^{tab}$ sai một lượng $\Delta\mathbf{e}_{dq} = \lambda\omega_e(\mathbf{g}_{dq} - \mathbf{g}_{dq}^{tab})$, là nhiễu điện áp có các thành phần bậc $6k$. Vòng dòng phản ứng với nhiễu này như với back-EMF của PVC (9.9):
+
+\begin{equation}
+\Delta\mathbf{i}_{dq}(j6k\omega_e) = -\frac{\Delta\mathbf{e}_{dq}(j6k\omega_e)}{Z(j6k\omega_e) + C(j6k\omega_e)}, \qquad
+T_e \approx \tfrac32 p\lambda\big[g_d\,\Delta i_d + g_q\,(i_q^{**} + \Delta i_q)\big].
+\tag{10.3}\label{eq:10.3}
+\end{equation}
+
+Nhiễu tỉ lệ với $\omega_e$, nên gợn do đường thứ hai tăng theo tốc độ, còn gợn tĩnh thì không.
+
+
+\begin{table}[H]
+\centering\small
+\caption{Gợn mô-men RMS (N$\cdot$m) do sai lệch dạng back-EMF của FOC bù: mô hình tuyến tính \eqref{eq:10.3} và phần tăng thêm trong mô phỏng so với danh định, $\sqrt{T_{rms}^2 - T_{rms,0}^2}$.}\label{tab:10.3}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xccccc@{}}
+\toprule
+Đỉnh phẳng & 100 v/ph: tĩnh & 100 v/ph: \eqref{eq:10.3} & 100 v/ph: mô phỏng & 30 v/ph: \eqref{eq:10.3} & 30 v/ph: mô phỏng \\ \midrule
+100$^\circ$ & 0,033 & 0,104 & 0,116 & 0,023 & 0,022 \\
+110$^\circ$ & 0,016 & 0,051 & 0,057 & 0,012 & 0,007 \\
+130$^\circ$ & 0,011 & 0,045 & 0,062 & 0,010 & 0,013 \\
+140$^\circ$ & 0,019 & 0,096 & 0,121 & 0,022 & 0,032 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Mô hình \eqref{eq:10.3} thấp hơn mô phỏng 10–27 \% ở 100 vòng/phút và đúng bậc độ lớn ở 30 vòng/phút. Gợn tĩnh chỉ chiếm khoảng một phần ba; phần lớn đến từ khâu bù back-EMF. Hệ quả: nếu không biết chắc dạng back-EMF, việc bỏ khâu bù theo góc (giữ lại định dạng dòng) có thể còn tốt hơn bù sai. Một bộ quan sát back-EMF trực tuyến sẽ loại bỏ cả hai đường.
+
+\subsection{Thông số động cơ}\label{sec:10.3}
+
+
+\begin{table}[H]
+\centering\small
+\caption{Gợn mô-men RMS (N$\cdot$m) với sai lệch thông số động cơ, 100 vòng/phút, 1 N$\cdot$m, nghịch lưu lý tưởng.}\label{tab:10.4}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xcccccc@{}}
+\toprule
+Trường hợp & FOC thường & FOC bù (V0) & FOC bù (V3) & Six-step & PVC & PVC + bù \\ \midrule
+Danh định & 0,174 & 0,030 & 0,030 & 0,045 & 0,201 & 0,034 \\
+$\lambda$ −10 \% & 0,136 & 0,030 & 0,030 & 0,045 & 0,167 & 0,039 \\
+$\lambda$ +10 \% & 0,198 & 0,091 & 0,047 & 0,044 & 0,227 & 0,066 \\
+$L$ −20 \% & 0,168 & 0,035 & 0,034 & 0,042 & 0,196 & 0,038 \\
+$L$ +20 \% & 0,182 & 0,028 & 0,028 & 0,050 & 0,201 & 0,033 \\
+$R$ +30 \% & 0,163 & 0,030 & 0,030 & 0,046 & 0,196 & 0,033 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{$R$ và $L$} hầu như không ảnh hưởng (thay đổi dưới 18 \%). Vòng dòng PI có tích phân bù sai số $R$; sai số $L$ chỉ làm lệch băng thông vòng dòng và khâu bù chéo một chút.
+\item \textbf{$\lambda$ −10 \%} không làm tăng gợn của FOC bù, nhưng tổn hao đồng tăng 22 \% vì cần thêm dòng cho cùng mô-men.
+\item \textbf{$\lambda$ +10 \%} làm back-EMF ở 100 vòng/phút lớn hơn, điện áp yêu cầu vượt $V_{dc}/\sqrt3$ và bộ giới hạn tác động. Với giới hạn gốc V0, gợn của FOC bù tăng 3 lần (0,091 N$\cdot$m); với V3, chỉ tăng 1,6 lần (0,047 N$\cdot$m). Đây là thêm một lý do dùng V3 (mục 9.8).
+\end{itemize}
+
+\subsection{Cảm biến vị trí}\label{sec:10.4}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.45\textheight,keepaspectratio]{fig10_2_encoder.png}
+\caption{Ảnh hưởng của lệch góc encoder tại 100 vòng/phút, 1 N$\cdot$m, nghịch lưu lý tưởng: (a) gợn mô-men RMS; (b) tổn hao đồng.}\label{fig:10.2}
+\end{figure}
+
+
+\begin{table}[H]
+\centering\small
+\caption{Gợn mô-men RMS (N$\cdot$m) với encoder không lý tưởng, 100 vòng/phút, 1 N$\cdot$m, nghịch lưu lý tưởng.}\label{tab:10.5}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xccccc@{}}
+\toprule
+Trường hợp & FOC thường & FOC bù & Six-step & PVC & PVC + bù \\ \midrule
+Lý tưởng & 0,174 & 0,030 & 0,045 & 0,201 & 0,034 \\
+4096 xung/vòng & 0,176 & 0,034 & 0,044 & 0,200 & 0,040 \\
+1024 xung/vòng & 0,166 & 0,046 & 0,044 & 0,189 & 0,054 \\
+256 xung/vòng & 0,165 & 0,116 & 0,165 & 0,169 & 0,132 \\
+Lệch −5$^\circ$ & 0,174 & 0,109 & 0,057 & 0,171 & 0,124 \\
+Lệch +5$^\circ$ & 0,176 & 0,094 & 0,042 & 0,206 & 0,087 \\
+Lệch −10$^\circ$ & 0,172 & 0,171 & 0,207 & 0,133 & 0,187 \\
+Lệch +10$^\circ$ & 0,177 & 0,171 & 0,177 & 0,196 & 0,171 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{Độ phân giải.} Lượng tử hóa góc tạo sai số răng cưa biên độ tới $Q$, tức một nhiễu tần số cao trên dòng đặt định dạng và trên khâu bù back-EMF. FOC bù cần khoảng 4096 xung/vòng để giữ gợn trong 15 \% của giá trị lý tưởng; 1024 xung/vòng làm gợn tăng 55 \%. Six-step không nhạy ở 1024 xung/vòng (sai số chuyển mạch tối đa 2,8$^\circ$ điện), nhưng ở 256 xung/vòng (11,25$^\circ$ điện) sai số chuyển mạch gần bằng lệch 10$^\circ$ và gợn tăng mạnh. Trong thực tế six-step dùng cảm biến Hall với cạnh chuyển mạch chính xác, nên kết quả 256 xung/vòng chỉ có ý nghĩa với FOC.
+\item \textbf{Lệch góc.} FOC bù nhạy nhất: lệch 5$^\circ$ làm gợn tăng 3,1–3,7 lần và lệch 10$^\circ$ đưa gợn về mức FOC thường (0,171 N$\cdot$m). Kết quả này khớp với kiểm tra $\pm$5$^\circ$ ở mục 7.4. Six-step chịu được lệch 5$^\circ$ (0,042–0,057 N$\cdot$m) nhưng không chịu được lệch 10$^\circ$ (0,18–0,21 N$\cdot$m), khớp với quét \texttt{COMM\_SHIFT} ở mục 8.7. FOC thường không nhạy vì vốn đã có gợn lớn; PVC với lệch −10$^\circ$ còn có gợn thấp hơn danh định vì lệch góc làm thay đổi pha của sai lệch (9.9) so với back-EMF, đồng thời tổn hao đồng tăng (Hình~\ref{fig:10.2}b).
+\end{itemize}
+
+Với FOC bù, lệch góc encoder và lệch dạng back-EMF tác động theo cùng một cơ chế \eqref{eq:10.3}: bảng tra được tra sai góc hoặc sai dạng. Vì vậy bước hiệu chỉnh góc (\texttt{TAB\_SHIFT}, mục 6.6) là bắt buộc khi triển khai thực tế.
+
+\subsection{Kết hợp với nghịch lưu không lý tưởng}\label{sec:10.5}
+
+Ở 100 vòng/phút, 36 V, thời gian chết và sụt áp van đưa FOC bù tới gần giới hạn điện áp (mục 9.7–9.8). Khi thêm sai lệch động cơ, các ảnh hưởng chồng lên nhau (Hình~\ref{fig:10.3}c):
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{FOC bù với V0} có gợn 0,11–0,29 N$\cdot$m ở hầu hết các trường hợp, và 0,74 N$\cdot$m (74 \% tải) với $\lambda$ +10 \%: bộ giới hạn gốc gần như mất tác dụng điều khiển khi thiếu điện áp.
+\item \textbf{FOC bù với V3} giữ được 0,049–0,060 N$\cdot$m với sai lệch $R$, $L$ và encoder 1024–4096 xung/vòng, nhưng 0,086–0,096 N$\cdot$m khi lệch dạng back-EMF và 0,10–0,17 N$\cdot$m khi lệch góc.
+\item \textbf{Six-step} có gợn 0,033–0,085 N$\cdot$m ở mọi trường hợp và thấp nhất trong sáu biến thể ở 16/17 trường hợp. Ngoại lệ duy nhất là $\lambda$ −10 \%, khi điện áp dư nhiều hơn và FOC bù V3 đạt 0,032 so với 0,047 N$\cdot$m; với $L$ +20 \%, hai bộ gần bằng nhau (0,049 và 0,048 N$\cdot$m). Nói cách khác, khi nghịch lưu không lý tưởng và động cơ không đúng hoàn toàn như mô hình, six-step là lựa chọn an toàn nhất ở điểm làm việc này.
+\end{itemize}
+
+\subsection{Tổng hợp và lựa chọn bộ điều khiển}\label{sec:10.6}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth,height=0.6\textheight,keepaspectratio]{fig10_3_heatmap.png}
+\caption{Gợn mô-men RMS (N$\cdot$m) của sáu biến thể với mọi trường hợp sai lệch: (a) 100 vòng/phút, 1 N$\cdot$m, nghịch lưu lý tưởng; (b) 30 vòng/phút, 0,5 N$\cdot$m, nghịch lưu lý tưởng; (c) 100 vòng/phút, 1 N$\cdot$m, thời gian chết 2 $\mu$s + sụt áp van 0,8 V. Màu theo thang log.}\label{fig:10.3}
+\end{figure}
+
+Ở 30 vòng/phút (Hình~\ref{fig:10.3}b), mọi ảnh hưởng đều nhỏ hơn nhiều vì nhiễu \eqref{eq:10.3} tỉ lệ với tốc độ: gợn của FOC bù chỉ tăng tối đa 1,6 lần (lệch −10$^\circ$) và mọi biến thể FOC/PVC nằm trong 0,018–0,048 N$\cdot$m. Ngoại lệ là six-step với sai số chuyển mạch lớn (256 xung/vòng, lệch $\pm$10$^\circ$): 0,10–0,13 N$\cdot$m, vì ở tốc độ thấp mô-men nhô lên khi chuyển mạch (mục 8.3) và chuyển mạch sai thời điểm làm tăng thêm.
+
+
+\begin{table}[H]
+\centering\small
+\caption{Khuyến nghị lựa chọn bộ điều khiển cho động cơ BLDC back-EMF hình thang, rút ra từ chương 7–10.}\label{tab:10.6}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.2\linewidth}>{\raggedright\arraybackslash}X@{}}
+\toprule
+Điều kiện & Nên dùng & Ghi chú \\ \midrule
+Dạng back-EMF đo được chính xác (sai lệch đỉnh phẳng < 5$^\circ$), encoder $\ge$ 4096 xung/vòng, góc hiệu chỉnh < 2–3$^\circ$ & FOC bù với giới hạn V3 & Gợn và tổn hao đồng thấp nhất; nhạy với dạng back-EMF và góc \\
+Dạng back-EMF chưa rõ, cảm biến Hall, chi phí thấp & Six-step & Bền vững với dạng back-EMF, thông số và nghịch lưu; cần lắp Hall chính xác trong khoảng $\pm$5$^\circ$ \\
+Gần tốc độ cơ sở, $V_{dc}$ ít dư, nghịch lưu thật & Six-step hoặc FOC bù V3 & Không dùng bộ giới hạn V0 \\
+Tốc độ thấp ($\le$ 30 vòng/phút) & FOC bù hoặc six-step & Sai lệch mô hình ít ảnh hưởng; six-step cần chuyển mạch chính xác \\
+-- & Không khuyến nghị: FOC thường, PVC không bù & Gợn lớn ở mọi trường hợp; PVC không bù tổn hao đồng lớn \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Bộ giới hạn mặc định.} Dựa trên mục 9.8, 9.10 và~\ref{sec:10.3}–\ref{sec:10.5}, từ chương này FOC bù dùng giới hạn lục giác V3 làm mặc định (\texttt{P.vlim = 3} trong \texttt{bldc\_params.m}). Ở các kịch bản S1–S4 với nghịch lưu lý tưởng, thay đổi này hầu như không ảnh hưởng tới gợn mô-men RMS (S2: 0,0303 $\to$ 0,0299 N$\cdot$m) nhưng làm gợn đỉnh–đỉnh ở S2 tăng khoảng 10 \% (0,153 $\to$ 0,169 N$\cdot$m) và giảm vọt lố khi đảo chiều ở S3 (132,4 $\to$ 129,7 vòng/phút). Mọi số liệu ở chương 7–9 được tính với bộ giới hạn gốc V0; để tái lập, chạy \texttt{VLIM = 0; run\_comp\_foc} hoặc dùng tùy chọn \texttt{'Vlim', 0} (mặc định) của các script trong \texttt{Studies/}.
+
+Kết quả cũng chỉ ra yêu cầu cho bước tiếp theo: điểm yếu của FOC bù nằm hoàn toàn ở chỗ nó cần biết chính xác $\mathbf{g}_{dq}(\theta)$. Một bộ ước lượng back-EMF trực tuyến (hoặc một bộ điều khiển cộng hưởng bậc 6 không dựa trên mô hình) có thể giữ ưu điểm của FOC bù mà vẫn bền vững như six-step.
+
+\subsection{Hạn chế}\label{sec:10.7}
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Dạng back-EMF} chỉ thay đổi độ rộng đỉnh phẳng theo mô hình \eqref{eq:10.2} của Simscape; chưa xét back-EMF không đối xứng giữa các pha, sóng hài bậc cao hay bão hòa từ.
+\item \textbf{Mỗi sai lệch được xét riêng}; chưa xét tổ hợp nhiều sai lệch cùng lúc (ví dụ lệch dạng back-EMF cùng lệch góc), cũng chưa xét thông số thay đổi theo nhiệt độ trong khi chạy.
+\item \textbf{Tốc độ đo lý tưởng.} Encoder chỉ ảnh hưởng tới góc; tốc độ được lấy trực tiếp từ mô hình. Với encoder độ phân giải thấp, ước lượng tốc độ từ góc sẽ thêm nhiễu cho vòng tốc độ.
+\item \textbf{Six-step dùng góc encoder} để xác định sector; với cảm biến Hall thật, độ phân giải encoder không ảnh hưởng nhưng sẽ có sai lệch lắp đặt và trễ riêng của Hall.
+\item \textbf{Hai điểm làm việc} (100 và 30 vòng/phút); kết luận ở 100 vòng/phút gắn với việc gần tốc độ cơ sở ở $V_{dc}$ = 36 V.
+\end{enumerate}
+
+\subsection{Tái lập kết quả}\label{sec:10.8}
+
+\begin{Verbatim}
+addpath('03_Simulation/Tests', '03_Simulation/Studies')
+% 1. kiểm tra mô hình mặc định không đổi (180 chỉ tiêu)
+bldc_regression('Scenarios', {'S1','S2','S3','S4'})
+% 2. nghiên cứu độ bền vững (khoảng 15 phút với 8 worker)
+run_robustness()                                          % Bảng 10.2, 10.4, 10.5
+run_robustness('Inverter', 'dt2vf', 'Points', [100 1], ...
+               'File', 'robustness_dt2vf.csv')            % mục 10.5
+% 3. hình fig10_*
+run('04_Results/make_robustness_figures.m')
+\end{Verbatim}
+
+Ví dụ một trường hợp riêng, đặt trước khi chạy mô hình:
+
+\begin{Verbatim}
+P = bldc_set_plant(P, 'flat', 140);
+P = bldc_set_encoder(P, 1024, 5*pi/180);
+\end{Verbatim}
+
+\noindent Các số liệu mô hình tuyến tính ở Bảng~\ref{tab:10.3} được tính từ \eqref{eq:10.2}, \eqref{eq:10.3} với các bảng $g_d$, $g_q$ của \texttt{comp\_foc\_init.m}.
+
+

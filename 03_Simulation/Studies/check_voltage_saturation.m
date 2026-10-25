@@ -67,6 +67,7 @@ end
 function P = setVdc(P, vd)
 P.Vdc = vd; P.Vm = vd/sqrt(3);
 P = bldc_set_inverter(P, 2e-6, [0.8 0.8]);
+P.vlim = 0;                     % original limiter (Table 9.6)
 end
 function logOut(b, name, k)
 if nargin < 3, k = 1; end

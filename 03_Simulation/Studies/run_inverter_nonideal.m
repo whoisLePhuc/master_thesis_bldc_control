@@ -12,12 +12,15 @@ function T = run_inverter_nonideal(varargin)
 %     dt2vf   Td = 2 us,  Vf = [0.8 0.8] V
 %
 %   Options (name-value): 'Controllers' (default: all), 'Scenarios' (default {'S2','S4'}),
+%     'Vlim'         voltage limiter of Compensated FOC, P.vlim (default 0 = original, as in Sec. 9.7-9.9;
+%                    the model default is 3 since Sec. 10)
 %   'Cases' (default all), 'Run' (default true; false = only rebuild the table from saved files).
 %
 %   See also BLDC_SET_INVERTER, BLDC_CONTROLLERS.
 
 ip = inputParser;
 ip.addParameter('Controllers', {});
+ip.addParameter('Vlim', 0);   % Compensated FOC limiter; 0 (original) reproduces the published tables
 ip.addParameter('Scenarios', {'S2', 'S4'});
 ip.addParameter('Cases', {});
 ip.addParameter('Run', true);
@@ -51,6 +54,7 @@ for c = 1:numel(C)
             if opt.Run
                 W = runInit(C(c).init, SCEN);
                 W.P = bldc_set_inverter(W.P, CASES(k).Td, CASES(k).Vf);
+                W.P.vlim = opt.Vlim;                                % limiter of Compensated FOC (BLDC_VLIM)
                 vars = cellfun(@(n) {n, W.(n)}, C(c).vars, 'UniformOutput', false);
                 vars = vertcat(vars{:});
                 [R, ~, tSim] = bldc_run_scenario(C(c).model, W.SC, vars);

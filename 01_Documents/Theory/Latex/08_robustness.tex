@@ -1,0 +1,42 @@
+% !TeX program = xelatex
+% =====================================================================
+%  Tài liệu 08 -- Độ bền vững của các bộ điều khiển
+%  Biên dịch: latexmk 08_robustness.tex   (hoặc xelatex 2 lần)
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+\usepackage{style/foc_style}
+
+\title{\vspace{-1.2cm}\textbf{Độ bền vững của các bộ điều khiển với sai lệch mô hình và cảm biến vị trí}}
+\author{\normalsize Tài liệu 08 -- Bộ tài liệu lý thuyết\\[2pt]
+\small Điều khiển định hướng từ trường cho động cơ BLDC có sức phản điện động hình thang}
+\date{\small Tháng 10 năm 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent Các chương trước so sánh năm bộ điều khiển trên một động cơ có thông số và dạng back-EMF đúng như bộ điều khiển giả định, với cảm biến vị trí lý tưởng. Tài liệu này kiểm tra điều gì xảy ra khi giả định đó sai. Động cơ trong mô hình được cho lệch khỏi thông số danh định: độ rộng đỉnh phẳng của back-EMF 100–140$^\circ$ (bảng tra của bộ điều khiển: 120$^\circ$), từ thông $\pm$10 \%, điện cảm $\pm$20 \%, điện trở +30 \%. Encoder được cho độ phân giải hữu hạn (256–4096 xung/vòng) và lệch góc lắp đặt $\pm$5$^\circ$, $\pm$10$^\circ$ điện. Tổng cộng 306 lượt mô phỏng xác lập, tại 100 vòng/phút, 1 N$\cdot$m và 30 vòng/phút, 0,5 N$\cdot$m, với nghịch lưu lý tưởng và có thời gian chết. FOC bù rất nhạy với dạng back-EMF và góc encoder: lệch đỉnh phẳng 10$^\circ$ làm gợn mô-men RMS tăng 1,9–2,3 lần, lệch 20$^\circ$ tăng 3,6–4,2 lần; lệch góc 5$^\circ$ tăng 3–3,7 lần. Phân tích tuyến tính cho thấy nguyên nhân chính không phải khâu định dạng dòng mà là khâu bù back-EMF theo bảng tra: sai số của bảng tạo một nhiễu điện áp bậc 6 tỉ lệ với tốc độ mà vòng dòng chỉ triệt được một phần. Mô hình này dự báo gợn thấp hơn mô phỏng 10–27 \% ở 100 vòng/phút. Sai lệch $R$, $L$ và từ thông −10 \% hầu như không ảnh hưởng; từ thông +10 \% làm FOC bù chạm giới hạn điện áp ở 100 vòng/phút, gợn tăng 3 lần với bộ giới hạn gốc nhưng chỉ 1,6 lần với giới hạn lục giác (V3). Six-step bền vững nhất: gợn của nó gần như không phụ thuộc dạng back-EMF (trừ đỉnh phẳng hẹp hơn 120$^\circ$), thông số động cơ và phi tuyến nghịch lưu; điểm yếu duy nhất là lệch góc chuyển mạch từ 10$^\circ$ trở lên. Với nghịch lưu có thời gian chết và sụt áp van, six-step có gợn thấp nhất ở 16/17 trường hợp.
+
+\vspace{0.5em}
+\noindent\textbf{Từ khóa:} BLDC; độ bền vững; sai lệch thông số; dạng back-EMF; encoder; FOC bù; six-step; PVC; gợn mô-men.
+\end{abstract}
+
+\seriesbox{8}
+
+\tableofcontents
+\newpage
+
+% ---------------- nội dung ----------------
+\setcounter{section}{9}
+\input{chapters/ch10_robustness}
+
+% ---------------- tài liệu tham khảo ----------------
+\begin{thebibliography}{9}
+\small
+\bibitem{r1} T. M. Jahns and W. L. Soong, "Pulsating torque minimization techniques for permanent magnet AC motor drives -- A review," \emph{IEEE Trans. Ind. Electron.}, vol. 43, no. 2, pp. 321–330, 1996.
+\bibitem{r2} R. Carlson, M. Lajoie-Mazenc, and J. C. dos S. Fagundes, "Analysis of torque ripple due to phase commutation in brushless dc machines," \emph{IEEE Trans. Ind. Appl.}, vol. 28, no. 3, pp. 632–638, 1992.
+\bibitem{r3} R. Krishnan, \emph{Permanent Magnet Synchronous and Brushless DC Motor Drives}. Boca Raton, FL, USA: CRC Press, 2010.
+\bibitem{r4} MathWorks, "Permanent Magnet Synchronous Machine," Simscape Electrical (Specialized Power Systems) documentation, R2023a.
+\end{thebibliography}
+
+\end{document}

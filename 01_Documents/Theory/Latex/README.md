@@ -1,6 +1,6 @@
 # Theory documents – LaTeX sources
 
-LaTeX version of the five theory documents (same content as `../Markdown/`).
+LaTeX version of the theory documents (same content as `../Markdown/`).
 Figures are shared with the Markdown version and taken from `../../Thesis/figures/`
 (draw.io exports, Simulink screenshots, MATLAB plots).
 
@@ -15,7 +15,8 @@ Latex/
 │   ├── ch6_compensated_foc.tex  # Chapter 6 (incl. 6.7 Simulink model)
 │   ├── ch7_simulation_results.tex # Chapter 7 (results, tables/figures from 04_Results/make_results.m)
 │   ├── ch8_six_step.tex         # Chapter 8 (six-step, comparison of three controllers)
-│   └── ch9_pseudo_vector_control.tex # Chapter 9 (pseudo vector control)
+│   ├── ch9_pseudo_vector_control.tex # Chapter 9 (pseudo vector control)
+│   └── ch10_robustness.tex      # Chapter 10 (robustness to motor mismatch and position-sensor errors)
 ├── 01_BLDC_model.tex            # main files: title, abstract, TOC, symbols, chapters, references
 ├── 02_dq_model.tex
 ├── 03_FOC_conventional.tex
@@ -23,6 +24,7 @@ Latex/
 ├── 05_simulation_results.tex
 ├── 06_six_step.tex
 ├── 07_pseudo_vector_control.tex
+├── 08_robustness.tex
 ├── latexmkrc                    # XeLaTeX, auxiliary files in build/
 ├── build.sh / build.bat         # build all documents and copy PDFs to ../PDF/
 └── build/                       # (generated, not tracked)

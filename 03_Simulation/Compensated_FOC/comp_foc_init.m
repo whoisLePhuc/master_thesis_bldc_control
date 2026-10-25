@@ -10,6 +10,7 @@
 %     >> SCEN = 'S3'; comp_foc_init;     % then run the model
 %     >> run_comp_foc                    % run S1-S4 and save results
 %
+%  Optional input: VLIM (voltage limiter, see Common/bldc_vlim.m; default P.vlim of bldc_params = 3)
 %  Variables created in the workspace: P, TAB, SC, SCEN, sc_name, THETA_OFF, TAB_SHIFT, DECIM, RPM
 
 addpath(fullfile(fileparts(which('comp_foc_init')), '..', 'Common'));
@@ -33,6 +34,9 @@ end
 
 % ---------------- common parameters ----------------
 P = bldc_params();
+% voltage limiter: P.vlim = 3 (inverter hexagon) by default since Sec. 10; the results of
+% Sec. 7-9 were computed with the original limiter: VLIM = 0; run_comp_foc reproduces them
+if exist('VLIM', 'var'), P.vlim = VLIM; end
 
 % ---------------- digital-delay compensation ----------------
 P.Td_ff = 1.5*P.Ts;            % back-EMF feedforward: theta_p = theta_e + 1.5*Ts*we
@@ -56,5 +60,5 @@ clear fa_ fb_ fc_ fal_ fbe_
 % ---------------- scenario ----------------
 [SC, sc_name] = bldc_scenario(SCEN);
 
-fprintf('[comp_foc_init] %s: %s (T = %.2f s) | THETA_OFF = %.4f rad, TAB_SHIFT = %.4f rad\n', ...
-        SCEN, sc_name, SC.T, THETA_OFF, TAB_SHIFT);
+fprintf('[comp_foc_init] %s: %s (T = %.2f s) | THETA_OFF = %.4f rad, TAB_SHIFT = %.4f rad | vlim = %d\n', ...
+        SCEN, sc_name, SC.T, THETA_OFF, TAB_SHIFT, P.vlim);

@@ -13,6 +13,8 @@ function T = run_sensor_error(varargin)
 %   fe and 2*fe torque components (N.m), Ia_dc = mean of the true phase-a current (A).
 %
 %   Options (name-value):
+%     'Vlim'         voltage limiter of Compensated FOC, P.vlim (default 0 = original, as in Sec. 9.7-9.9;
+%                    the model default is 3 since Sec. 10)
 %     'Controllers'  tags (default: all registered)
 %     'Points'       [rpm N.m] rows (default [100 1; 30 0.5])
 %     'Cases'        sensor cases (default all): ideal, offA3, offA2, gainB3, gainB2
@@ -28,6 +30,7 @@ function T = run_sensor_error(varargin)
 
 ip = inputParser;
 ip.addParameter('Controllers', {});
+ip.addParameter('Vlim', 0);   % Compensated FOC limiter; 0 (original) reproduces the published tables
 ip.addParameter('Points', [100 1; 30 0.5]);
 ip.addParameter('Cases', {'ideal', 'offA3', 'offA2', 'gainB3', 'gainB2'});
 ip.addParameter('Offset', 0.03);
@@ -68,6 +71,7 @@ for c = 1:numel(C)
         for k = 1:numel(SENS)
             W = W0; W.SC = SC;
             W.P = bldc_set_inverter(W.P, INV.Td, INV.Vf);
+            W.P.vlim = opt.Vlim;                                % limiter of Compensated FOC (BLDC_VLIM)
             W.P = bldc_set_sensor(W.P, SENS(k).off, SENS(k).gain, SENS(k).n);
             vars = cellfun(@(v) {v, W.(v)}, C(c).vars, 'UniformOutput', false);
             in(end+1) = bldc_sim_input(C(c).model, SC, vertcat(vars{:})); %#ok<AGROW>

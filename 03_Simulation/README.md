@@ -9,7 +9,7 @@ and the same test scenarios S1–S4, so that results are directly comparable.
 | Folder | Controller | Theory |
 |---|---|---|
 | `Conventional_FOC/` | Two PI current controllers + cross-coupling + constant fundamental back-EMF compensation (ω_e λ_1) | Sec. 5, Fig. 5.1 |
-| `Compensated_FOC/` | Conventional FOC + angle-based back-EMF compensation (LUT g_d, g_q), digital-delay compensation (θ_p, θ_a) and i_q current shaping (k_s); options: voltage limiter `P.vlim`, field weakening `P.FW` (both off by default) | Sec. 6, Fig. 6.2; Sec. 9.8, 9.10 |
+| `Compensated_FOC/` | Conventional FOC + angle-based back-EMF compensation (LUT g_d, g_q), digital-delay compensation (θ_p, θ_a) and i_q current shaping (k_s); options: voltage limiter `P.vlim` (default 3 = inverter hexagon since Sec. 10; 0 = original, used up to Sec. 9), field weakening `P.FW` (off by default) | Sec. 6, Fig. 6.2; Sec. 9.8, 9.10, 10 |
 | `Six_Step/` | 120° six-step: Hall sectors (from the encoder angle), PI on the two-phase current I = ½·sᵀi_abc, back-EMF feed-forward 2λω_e, H_PWM–L_ON | Sec. 8, Fig. 8.2 |
 | `PVC/` | Pseudo vector control (US 7,339,346): vector-control current references (power-balance i_q*, field-weakening i_d*) → i_abc*, three phase PI controllers; variant with phase back-EMF feedforward (`PVC_FF = 1`) | Sec. 9, Fig. 9.1 |
 
@@ -36,10 +36,12 @@ Common/                    # shared by every controller -- edit here only
 ├── bldc_set_inverter.m    # P = bldc_set_inverter(P, Td, Vf): dead time and device forward voltages (default off)
 ├── bldc_set_sensor.m      # P = bldc_set_sensor(P, off, gain, nsens): current-sensor offsets/gains, 2 or 3 sensors (default ideal)
 ├── bldc_vlim.m            # voltage limiter of the d-q current loop, P.vlim = 0..3 (VLim block of Compensated FOC)
+├── bldc_set_plant.m       # P = bldc_set_plant(P, 'lam', 1.1, 'flat', 140, ...): motor mismatch (R, L, lam, back-EMF flat top), default nominal
+├── bldc_set_encoder.m     # P = bldc_set_encoder(P, N, off_e): encoder resolution and mounting offset, default ideal
 ├── bldc_sim_input.m       # SimulationInput for one scenario (used by bldc_run_scenario and parsim studies)
 ├── bldc_collect.m         # collect the outputs of one run (struct R)
 ├── bldc_ss_indicators.m   # steady-state indicators in a window (ripple, 6th harmonic, THD, I_rms, P_Cu)
-└── bldc_plant_lib.slx     # Simulink library: Power Stage, PWM (with optional dead time), SVPWM, abc_to_dq, Current Sensor
+└── bldc_plant_lib.slx     # Simulink library: Power Stage, PWM (with optional dead time), SVPWM, abc_to_dq, Current Sensor, Position Sensor
 
 Conventional_FOC/
 ├── Conventional_FOC.slx   # model (powergui discrete 1 us); plant blocks are links to bldc_plant_lib
@@ -70,7 +72,8 @@ Studies/
 ├── run_voltage_limit.m      # Compensated FOC with limiters P.vlim = 0..3 vs PVC + ff (parsim) -> voltage_limit.csv
 ├── run_sensor_error.m       # all controllers with current-sensor offset/gain errors (parsim) -> sensor_error*.csv
 ├── check_zero_sequence.m    # zero-sequence wind-up of the PVC phase PIs with a sensor offset -> Raw/zero_sequence_drift.mat
-└── run_high_speed.m         # scenario S5 (above base speed), field-weakening variants -> high_speed.csv
+├── run_high_speed.m         # scenario S5 (above base speed), field-weakening variants -> high_speed.csv
+└── run_robustness.m         # all controllers with motor mismatch / encoder errors (parsim) -> robustness*.csv
 
 Tests/
 ├── bldc_controllers.m     # registry of implemented controllers (model, folder, init script, variables)
